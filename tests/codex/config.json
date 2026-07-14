@@ -1,0 +1,6 @@
+{
+  "harness": "codex",
+  "selector": "gopher@alvadorncorp",
+  "requires_local_install": true,
+  "runner": "python3 tests/run_forward_tests.py --harness codex"
+}

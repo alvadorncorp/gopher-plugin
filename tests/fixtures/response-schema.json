@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "type": "object",
+  "required": ["selected_skill"],
+  "properties": {
+    "selected_skill": {"type": "string"}, "primary_owner": {"type": ["string", "null"]},
+    "status": {"type": "string"}, "decision": {"type": "string"},
+    "go_mapping": {"type": ["string", "null"]},
+    "selected_lenses": {"type": "array", "items": {"type": "string"}},
+    "needs_confirmation": {"type": "boolean"}, "verdict": {"type": "string"},
+    "authorization_gate": {"type": "string"}, "handoff": {"type": ["string", "null"]}
+  },
+  "additionalProperties": true
+}

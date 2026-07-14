@@ -1,0 +1,20 @@
+{
+  "name": "alvadorncorp",
+  "interface": {
+    "displayName": "Alvadorncorp"
+  },
+  "plugins": [
+    {
+      "name": "gopher",
+      "source": {
+        "source": "local",
+        "path": "./plugins/gopher"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}

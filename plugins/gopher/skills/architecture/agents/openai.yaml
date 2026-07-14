@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Architecture"
+  short_description: "Shape Go packages and public contracts"
+  default_prompt: "Use $architecture to assess this Go package or public-contract change before editing."

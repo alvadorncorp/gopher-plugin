@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "gopher",
+  "displayName": "Gopher",
+  "version": "0.1.0",
+  "description": "Evidence-driven Go engineering workflows for design, implementation, diagnosis, security, and multi-lens review.",
+  "author": {
+    "name": "Alvadorncorp"
+  },
+  "license": "MIT",
+  "keywords": [
+    "go",
+    "golang",
+    "architecture",
+    "security",
+    "code-review"
+  ]
+}
