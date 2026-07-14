@@ -1,0 +1,86 @@
+{
+  "marketplace_name": "alvadorncorp",
+  "plugin_name": "gopher",
+  "plugin_version": "0.1.0",
+  "skills": {
+    "design-patterns": [
+      "references/behavior.md",
+      "references/composition.md",
+      "references/construction.md",
+      "references/diagnostics.md",
+      "references/state-traversal.md",
+      "references/values-errors.md"
+    ],
+    "application-architecture": [
+      "references/anti-patterns.md",
+      "references/boundaries.md",
+      "references/dependency-direction.md",
+      "references/migration.md",
+      "references/styles.md",
+      "references/validation.md"
+    ],
+    "developer": [
+      "references/api-errors-values.md",
+      "references/construction-options.md",
+      "references/idioms.md",
+      "references/pattern-mappings.md",
+      "references/project-detection.md",
+      "references/testing.md",
+      "references/tooling.md"
+    ],
+    "architecture": [
+      "references/architecture-tests.md",
+      "references/interfaces-seams.md",
+      "references/migrations.md",
+      "references/modules-workspaces.md",
+      "references/packages-internal.md",
+      "references/pattern-mappings.md",
+      "references/public-api.md"
+    ],
+    "concurrency-performance": [
+      "references/benchmarking.md",
+      "references/channels-synchronization.md",
+      "references/context-cancellation.md",
+      "references/diagnostics.md",
+      "references/goroutine-lifetime.md",
+      "references/pattern-mappings.md",
+      "references/profiling.md"
+    ],
+    "diagnose": [
+      "references/evidence-bundle.md",
+      "references/heuristic.md",
+      "references/signal-router.md"
+    ],
+    "security": [
+      "references/data-flow.md",
+      "references/finding-format.md",
+      "references/go-risk-catalog.md",
+      "references/sources.md",
+      "references/threat-model.md",
+      "references/tooling.md"
+    ],
+    "review": [
+      "references/consolidation.md",
+      "references/controller.md",
+      "references/harnesses/claude.md",
+      "references/harnesses/codex.md",
+      "references/lenses/architecture.md",
+      "references/lenses/concurrency-performance.md",
+      "references/lenses/correctness.md",
+      "references/lenses/security.md",
+      "references/lenses/tests.md",
+      "references/severity.md"
+    ]
+  },
+  "review_lenses": [
+    "architecture",
+    "concurrency-performance",
+    "correctness",
+    "security",
+    "tests"
+  ],
+  "review_harnesses": [
+    "claude",
+    "codex"
+  ]
+}
