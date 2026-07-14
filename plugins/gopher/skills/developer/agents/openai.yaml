@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Developer"
+  short_description: "Build and maintain idiomatic Go code"
+  default_prompt: "Use $developer to implement this local Go change with project-aware validation."
