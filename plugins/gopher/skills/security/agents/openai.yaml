@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Security"
+  short_description: "Threat-model and secure Go applications"
+  default_prompt: "Use $security to assess this Go security concern from trust boundaries and reachability evidence."
