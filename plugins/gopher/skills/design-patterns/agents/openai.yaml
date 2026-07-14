@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Patterns"
+  short_description: "Select patterns from evidence and forces"
+  default_prompt: "Use $design-patterns to compare patterns for this design and include the direct baseline."

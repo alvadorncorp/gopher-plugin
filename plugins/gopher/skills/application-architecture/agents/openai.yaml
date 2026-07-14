@@ -1,0 +1,4 @@
+interface:
+  display_name: "Application Architecture"
+  short_description: "Design internal application boundaries"
+  default_prompt: "Use $application-architecture to compare internal application boundaries and migration options."
