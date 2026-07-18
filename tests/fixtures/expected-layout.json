@@ -100,6 +100,15 @@
       "references/project-contract.md",
       "references/sources.md",
       "references/tooling.md"
+    ],
+    "refactor": [
+      "references/baseline.md",
+      "references/controller.md",
+      "references/handoffs.md",
+      "references/harnesses/claude.md",
+      "references/harnesses/codex.md",
+      "references/prioritization.md",
+      "references/reports.md"
     ]
   },
   "review_lenses": [
