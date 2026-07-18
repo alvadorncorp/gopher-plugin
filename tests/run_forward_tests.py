@@ -42,7 +42,7 @@ def validate_corpus(payload):
     if duplicates:
         errors.append(f"duplicate case ids: {duplicates}")
     selected_skills = {case.get("expected", {}).get("selected_skill") for case in cases}
-    required = {"gopher:design-patterns", "gopher:application-architecture", "gopher:developer", "gopher:architecture", "gopher:concurrency-performance", "gopher:diagnose", "gopher:security", "gopher:review"}
+    required = {"gopher:design-patterns", "gopher:application-architecture", "gopher:developer", "gopher:architecture", "gopher:concurrency-performance", "gopher:diagnose", "gopher:security", "gopher:review", "gopher:config", "gopher:complexity", "gopher:test-quality", "gopher:modernize", "gopher:refactor"}
     if not required.issubset(selected_skills):
         errors.append(f"routing coverage missing skills: {sorted(required - selected_skills)}")
     return errors
