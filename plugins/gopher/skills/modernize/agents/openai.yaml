@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Modernize"
+  short_description: "Modernize Go language, modules, and toolchain"
+  default_prompt: "Use $modernize to preview declared-version-safe modernization for this Go module."

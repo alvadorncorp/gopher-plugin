@@ -92,6 +92,14 @@
       "references/refactoring-safety.md",
       "references/sources.md",
       "references/tooling.md"
+    ],
+    "modernize": [
+      "references/language-apis.md",
+      "references/migration.md",
+      "references/modules-toolchain.md",
+      "references/project-contract.md",
+      "references/sources.md",
+      "references/tooling.md"
     ]
   },
   "review_lenses": [
