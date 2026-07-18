@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Complexity"
+  short_description: "Measure and reduce Go complexity hotspots"
+  default_prompt: "Use $complexity to measure and rank complexity hotspots in this Go scope."

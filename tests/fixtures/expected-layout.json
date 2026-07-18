@@ -76,6 +76,14 @@
       "references/explain.md",
       "references/schema.md",
       "references/validation.md"
+    ],
+    "complexity": [
+      "references/hotspots.md",
+      "references/metrics.md",
+      "references/refactoring.md",
+      "references/sources.md",
+      "references/tooling.md",
+      "references/trends-ci.md"
     ]
   },
   "review_lenses": [
