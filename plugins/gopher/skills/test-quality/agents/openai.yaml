@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Test Quality"
+  short_description: "Analyze Go coverage, effectiveness, and mutation"
+  default_prompt: "Use $test-quality to analyze coverage and test effectiveness for this Go scope."

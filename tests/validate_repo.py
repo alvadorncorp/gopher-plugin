@@ -157,8 +157,11 @@ def validate_repository() -> list[str]:
             )
         reference_count += len(actual_refs)
 
-    if reference_count != 52:
-        errors.append(f"expected 52 references, found {reference_count}")
+    expected_reference_total = sum(len(refs) for refs in expected["skills"].values())
+    if reference_count != expected_reference_total:
+        errors.append(
+            f"expected {expected_reference_total} references, found {reference_count}"
+        )
 
     for path in PLUGIN.rglob("*"):
         if path.is_symlink():
@@ -218,9 +221,12 @@ def main() -> int:
         for error in errors:
             print(f"- {error}")
         return 1
+    expected = load_json(FIXTURE)
+    skill_count = len(expected["skills"])
+    reference_total = sum(len(refs) for refs in expected["skills"].values())
     print(
-        "Repository validation passed (8 skills, 52 references, "
-        "2 manifests, 2 marketplaces)."
+        f"Repository validation passed ({skill_count} skills, "
+        f"{reference_total} references, 2 manifests, 2 marketplaces)."
     )
     return 0
 

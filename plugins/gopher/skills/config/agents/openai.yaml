@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Config"
+  short_description: "Manage the .gopher-plugin.toml project contract"
+  default_prompt: "Use $config --bootstrap to create or edit the Gopher project configuration."

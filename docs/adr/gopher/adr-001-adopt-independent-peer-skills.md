@@ -117,3 +117,5 @@ explicitly selected lenses.
 ---
 
 *References: `.plans/gopher-plugin/design.md` and `.plans/gopher-plugin/interview.md` (planning sources ignored by Git)*
+
+*Amended by `adr:gopher:002` — permits `gopher:refactor` as a second bounded orchestrator.*

@@ -1,0 +1,34 @@
+[gopher]
+schema_version = 1
+
+[project]
+module_roots = []
+package_patterns = ["./..."]
+
+[complexity]
+mode = "advisory"
+cyclomatic_max = 15
+cognitive_max = 20
+maintainability_min = 20
+function_lines_max = 60
+file_lines_max = 500
+
+[test-quality]
+coverage_target = 80
+coverage_regression_max = 0
+mutation_mode = "advisory"
+mutation_target = 75
+
+[modernize]
+target_go = "declared"
+apply_fixes = false
+dependency_updates = "none"
+
+[refactor]
+require_passing_baseline = true
+require_behavior_tests = true
+
+[tools]
+complexity = "auto"
+mutation = "auto"
+modernize = "auto"

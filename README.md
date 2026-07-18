@@ -3,7 +3,9 @@
 Gopher is an evidence-driven Go engineering plugin for Codex and Claude. One
 physical skill tree provides pattern decisions, application architecture,
 routine Go development, package architecture, concurrency/performance diagnosis,
-security workflows, symptom attribution, and read-only multi-lens review.
+security workflows, symptom attribution, read-only multi-lens review, project
+configuration, complexity management, test quality, modernization, and
+repository-wide refactoring orchestration.
 
 ## Package layout
 
@@ -13,7 +15,7 @@ security workflows, symptom attribution, and read-only multi-lens review.
 - Shared skills: `plugins/gopher/skills/`
 - Structural and forward tests: `tests/`
 
-Version `0.1.0` intentionally ships no hooks, MCP servers, apps, LSP servers,
+Version `0.2.0` intentionally ships no hooks, MCP servers, apps, LSP servers,
 or visual assets.
 
 ## Skills and ownership
@@ -28,6 +30,11 @@ or visual assets.
 | `diagnose` | Evidence-driven attribution of vague Go symptoms |
 | `security` | Go threat modeling, reachability, safe verification, and remediation |
 | `review` | Read-only exact-mode review fan-out, consolidation, and verdict |
+| `config` | The `.gopher-plugin.toml` project contract: bootstrap, validation, explanation, and schema evolution |
+| `complexity` | Cyclomatic/cognitive complexity, hotspots, reduction plans, and complexity CI policy |
+| `test-quality` | Coverage, mutation, test effectiveness, and refactoring safety nets |
+| `modernize` | Declared-version-aware Go language, API, module, dependency, and toolchain modernization |
+| `refactor` | Repository-wide or multidimensional refactoring orchestration, sequencing, and evidence |
 
 Each request has one primary owner. Skills exchange stable `gopher:<skill>` and
 `pattern.*`/`go.*` identifiers through textual handoffs; no skill depends on a

@@ -7,4 +7,6 @@ missing essential coverage, nondeterminism, and inappropriate mocks.
 
 Recommend race, fuzz, benchmark, or integration coverage only when the changed
 risk justifies it. A missing essential test is `important`; optional confidence
-or maintainability coverage is `minor`. Route fixes to the implementation owner.
+or maintainability coverage is `minor`. Route behavior fixes to
+`gopher:developer` and coverage or safety-net improvements to
+`gopher:test-quality`.

@@ -5,7 +5,7 @@ context: gopher
 title: Package Go engineering workflows for Codex and Claude
 status: Accepted
 tags: [go, codex, claude, skills, marketplace]
-related: [adr:gopher:001]
+related: [adr:gopher:001, adr:gopher:002]
 date: 2026-07-14
 ---
 # SDD: Package Go engineering workflows for Codex and Claude
@@ -23,16 +23,19 @@ and `adr:gopher:001`.
 
 ## Solution Overview
 
-Publish marketplace `alvadorncorp` with plugin `gopher` version `0.1.0`.
+Publish marketplace `alvadorncorp` with plugin `gopher` version `0.2.0`.
 Codex and Claude receive native manifests while loading the same physical tree
-at `plugins/gopher/skills/`. Eight peer skills have canonical ownership and a
-textual decision and handoff contract.
+at `plugins/gopher/skills/`. Thirteen peer skills have canonical ownership and a
+textual decision and handoff contract. A `.gopher-plugin.toml` project contract,
+owned by `gopher:config`, carries thresholds, tool policy, and refactoring
+safeguards for the quality workflows.
 
 ## Architecture
 
-- **Components:** Codex/Claude marketplaces; plugin manifests; eight skills
+- **Components:** Codex/Claude marketplaces; plugin manifests; thirteen skills
   (`design-patterns`, `application-architecture`, `developer`, `architecture`,
-  `concurrency-performance`, `diagnose`, `security`, `review`); references;
+  `concurrency-performance`, `diagnose`, `security`, `review`, `config`,
+  `complexity`, `test-quality`, `modernize`, `refactor`); references;
   validators; cross-harness corpus.
 - **Data:** versioned Markdown, YAML, and JSON only. No database, production
   state, generated copies, or symlinks.
@@ -54,6 +57,11 @@ textual decision and handoff contract.
 | `diagnose` | evidence-based attribution without solution or editing |
 | `security` | threats, reachability, safe verification, and remediation |
 | `review` | read-only lens review, consolidation, and verdict |
+| `config` | `.gopher-plugin.toml` bootstrap, validation, explanation, and schema evolution |
+| `complexity` | complexity measurement, hotspots, reduction, trends, and CI guidance |
+| `test-quality` | coverage, mutation, test effectiveness, and refactoring safety nets |
+| `modernize` | declared-version Go language, API, module, dependency, and toolchain modernization |
+| `refactor` | repository-wide or multidimensional refactoring orchestration and evidence |
 
 Explicitly requested local and reversible changes may proceed. Cross-package,
 public-contract, boundary, persistence, security-boundary, or ADR-affecting
@@ -79,10 +87,11 @@ changes require evidence, alternatives, and explicit approval before editing.
 ## Key Decisions
 
 - Use independent peer skills — recorded in `adr:gopher:001`.
+- Permit `gopher:refactor` as a second bounded orchestrator — recorded in `adr:gopher:002`.
 - Use one physical tree and two marketplace/manifest formats.
 - Use the project's declared Go version; use the current baseline only for a new project.
 - Keep `review` read-only with exact selection across five lenses.
-- Keep hooks, MCP, apps, LSP, and assets outside version `0.1.0`.
+- Keep hooks, MCP, apps, LSP, and assets outside version `0.2.0`.
 
 ## Risks and Trade-offs
 
@@ -96,6 +105,7 @@ changes require evidence, alternatives, and explicit approval before editing.
 
 - Phase 1: packaging, eight skills, references, and structural validation.
 - Phase 2: cross-harness forward tests and Rashomon corrections.
+- Phase 3: five new peers (`config`, `complexity`, `test-quality`, `modernize`, `refactor`), the `.gopher-plugin.toml` contract, and `adr:gopher:002` — version `0.2.0`.
 - After a real non-Go consumer exists: evaluate extracting `design-patterns`
   and `application-architecture` without changing handoff identifiers.
 - After every stable Go release and at least quarterly: review

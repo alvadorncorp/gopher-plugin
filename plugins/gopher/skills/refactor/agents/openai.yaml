@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Refactor Orchestrator"
+  short_description: "Coordinate repository-wide multidimensional Go refactoring"
+  default_prompt: "Use $refactor to orchestrate a baseline-guarded multidimensional refactor across this repository."

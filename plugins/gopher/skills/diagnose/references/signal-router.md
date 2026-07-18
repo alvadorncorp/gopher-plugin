@@ -9,6 +9,11 @@
 | Language-agnostic internal application boundary or dependency direction | `gopher:application-architecture` |
 | Threat, trust boundary, exploit path, vulnerable dependency/symbol, or security control | `gopher:security` |
 | Diff/PR review intent rather than diagnosis | `gopher:review` |
+| Project configuration bootstrap, validation, or explanation | `gopher:config` |
+| Cyclomatic/cognitive complexity, hotspots, or complexity thresholds | `gopher:complexity` |
+| Coverage, mutation score, or whether tests detect behavioral faults | `gopher:test-quality` |
+| Go version, API, module, dependency, or toolchain modernization | `gopher:modernize` |
+| Repository-wide or multidimensional remediation across two or more dimensions | `gopher:refactor` |
 
 Mixed symptoms still receive one owner: choose the domain whose risk and
 evidence explain the observed failure. Put secondary constraints in `handoff`

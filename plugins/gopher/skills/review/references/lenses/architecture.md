@@ -8,4 +8,6 @@ unnecessary boundary growth.
 
 Folder preference without a demonstrated risk is not a finding. Route structural
 fixes to `gopher:architecture` and conceptual application-boundary questions to
-`gopher:application-architecture`.
+`gopher:application-architecture`. Hand public-API or module-topology
+modernization findings to `gopher:modernize`, which routes contract-changing
+work back to `gopher:architecture`.

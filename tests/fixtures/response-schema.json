@@ -8,7 +8,10 @@
     "go_mapping": {"type": ["string", "null"]},
     "selected_lenses": {"type": "array", "items": {"type": "string"}},
     "needs_confirmation": {"type": "boolean"}, "verdict": {"type": "string"},
-    "authorization_gate": {"type": "string"}, "handoff": {"type": ["string", "null"]}
+    "authorization_gate": {"type": "string"}, "handoff": {"type": ["string", "null"]},
+    "config_mode": {"type": "string"}, "config_status": {"type": "string"},
+    "selected_dimensions": {"type": "array", "items": {"type": "string"}},
+    "baseline_status": {"type": "string"}
   },
   "additionalProperties": true
 }

@@ -7,6 +7,8 @@ callers affected by signature or behavior changes.
 
 Report only concrete failure scenarios with file:line evidence. Route local
 fixes to `gopher:developer` and package/public-contract fixes to
-`gopher:architecture`. Keep test-quality, security, architecture style, and
+`gopher:architecture`. Route test-effectiveness findings to
+`gopher:test-quality`, complexity findings to `gopher:complexity`, and
+modernization findings to `gopher:modernize`. Keep test-quality, security, architecture style, and
 performance claims in their selected lenses unless they directly cause the
 correctness failure.

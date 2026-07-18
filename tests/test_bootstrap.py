@@ -30,7 +30,7 @@ class BootstrapPackageTest(unittest.TestCase):
         for key in ("name", "version", "description", "author"):
             self.assertEqual(codex_plugin[key], claude_plugin[key])
         self.assertEqual("gopher", codex_plugin["name"])
-        self.assertEqual("0.1.0", codex_plugin["version"])
+        self.assertEqual("0.2.0", codex_plugin["version"])
         self.assertTrue((PLUGIN / "skills").is_dir())
 
     def test_v1_declares_no_optional_runtime_components(self):

@@ -1,7 +1,7 @@
 {
   "marketplace_name": "alvadorncorp",
   "plugin_name": "gopher",
-  "plugin_version": "0.1.0",
+  "plugin_version": "0.2.0",
   "skills": {
     "design-patterns": [
       "references/behavior.md",
@@ -25,6 +25,7 @@
       "references/idioms.md",
       "references/pattern-mappings.md",
       "references/project-detection.md",
+      "references/refactoring.md",
       "references/testing.md",
       "references/tooling.md"
     ],
@@ -70,6 +71,45 @@
       "references/lenses/security.md",
       "references/lenses/tests.md",
       "references/severity.md"
+    ],
+    "config": [
+      "references/bootstrap.md",
+      "references/explain.md",
+      "references/schema.md",
+      "references/validation.md"
+    ],
+    "complexity": [
+      "references/hotspots.md",
+      "references/metrics.md",
+      "references/refactoring.md",
+      "references/sources.md",
+      "references/tooling.md",
+      "references/trends-ci.md"
+    ],
+    "test-quality": [
+      "references/coverage.md",
+      "references/effectiveness.md",
+      "references/mutation.md",
+      "references/refactoring-safety.md",
+      "references/sources.md",
+      "references/tooling.md"
+    ],
+    "modernize": [
+      "references/language-apis.md",
+      "references/migration.md",
+      "references/modules-toolchain.md",
+      "references/project-contract.md",
+      "references/sources.md",
+      "references/tooling.md"
+    ],
+    "refactor": [
+      "references/baseline.md",
+      "references/controller.md",
+      "references/handoffs.md",
+      "references/harnesses/claude.md",
+      "references/harnesses/codex.md",
+      "references/prioritization.md",
+      "references/reports.md"
     ]
   },
   "review_lenses": [
