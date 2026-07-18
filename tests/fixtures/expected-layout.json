@@ -70,6 +70,12 @@
       "references/lenses/security.md",
       "references/lenses/tests.md",
       "references/severity.md"
+    ],
+    "config": [
+      "references/bootstrap.md",
+      "references/explain.md",
+      "references/schema.md",
+      "references/validation.md"
     ]
   },
   "review_lenses": [
