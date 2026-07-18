@@ -16,6 +16,10 @@ goroutine/synchronization/memory/performance work to
 `gopher:concurrency-performance`, explicit security work to `gopher:security`,
 and unknown symptoms to `gopher:diagnose`.
 
+Route repository-wide or multidimensional refactoring to `gopher:refactor`.
+Route complexity, test-quality, or modernization work that is not a purely local
+edit to `gopher:complexity`, `gopher:test-quality`, or `gopher:modernize`.
+
 ## Workflow
 
 1. Detect the project contract using `references/project-detection.md`.
@@ -25,9 +29,12 @@ and unknown symptoms to `gopher:diagnose`.
 4. Prefer direct code, concrete types, functions, and useful zero values.
 5. When a `pattern.*` handoff exists, load `references/pattern-mappings.md` and
    accept, adapt, or veto it with Go-specific evidence.
-6. Implement the smallest cohesive change and behavior-focused tests.
-7. Format and validate proportionally using existing project commands.
-8. Report files, behavior, validation, limitations, and any handoff.
+6. For a local reversible refactor, load `references/refactoring.md` and follow
+   its FOCUSED workflow; hand multidimensional or repository-wide work to
+   `gopher:refactor`.
+7. Implement the smallest cohesive change and behavior-focused tests.
+8. Format and validate proportionally using existing project commands.
+9. Report files, behavior, validation, limitations, and any handoff.
 
 ## Output format
 
@@ -70,3 +77,4 @@ tools may run locally; installing tools or probing production requires approval.
 - `references/testing.md` — Go-specific behavioral test guidance.
 - `references/tooling.md` — proportional validation ladder.
 - `references/pattern-mappings.md` — canonical general-to-Go mappings.
+- `references/refactoring.md` — local reversible refactor workflow and outward routing.

@@ -16,6 +16,9 @@ Route local implementation to `gopher:developer`, runtime synchronization and
 performance to `gopher:concurrency-performance`, and explicit security analysis
 to `gopher:security`.
 
+Receive public-API and module-topology modernization from `gopher:modernize`;
+contract-changing modernization remains owned here.
+
 ## Workflow
 
 1. Detect module, workspace, Go version, packages, imports, public consumers,

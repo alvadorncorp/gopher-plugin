@@ -8,8 +8,10 @@ description: Reviews Go diffs read-only through explicit correctness, tests, sec
 ## Context and ownership
 
 Own read-only review fan-out, deterministic consolidation, narrow adjudication,
-and verdict. Primary owner: `gopher:review`. This is the only bounded
-orchestrator in Gopher and is not an entry point for routine development.
+and verdict. Primary owner: `gopher:review`. This is the sole read-only bounded
+orchestrator in Gopher — repository-wide or multidimensional refactoring is the
+separate bounded orchestrator `gopher:refactor` — and is not an entry point for
+routine development.
 
 ## Modes
 
