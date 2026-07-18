@@ -84,6 +84,14 @@
       "references/sources.md",
       "references/tooling.md",
       "references/trends-ci.md"
+    ],
+    "test-quality": [
+      "references/coverage.md",
+      "references/effectiveness.md",
+      "references/mutation.md",
+      "references/refactoring-safety.md",
+      "references/sources.md",
+      "references/tooling.md"
     ]
   },
   "review_lenses": [
