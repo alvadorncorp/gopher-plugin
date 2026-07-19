@@ -1,2 +1,4 @@
 .plans
 .worktrees
+.lessons
+**/__pycache__/**
