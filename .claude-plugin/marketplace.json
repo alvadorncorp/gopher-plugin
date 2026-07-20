@@ -9,7 +9,7 @@
       "name": "gopher",
       "source": "./plugins/gopher",
       "description": "Evidence-driven Go engineering workflows for design, implementation, diagnosis, security, and multi-lens review.",
-      "version": "0.2.0",
+      "version": "0.2.1",
       "author": {
         "name": "Igor Sant'Ana @ Alvadorn Corp"
       },

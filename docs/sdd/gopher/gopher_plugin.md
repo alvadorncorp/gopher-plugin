@@ -23,7 +23,7 @@ and `adr:gopher:001`.
 
 ## Solution Overview
 
-Publish marketplace `alvadorncorp` with plugin `gopher` version `0.2.0`.
+Publish marketplace `alvadorncorp` with plugin `gopher` version `0.2.1`.
 Codex and Claude receive native manifests while loading the same physical tree
 at `plugins/gopher/skills/`. Thirteen peer skills have canonical ownership and a
 textual decision and handoff contract. A `.gopher-plugin.toml` project contract,
@@ -91,7 +91,7 @@ changes require evidence, alternatives, and explicit approval before editing.
 - Use one physical tree and two marketplace/manifest formats.
 - Use the project's declared Go version; use the current baseline only for a new project.
 - Keep `review` read-only with exact selection across five lenses.
-- Keep hooks, MCP, apps, LSP, and assets outside version `0.2.0`.
+- Keep hooks, MCP, apps, LSP, and assets outside version `0.2.1`.
 
 ## Risks and Trade-offs
 
