@@ -17,10 +17,10 @@ class DocumentationTest(unittest.TestCase):
         )
         self.assertTrue(all(value in text for value in required))
 
-    def test_license_is_mit_for_alvadorncorp(self):
+    def test_license_is_mit_for_project_author(self):
         text = (ROOT / "LICENSE").read_text(encoding="utf-8")
         self.assertIn("MIT License", text)
-        self.assertIn("Copyright (c) 2026 Alvadorncorp", text)
+        self.assertIn("Copyright (c) 2026 Igor Sant'Ana @ Alvadorn Corp", text)
 
     def test_all_repository_markdown_passes_english_gate(self):
         errors = [error for error in validate_repo.validate_repository() if "documentation must be English" in error]
