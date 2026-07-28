@@ -54,6 +54,17 @@
       "references/pattern-mappings.md",
       "references/profiling.md"
     ],
+    "performance": [
+      "references/algorithmic-transformations.md",
+      "references/allocation-runtime.md",
+      "references/benchmarking.md",
+      "references/evidence-matrix.md",
+      "references/go-hot-paths.md",
+      "references/pattern-mappings.md",
+      "references/profiling.md",
+      "references/sources.md",
+      "references/version-sensitive.md"
+    ],
     "diagnose": [
       "references/evidence-bundle.md",
       "references/heuristic.md",

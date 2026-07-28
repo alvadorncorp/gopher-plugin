@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Performance"
+  short_description: "Analyze and plan Go performance work"
+  default_prompt: "Use $performance to analyze this Go hot path and produce an evidence-backed optimization plan."
