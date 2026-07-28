@@ -15,7 +15,7 @@ profiling can affect a scheduler trace.
 | Memory is retained rather than churned | heap `inuse_space` / `inuse_objects` | which call path allocated it originally |
 | The routine waits on a lock | mutex profile | which goroutine held it and for what reason |
 | The routine blocks on a channel or syscall | block profile | scheduling order across processors |
-| Latency, scheduling, utilization, syscall or network wait, blocking, or a GC pause explains the metric | bounded execution trace | CPU or memory hot-spot attribution |
+| Latency, scheduling, utilization, syscall or network wait, blocking, or GC timing explains the metric | bounded execution trace | CPU or memory hot-spot attribution |
 | I/O round trips dominate | request count and payload size at the boundary, plus a CPU profile to exclude local cost | database or remote-service execution cost |
 
 ## Stopping rules

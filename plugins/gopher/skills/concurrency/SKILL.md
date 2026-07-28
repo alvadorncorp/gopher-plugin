@@ -1,6 +1,6 @@
 ---
 name: concurrency
-description: Diagnoses and fixes Go concurrency defects across goroutine lifetime, channels, mutexes, atomics, context cancellation, races, deadlocks, leaks, and backpressure. Use for hangs, leaked goroutines, race detector output, unclear ownership, or synchronization design. Route asymptotic cost, allocation, GC, and throughput analysis to `gopher:performance`.
+description: Diagnoses and fixes Go concurrency defects across goroutine lifetime, channels, mutexes, atomics, context cancellation, races, deadlocks, goroutine leaks, and backpressure. Use for hangs, leaked goroutines, race detector output, unclear ownership, or synchronization design. Route asymptotic cost, allocation, GC, and throughput analysis to `gopher:performance`.
 ---
 
 # Go Concurrency
@@ -8,7 +8,7 @@ description: Diagnoses and fixes Go concurrency defects across goroutine lifetim
 ## Context and ownership
 
 Own goroutine lifetime, channels, synchronization, atomics, context, races,
-deadlocks, leaks, and backpressure. Primary owner: `gopher:concurrency`.
+deadlocks, goroutine leaks, and backpressure. Primary owner: `gopher:concurrency`.
 
 Route asymptotic cost, allocation, GC, cache behavior, parsing, I/O
 amplification, benchmark, profile, latency, and throughput analysis to
@@ -39,7 +39,7 @@ CAPTURE SYMPTOM -> REPRODUCE -> HYPOTHESES -> ONE DISCRIMINATING PROBE -> EXPLIC
    before changing any primitive, using `references/goroutine-lifetime.md`,
    `references/channels-synchronization.md`, and
    `references/context-cancellation.md`.
-5. Apply the smallest change the evidence supports.
+5. Recommend or hand off the smallest change the evidence supports.
 6. Re-run correctness plus the same probe, and state which schedules the
    evidence covered.
 
@@ -56,7 +56,7 @@ change_or_recommendation:
 after_verification:
 limitations:
 authorization_gate: none | approval-required | blocked
-handoff: gopher:developer | gopher:performance | gopher:architecture | null
+handoff: gopher:developer | gopher:performance | gopher:architecture | gopher:diagnose | null
 ```
 
 ## Authorization boundaries

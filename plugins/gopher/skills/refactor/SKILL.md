@@ -50,8 +50,9 @@ each one starts from a known passing state (`references/controller.md`).
 1. Correctness and security risk.
 2. Test safety.
 3. Complexity reduction.
-4. Modernization.
-5. Whole-scope validation and a fresh review.
+4. Concurrency and performance dimensions.
+5. Modernization.
+6. Whole-scope validation and a fresh review.
 
 ## Proportional blockers
 
@@ -83,7 +84,7 @@ primary_owner: gopher:refactor
 status: COMPLETE | COMPLETE_WITH_LIMITATIONS | BLOCKED
 config_status: ABSENT | VALID | INVALID | UNSUPPORTED_VERSION
 baseline_status: passing | failing | not-run
-selected_dimensions: [correctness, security, tests, complexity, modernization]
+selected_dimensions: [correctness, security, tests, complexity, concurrency, performance, modernization]
 authorization_gate: none | approval-required | blocked
 handoff: gopher:<skill> | null
 ```
@@ -103,7 +104,7 @@ handoff: gopher:<skill> | null
 
 - `references/controller.md` — the bounded flow, sequencing, and handoff discipline.
 - `references/baseline.md` — immutable baseline capture and phase-boundary recovery.
-- `references/prioritization.md` — the five-step priority order.
+- `references/prioritization.md` — the six-step priority order.
 - `references/handoffs.md` — recording and following specialist handoffs.
 - `references/reports.md` — the evidence and output contract and terminal states.
 - `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, and `references/harnesses/kimi.md` — per-harness orchestration.

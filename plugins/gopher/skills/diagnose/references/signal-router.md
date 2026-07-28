@@ -17,5 +17,5 @@
 | Repository-wide or multidimensional remediation across two or more dimensions | `gopher:refactor` |
 
 Mixed symptoms still receive one owner: choose the domain whose risk and
-evidence explain the observed failure. Put secondary constraints in `handoff`
-without assigning multiple primary owners.
+evidence explain the observed failure. Put secondary constraints in
+`recommended_next_step` without assigning multiple primary owners.

@@ -117,7 +117,7 @@ Source: <https://go.dev/doc/gc-guide#Memory_limit>.
 - **Cost:** trades profile collection and refresh maintenance for a
   workload-dependent gain; state an expected improvement, never a fixed range.
 - **Failure modes:** a stale or unrepresentative profile silently misdirects
-  inlining decisions.
+  inlining and devirtualization decisions.
 - **Evidence:** before and after measurement on the same workload with the same
   toolchain.
 

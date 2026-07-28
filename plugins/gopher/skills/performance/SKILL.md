@@ -1,6 +1,6 @@
 ---
 name: performance
-description: Analyzes and plans Go sequential performance work across asymptotic and algorithmic cost, data structures, allocations, GC, cache behavior, parsing, I/O amplification, benchmarks, profiles, latency, and throughput. Use to make existing Go code faster, remove a quadratic or cubic scan, or interpret testing.B, pprof, and go tool trace evidence. Route goroutine, synchronization, and backpressure work to `gopher:concurrency` and local edits to `gopher:developer`.
+description: Analyzes and plans Go sequential performance work across asymptotic and algorithmic cost, data structures, allocations, GC, cache behavior, parsing, I/O amplification, benchmarks, profiles, latency, and throughput. Use to make existing Go code faster, remove a quadratic or cubic scan, or interpret testing.B, pprof, and go tool trace evidence. Route goroutine, synchronization, and backpressure work to `gopher:concurrency` and local edits to `gopher:developer`. Asymptotic cost stays here even when the user calls it complexity; cyclomatic and cognitive complexity metrics belong to `gopher:complexity`.
 ---
 
 # Go Performance
@@ -18,7 +18,7 @@ after verification. An independent revalidation by this skill after the change
 happens when the user asks for it.
 
 Route goroutine lifetime, channel, synchronization, cancellation, race,
-deadlock, leak, and backpressure remedies to `gopher:concurrency`. Route a
+deadlock, goroutine leak, and backpressure remedies to `gopher:concurrency`. Route a
 package boundary, module topology, or public-contract change to
 `gopher:architecture`. Route an unattributed symptom to `gopher:diagnose`.
 
@@ -93,7 +93,7 @@ optimization_options:
 selected_option_and_tradeoffs:
 verification_plan:
 authorization_gate: none | approval-required | blocked
-handoff: gopher:developer | gopher:concurrency | gopher:architecture | null
+handoff: gopher:developer | gopher:concurrency | gopher:architecture | gopher:diagnose | null
 ```
 
 ## Authorization boundaries
@@ -105,7 +105,8 @@ handoff: gopher:developer | gopher:concurrency | gopher:architecture | null
   installation, production profiling, destructive load generation, secret
   access, and broad security probes require explicit authorization.
 - Cross-package, public-contract, architectural, and `unsafe` changes retain an
-  explicit approval gate and their canonical owner.
+  explicit approval gate and their canonical owner; `GOMEMLIMIT` and
+  profile-guided optimization carry the same gate.
 - An optimization request with no stable baseline returns a measurement plan
   first rather than a code change.
 - Production telemetry used as workload context stays bounded and

@@ -12,13 +12,15 @@ benchmark that established magnitude.
 | What memory stays live? | heap `inuse_space` and `inuse_objects` |
 | Which lock is contended? | `mutex` |
 | Where does the code block? | `block` |
-| How many goroutines exist right now? | `goroutine` (a point-in-time snapshot) |
+| How many goroutines exist right now? | `goroutine` (point-in-time handoff evidence for `gopher:concurrency`) |
 
 ## Capture from a benchmark
 
 ```bash
 go test -run '^$' -bench 'BenchmarkTarget' -benchmem \
-  -cpuprofile cpu.out -memprofile mem.out -memprofilerate 1 ./pkg
+  -cpuprofile cpu.out ./pkg
+go test -run '^$' -bench 'BenchmarkTarget' -benchmem \
+  -memprofile mem.out -memprofilerate 1 ./pkg
 go tool pprof -top -nodecount 20 cpu.out
 go tool pprof -sample_index=alloc_space -top mem.out
 go tool pprof -sample_index=inuse_space -top mem.out
