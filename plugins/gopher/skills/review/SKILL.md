@@ -76,5 +76,5 @@ fresh review receives a new immutable bundle.
 - `references/controller.md` — bundle capture, dispatch lifecycle, failure handling.
 - `references/consolidation.md` — preservation, deduplication, adjudication, verdict.
 - `references/severity.md` — shared severity and confidence scales.
-- `references/harnesses/codex.md`, `references/harnesses/claude.md`, and `references/harnesses/grok.md` — native adapters.
+- `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, and `references/harnesses/kimi.md` — native adapters.
 - `references/lenses/*.md` — five non-overlapping review criteria.

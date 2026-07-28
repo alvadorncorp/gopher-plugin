@@ -66,6 +66,7 @@
       "references/harnesses/claude.md",
       "references/harnesses/codex.md",
       "references/harnesses/grok.md",
+      "references/harnesses/kimi.md",
       "references/lenses/architecture.md",
       "references/lenses/concurrency-performance.md",
       "references/lenses/correctness.md",
@@ -110,6 +111,7 @@
       "references/harnesses/claude.md",
       "references/harnesses/codex.md",
       "references/harnesses/grok.md",
+      "references/harnesses/kimi.md",
       "references/prioritization.md",
       "references/reports.md"
     ]
@@ -124,6 +126,7 @@
   "review_harnesses": [
     "claude",
     "codex",
-    "grok"
+    "grok",
+    "kimi"
   ]
 }

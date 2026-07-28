@@ -5,8 +5,8 @@
 </p>
 
 Gopher packages evidence-driven Go engineering workflows as one installable
-plugin for Codex, Claude Code, and Grok Build. Its goal is to help an agent
-diagnose before it prescribes, choose idiomatic Go designs, make small
+plugin for Codex, Claude Code, Grok Build, and Kimi Code. Its goal is to help
+an agent diagnose before it prescribes, choose idiomatic Go designs, make small
 reversible changes, review code through explicit risk lenses, and coordinate
 larger refactors with documented evidence.
 
@@ -16,8 +16,9 @@ exposes it through native marketplace manifests for each host. Codex reads the
 `.codex-plugin/plugin.json` manifest. Claude Code reads
 `.claude-plugin/marketplace.json` and the plugin's `.claude-plugin/plugin.json`
 manifest. Grok Build reads `.grok-plugin/marketplace.json` and the plugin's
-`.grok-plugin/plugin.json` manifest. All three hosts load the same `skills/`
-tree.
+`.grok-plugin/plugin.json` manifest. Kimi Code reads
+`.kimi-plugin/marketplace.json` and the plugin's `.kimi-plugin/plugin.json`
+manifest. All four hosts load the same `skills/` tree.
 
 ## What Gopher provides
 
@@ -44,10 +45,12 @@ LSP servers, or runtime visual assets.
 - Codex marketplace: `.agents/plugins/marketplace.json`
 - Claude Code marketplace: `.claude-plugin/marketplace.json`
 - Grok Build marketplace: `.grok-plugin/marketplace.json`
+- Kimi Code marketplace: `.kimi-plugin/marketplace.json`
 - Shared plugin: `plugins/gopher/`
 - Codex manifest: `plugins/gopher/.codex-plugin/plugin.json`
 - Claude Code manifest: `plugins/gopher/.claude-plugin/plugin.json`
 - Grok Build manifest: `plugins/gopher/.grok-plugin/plugin.json`
+- Kimi Code manifest: `plugins/gopher/.kimi-plugin/plugin.json`
 - Shared skills: `plugins/gopher/skills/`
 - Structural and forward tests: `tests/`
 - Architecture notes: `docs/`
@@ -153,12 +156,40 @@ grok plugin list
 grok plugin validate plugins/gopher
 ```
 
+## Install locally in Kimi Code
+
+From this repository root, install the plugin from the local directory inside a
+Kimi Code session:
+
+```text
+/plugins install ./plugins/gopher
+```
+
+Alternatively, browse the local marketplace catalog and install from it:
+
+```text
+/plugins marketplace ./.kimi-plugin/marketplace.json
+```
+
+Kimi Code installs plugins per user and copies the plugin to
+`$KIMI_CODE_HOME/plugins/managed/gopher/`; editing this repository after
+installation has no effect until you reinstall. Run `/reload` or start a new
+session so the installed plugin snapshot is loaded.
+
+To confirm Kimi Code can see the plugin:
+
+```text
+/plugins list
+/plugins info gopher
+```
+
 ## Use Gopher
 
 After installation, ask naturally for Go engineering help or select a bundled
 skill explicitly. Codex can route from the prompt or from an installed plugin
 skill. Claude Code and Grok Build expose plugin skills as namespaced commands
-such as `/gopher:review --mode full`.
+such as `/gopher:review --mode full`. Kimi Code routes from the prompt or from
+explicit skill invocation such as `/skill:review`.
 
 Examples:
 
@@ -200,10 +231,10 @@ python3 tests/run_forward_tests.py --validate-only
 ```
 
 Live forward tests require authenticated local harnesses and installed Codex,
-Claude Code, and/or Grok Build plugin snapshots:
+Claude Code, Grok Build, and/or Kimi Code plugin snapshots:
 
 ```bash
-python3 tests/run_forward_tests.py --harness codex --harness claude --harness grok
+python3 tests/run_forward_tests.py --harness codex --harness claude --harness grok --harness kimi
 ```
 
 Review official, version-sensitive Go references after every stable Go release

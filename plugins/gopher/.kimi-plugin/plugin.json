@@ -1,0 +1,23 @@
+{
+  "name": "gopher",
+  "version": "0.2.2",
+  "description": "Evidence-driven Go engineering workflows for design, implementation, diagnosis, security, and multi-lens review.",
+  "author": {
+    "name": "Igor Sant'Ana @ Alvadorn Corp"
+  },
+  "license": "MIT",
+  "keywords": [
+    "go",
+    "golang",
+    "architecture",
+    "security",
+    "code-review"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Gopher",
+    "shortDescription": "Evidence-driven Go engineering workflows.",
+    "longDescription": "Gopher diagnoses Go engineering problems, selects idiomatic designs, guides implementation, and performs evidence-backed security and multi-lens review workflows.",
+    "developerName": "Igor Sant'Ana @ Alvadorn Corp"
+  }
+}

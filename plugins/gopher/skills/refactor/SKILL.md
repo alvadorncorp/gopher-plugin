@@ -105,4 +105,4 @@ handoff: gopher:<skill> | null
 - `references/prioritization.md` — the five-step priority order.
 - `references/handoffs.md` — recording and following specialist handoffs.
 - `references/reports.md` — the evidence and output contract and terminal states.
-- `references/harnesses/codex.md`, `references/harnesses/claude.md`, and `references/harnesses/grok.md` — per-harness orchestration.
+- `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, and `references/harnesses/kimi.md` — per-harness orchestration.

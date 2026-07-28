@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests/fixtures/forward-tests.json"
 SCHEMA_PATH = ROOT / "tests/fixtures/response-schema.json"
-HARNESSES = ("codex", "claude", "grok")
+HARNESSES = ("codex", "claude", "grok", "kimi")
 
 
 def load_json(path: Path):
@@ -150,8 +150,62 @@ def run_grok(case, timeout):
     return _coerce_structured(payload)
 
 
+def _assistant_texts(event):
+    texts = []
+    if not isinstance(event, dict):
+        return texts
+    message = event.get("message", event)
+    if isinstance(message, dict):
+        role = message.get("role", event.get("role"))
+        if role not in (None, "assistant"):
+            return texts
+        content = message.get("content")
+        if isinstance(content, str):
+            texts.append(content)
+        elif isinstance(content, list):
+            for block in content:
+                if isinstance(block, dict) and block.get("type") in (None, "text") and isinstance(block.get("text"), str):
+                    texts.append(block["text"])
+    if isinstance(event.get("text"), str):
+        texts.append(event["text"])
+    return texts
+
+
+def run_kimi(case, timeout):
+    schema = json.dumps(load_json(SCHEMA_PATH), separators=(",", ":"))
+    prompt = (
+        wrapped_prompt(case)
+        + "\n\nSkill identifiers must always use the canonical `gopher:` prefix"
+        " (for example `gopher:architecture`, never a bare `architecture`)."
+        " `authorization_gate` must be exactly one of `none`,"
+        " `approval-required`, or `blocked`."
+        "\n\nResponse JSON schema:\n" + schema
+    )
+    command = ["kimi", "-p", prompt, "--output-format", "stream-json"]
+    completed = subprocess.run(command, text=True, capture_output=True, timeout=timeout, cwd=str(ROOT))
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or completed.stdout.strip())
+    candidates = []
+    for line in completed.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            candidates.append(line)
+            continue
+        candidates.extend(_assistant_texts(event))
+    for candidate in reversed(candidates):
+        try:
+            return _coerce_structured(candidate)
+        except (RuntimeError, json.JSONDecodeError):
+            continue
+    raise RuntimeError("Kimi returned no structured object")
+
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex, Claude, and Grok")
+    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex, Claude, Grok, and Kimi")
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--harness", action="append", choices=HARNESSES)
     parser.add_argument("--case", default="*")
@@ -177,9 +231,9 @@ def main():
         return 1
     harnesses = args.harness or list(HARNESSES)
     if args.validate_only:
-        print(f"Validated {len(payload['cases'])} forward-test cases for codex, claude, and grok.")
+        print(f"Validated {len(payload['cases'])} forward-test cases for codex, claude, grok, and kimi.")
         return 0
-    runners = {"codex": run_codex, "claude": run_claude, "grok": run_grok}
+    runners = {"codex": run_codex, "claude": run_claude, "grok": run_grok, "kimi": run_kimi}
     results = []
     failed = False
     for harness in harnesses:
