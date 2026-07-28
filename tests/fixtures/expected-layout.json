@@ -1,7 +1,7 @@
 {
   "marketplace_name": "alvadorncorp",
   "plugin_name": "gopher",
-  "plugin_version": "0.2.2",
+  "plugin_version": "0.2.3",
   "skills": {
     "design-patterns": [
       "references/behavior.md",
@@ -37,6 +37,13 @@
       "references/packages-internal.md",
       "references/pattern-mappings.md",
       "references/public-api.md"
+    ],
+    "concurrency": [
+      "references/channels-synchronization.md",
+      "references/context-cancellation.md",
+      "references/diagnostics.md",
+      "references/goroutine-lifetime.md",
+      "references/pattern-mappings.md"
     ],
     "concurrency-performance": [
       "references/benchmarking.md",
