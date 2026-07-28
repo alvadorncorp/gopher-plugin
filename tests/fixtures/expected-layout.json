@@ -45,15 +45,6 @@
       "references/goroutine-lifetime.md",
       "references/pattern-mappings.md"
     ],
-    "concurrency-performance": [
-      "references/benchmarking.md",
-      "references/channels-synchronization.md",
-      "references/context-cancellation.md",
-      "references/diagnostics.md",
-      "references/goroutine-lifetime.md",
-      "references/pattern-mappings.md",
-      "references/profiling.md"
-    ],
     "performance": [
       "references/algorithmic-transformations.md",
       "references/allocation-runtime.md",
