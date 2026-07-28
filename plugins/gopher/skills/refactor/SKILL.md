@@ -14,9 +14,10 @@ orchestrator in Gopher, alongside the read-only `gopher:review`.
 
 Coordinate through the canonical owners. Route single-dimension work to its
 owner (`gopher:complexity`, `gopher:test-quality`, `gopher:modernize`,
-`gopher:security`, `gopher:concurrency-performance`, `gopher:architecture`) and a
-local reversible refactor to `gopher:developer`. Record and follow every handoff
-using `references/handoffs.md`, keeping each dimension with its owner.
+`gopher:security`, `gopher:concurrency`, `gopher:performance`,
+`gopher:architecture`) and a local reversible refactor to `gopher:developer`.
+Record and follow every handoff using `references/handoffs.md`, keeping each
+dimension with its owner.
 
 ## State machine
 

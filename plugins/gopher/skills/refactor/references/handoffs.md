@@ -13,7 +13,8 @@ performs work that belongs to a specialist.
 | Language, API, module, toolchain modernization | `gopher:modernize` |
 | Public API, module topology, cross-package contract | `gopher:architecture` |
 | Security exposure and boundaries | `gopher:security` |
-| Goroutine, synchronization, memory, performance | `gopher:concurrency-performance` |
+| Goroutine lifetime, synchronization, cancellation, backpressure | `gopher:concurrency` |
+| Algorithmic cost, allocation, GC, memory growth, latency, throughput | `gopher:performance` |
 | Read-only multi-lens review | `gopher:review` |
 
 ## Recording a handoff

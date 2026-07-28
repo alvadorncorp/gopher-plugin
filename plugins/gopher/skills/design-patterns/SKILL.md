@@ -15,8 +15,8 @@ Primary owner: `gopher:design-patterns`.
 
 Route internal application boundaries to `gopher:application-architecture`, Go
 implementation to `gopher:developer`, Go package/public-contract decisions to
-`gopher:architecture`, and concurrency/performance mechanics to
-`gopher:concurrency-performance`.
+`gopher:architecture`, concurrency mechanics to `gopher:concurrency`, and
+performance mechanics to `gopher:performance`.
 
 ## Workflow
 

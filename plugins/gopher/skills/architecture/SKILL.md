@@ -12,9 +12,9 @@ direction, public APIs, interface seams, migrations, and architecture tests.
 Primary owner: `gopher:architecture`.
 
 Receive conceptual application boundaries from `gopher:application-architecture`.
-Route local implementation to `gopher:developer`, runtime synchronization and
-performance to `gopher:concurrency-performance`, and explicit security analysis
-to `gopher:security`.
+Route local implementation to `gopher:developer`, runtime synchronization to
+`gopher:concurrency`, performance cost and throughput to `gopher:performance`, and
+explicit security analysis to `gopher:security`.
 
 Receive public-API and module-topology modernization from `gopher:modernize`;
 contract-changing modernization remains owned here.

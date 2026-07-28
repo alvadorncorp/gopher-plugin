@@ -21,5 +21,5 @@
 | `pattern.result` | `go.error-return` | `(T, error)` with wrapping/inspection |
 
 `pattern.facade` and `pattern.dependency-injection` cross package/seam ownership
-and map in `gopher:architecture`. Context, pipeline, and pooling boundary cards
-map in `gopher:concurrency-performance`.
+and map in `gopher:architecture`. Context and pipeline boundary cards map in
+`gopher:concurrency`; the pooling boundary card maps in `gopher:performance`.
