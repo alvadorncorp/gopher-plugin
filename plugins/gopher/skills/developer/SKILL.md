@@ -1,6 +1,6 @@
 ---
 name: developer
-description: Implements and maintains idiomatic Go code, including local APIs, types, errors, values, modules, tooling, tests, fixes, and reversible refactors. Use for routine Go development. Route cross-package architecture, security audits, and specialized concurrency/performance investigations to their canonical peers.
+description: Implements and maintains idiomatic Go code, including local APIs, types, errors, values, modules, tooling, tests, fixes, and reversible refactors. Use for routine Go development. Route cross-package architecture, security audits, and specialized concurrency or performance investigations to their canonical peers.
 ---
 
 # Go Developer
@@ -12,9 +12,9 @@ Own routine, local Go implementation and maintenance. Primary owner:
 dependencies, commands, and adopted tooling; this skill has no global Go baseline.
 
 Route cross-package dependency or public-contract work to `gopher:architecture`,
-goroutine/synchronization/memory/performance work to
-`gopher:concurrency-performance`, explicit security work to `gopher:security`,
-and unknown symptoms to `gopher:diagnose`.
+goroutine, synchronization, and cancellation work to `gopher:concurrency`,
+cost, allocation, and throughput work to `gopher:performance`, explicit
+security work to `gopher:security`, and unknown symptoms to `gopher:diagnose`.
 
 Route repository-wide or multidimensional refactoring to `gopher:refactor`.
 Route complexity, test-quality, or modernization work that is not a purely local

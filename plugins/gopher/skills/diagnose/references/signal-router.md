@@ -4,7 +4,8 @@
 |---|---|
 | Local API, types, errors, modules, tooling, tests, or reversible implementation | `gopher:developer` |
 | Cross-package dependency, package boundary, interface seam, module/workspace, or public contract | `gopher:architecture` |
-| Goroutine lifetime, channel, synchronization, context, race, leak, memory, throughput, benchmark, or profile | `gopher:concurrency-performance` |
+| Goroutine lifetime, channel, synchronization, context, race, deadlock, goroutine leak, or backpressure | `gopher:concurrency` |
+| Algorithmic or asymptotic cost, allocation, GC, memory growth, cache behavior, parsing, I/O amplification, benchmark, profile, latency, or throughput | `gopher:performance` |
 | Explicit pattern forces and selection/rejection | `gopher:design-patterns` |
 | Language-agnostic internal application boundary or dependency direction | `gopher:application-architecture` |
 | Threat, trust boundary, exploit path, vulnerable dependency/symbol, or security control | `gopher:security` |
@@ -16,5 +17,5 @@
 | Repository-wide or multidimensional remediation across two or more dimensions | `gopher:refactor` |
 
 Mixed symptoms still receive one owner: choose the domain whose risk and
-evidence explain the observed failure. Put secondary constraints in `handoff`
-without assigning multiple primary owners.
+evidence explain the observed failure. Put secondary constraints in
+`recommended_next_step` without assigning multiple primary owners.

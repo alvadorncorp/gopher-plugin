@@ -87,7 +87,8 @@ def mapping_rows():
     for path in (
         SKILLS / "developer/references/pattern-mappings.md",
         SKILLS / "architecture/references/pattern-mappings.md",
-        SKILLS / "concurrency-performance/references/pattern-mappings.md",
+        SKILLS / "concurrency/references/pattern-mappings.md",
+        SKILLS / "performance/references/pattern-mappings.md",
     ):
         for line in path.read_text(encoding="utf-8").splitlines():
             match = MAPPING_ROW.match(line)

@@ -45,9 +45,9 @@ Boundary cards select a concept while routing mechanics to the named owner.
 | pattern.flyweight | deferred | state-traversal |
 | pattern.memento | deferred | state-traversal |
 | pattern.interpreter | deferred | state-traversal |
-| pattern.context-cancellation | boundary | gopher:concurrency-performance |
-| pattern.pipeline | boundary | gopher:concurrency-performance |
-| pattern.object-pool | boundary | gopher:concurrency-performance |
+| pattern.context-cancellation | boundary | gopher:concurrency |
+| pattern.pipeline | boundary | gopher:concurrency |
+| pattern.object-pool | boundary | gopher:performance |
 
 Counts are normative: 19 full, 10 diagnostic, 4 deferred, and 3 boundary
 candidates (36 total). No popularity ranking is implied.
@@ -61,5 +61,6 @@ candidates (36 total). No popularity ranking is implied.
 - Require distinct access/lazy/remote/lifecycle semantics for Proxy.
 - Keep Service Locator, reflection-heavy injection, and global Registry as
   diagnostics unless a real runtime plugin ecosystem is demonstrated.
-- Route cancellation, pipelines, fan-out/fan-in, and pooling mechanics to
-  `gopher:concurrency-performance`; require measurement before pooling.
+- Route cancellation, pipelines, and fan-out/fan-in mechanics to
+  `gopher:concurrency`; route pooling to `gopher:performance` and require
+  measurement before pooling.

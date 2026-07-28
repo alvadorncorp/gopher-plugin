@@ -44,7 +44,7 @@ class BootstrapPackageTest(unittest.TestCase):
             self.assertEqual(codex_plugin[key], grok_plugin[key])
             self.assertEqual(codex_plugin[key], kimi_plugin[key])
         self.assertEqual("gopher", codex_plugin["name"])
-        self.assertEqual("0.2.2", codex_plugin["version"])
+        self.assertEqual("0.3.0", codex_plugin["version"])
         self.assertTrue((PLUGIN / "skills").is_dir())
 
     def test_v1_declares_no_optional_runtime_components(self):

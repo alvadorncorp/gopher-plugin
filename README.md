@@ -67,7 +67,8 @@ relative path into a peer.
 | `application-architecture` | Language-agnostic internal application boundaries |
 | `developer` | Routine local Go implementation, APIs, errors, tests, and tooling |
 | `architecture` | Go packages, modules/workspaces, dependency direction, seams, and public APIs |
-| `concurrency-performance` | Goroutine lifetime, synchronization, context, races, benchmarks, profiles, and measured optimization |
+| `concurrency` | Goroutine lifetime, channels, synchronization, context, races, deadlocks, leaks, and backpressure |
+| `performance` | Asymptotic and algorithmic cost, allocations, GC, cache behavior, parsing, I/O amplification, benchmarks, profiles, latency, and throughput |
 | `diagnose` | Evidence-driven attribution of vague Go symptoms |
 | `security` | Go threat modeling, reachability, safe verification, and remediation |
 | `review` | Read-only exact-mode review fan-out, consolidation, and verdict |
@@ -198,10 +199,10 @@ Examples:
 - `Review this Go change with --mode tests,security.`
 - `Coordinate a repository-wide refactor that reduces complexity and modernizes APIs together.`
 
-Review lenses are `correctness`, `tests`, `security`, `architecture`, and
-`concurrency-performance`. `--mode full` selects all five. A comma-separated
-mode selects exactly that subset. Without a mode, `review` recommends lenses and
-waits for confirmation before dispatch.
+Review lenses are `correctness`, `tests`, `security`, `architecture`,
+`concurrency`, `performance`, and `complexity`. `--mode full` selects all seven.
+A comma-separated mode selects exactly that subset. Without a mode, `review`
+recommends lenses and waits for confirmation before dispatch.
 
 ## Project configuration
 

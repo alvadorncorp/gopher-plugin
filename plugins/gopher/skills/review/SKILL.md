@@ -1,6 +1,6 @@
 ---
 name: review
-description: Reviews Go diffs read-only through explicit correctness, tests, security, architecture, and concurrency-performance lenses, then consolidates findings and verdicts. Use for review, diff, or PR intent. Fixes and technical solution ownership remain with canonical peers.
+description: Reviews Go diffs read-only through explicit correctness, tests, security, architecture, concurrency, performance, and complexity lenses, then consolidates findings and verdicts. Use for review, diff, or PR intent. Fixes and technical solution ownership remain with canonical peers.
 ---
 
 # Go Multi-lens Review
@@ -15,10 +15,10 @@ routine development.
 
 ## Modes
 
-Allowed lenses are `correctness`, `tests`, `security`, `architecture`, and
-`concurrency-performance`.
+Allowed lenses are `correctness`, `tests`, `security`, `architecture`,
+`concurrency`, `performance`, and `complexity`.
 
-- `--mode full` selects all five.
+- `--mode full` selects all seven.
 - `--mode correctness` selects one.
 - `--mode tests,security` selects exactly those two in canonical order.
 - Any comma-separated subset must contain unique allowed names.
@@ -45,7 +45,7 @@ recommend lenses with reasons, and wait for confirmation before dispatch.
 ## Reviewer output
 
 ```yaml
-LENS: correctness | tests | security | architecture | concurrency-performance
+LENS: correctness | tests | security | architecture | concurrency | performance | complexity
 STATUS: COMPLETE | NEEDS_EVIDENCE | BLOCKED
 FINDINGS:
   - id:
@@ -77,4 +77,4 @@ fresh review receives a new immutable bundle.
 - `references/consolidation.md` — preservation, deduplication, adjudication, verdict.
 - `references/severity.md` — shared severity and confidence scales.
 - `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, and `references/harnesses/kimi.md` — native adapters.
-- `references/lenses/*.md` — five non-overlapping review criteria.
+- `references/lenses/*.md` — seven non-overlapping review criteria.

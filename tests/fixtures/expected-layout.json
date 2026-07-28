@@ -1,7 +1,7 @@
 {
   "marketplace_name": "alvadorncorp",
   "plugin_name": "gopher",
-  "plugin_version": "0.2.2",
+  "plugin_version": "0.3.0",
   "skills": {
     "design-patterns": [
       "references/behavior.md",
@@ -38,14 +38,23 @@
       "references/pattern-mappings.md",
       "references/public-api.md"
     ],
-    "concurrency-performance": [
-      "references/benchmarking.md",
+    "concurrency": [
       "references/channels-synchronization.md",
       "references/context-cancellation.md",
       "references/diagnostics.md",
       "references/goroutine-lifetime.md",
+      "references/pattern-mappings.md"
+    ],
+    "performance": [
+      "references/algorithmic-transformations.md",
+      "references/allocation-runtime.md",
+      "references/benchmarking.md",
+      "references/evidence-matrix.md",
+      "references/go-hot-paths.md",
       "references/pattern-mappings.md",
-      "references/profiling.md"
+      "references/profiling.md",
+      "references/sources.md",
+      "references/version-sensitive.md"
     ],
     "diagnose": [
       "references/evidence-bundle.md",
@@ -68,8 +77,10 @@
       "references/harnesses/grok.md",
       "references/harnesses/kimi.md",
       "references/lenses/architecture.md",
-      "references/lenses/concurrency-performance.md",
+      "references/lenses/complexity.md",
+      "references/lenses/concurrency.md",
       "references/lenses/correctness.md",
+      "references/lenses/performance.md",
       "references/lenses/security.md",
       "references/lenses/tests.md",
       "references/severity.md"
@@ -118,8 +129,10 @@
   },
   "review_lenses": [
     "architecture",
-    "concurrency-performance",
+    "complexity",
+    "concurrency",
     "correctness",
+    "performance",
     "security",
     "tests"
   ],

@@ -1,4 +1,0 @@
-interface:
-  display_name: "Go Concurrency and Performance"
-  short_description: "Diagnose Go concurrency and performance"
-  default_prompt: "Use $concurrency-performance to diagnose this Go lifecycle or performance issue from measurements."

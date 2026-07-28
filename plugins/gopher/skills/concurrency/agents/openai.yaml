@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Concurrency"
+  short_description: "Diagnose Go concurrency defects"
+  default_prompt: "Use $concurrency to diagnose this Go goroutine, synchronization, or cancellation problem."
