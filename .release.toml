@@ -10,6 +10,7 @@ notes_paths = [
   "plugins/gopher",
   ".agents/plugins/marketplace.json",
   ".claude-plugin/marketplace.json",
+  ".grok-plugin/marketplace.json",
   "README.md",
   "tests",
 ]
@@ -20,3 +21,7 @@ path = "plugins/gopher/.claude-plugin/plugin.json"
 [[groups.default.targets]]
 type = "plugin"
 path = "plugins/gopher/.codex-plugin/plugin.json"
+
+[[groups.default.targets]]
+type = "plugin"
+path = "plugins/gopher/.grok-plugin/plugin.json"

@@ -12,7 +12,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests/fixtures/forward-tests.json"
 SCHEMA_PATH = ROOT / "tests/fixtures/response-schema.json"
-HARNESSES = ("codex", "claude")
+HARNESSES = ("codex", "claude", "grok")
 
 
 def load_json(path: Path):
@@ -99,8 +99,59 @@ def run_claude(case, timeout):
     return value
 
 
+def _coerce_structured(value):
+    if isinstance(value, dict):
+        return value
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            raise RuntimeError("empty structured payload")
+        try:
+            parsed = json.loads(text)
+        except json.JSONDecodeError:
+            start = text.find("{")
+            end = text.rfind("}")
+            if start < 0 or end <= start:
+                raise
+            parsed = json.loads(text[start : end + 1])
+        if isinstance(parsed, dict):
+            return parsed
+    raise RuntimeError("structured payload is not an object")
+
+
+def run_grok(case, timeout):
+    schema = json.dumps(load_json(SCHEMA_PATH), separators=(",", ":"))
+    command = [
+        "grok",
+        "-p",
+        wrapped_prompt(case),
+        "--cwd",
+        str(ROOT),
+        "--json-schema",
+        schema,
+        "--output-format",
+        "json",
+        "--permission-mode",
+        "dontAsk",
+        "--tools",
+        "",
+        "--no-subagents",
+    ]
+    completed = subprocess.run(command, text=True, capture_output=True, timeout=timeout)
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or completed.stdout.strip())
+    payload = json.loads(completed.stdout)
+    for key in ("structured_output", "result", "text"):
+        if key in payload:
+            try:
+                return _coerce_structured(payload[key])
+            except (RuntimeError, json.JSONDecodeError):
+                continue
+    return _coerce_structured(payload)
+
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex and Claude")
+    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex, Claude, and Grok")
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--harness", action="append", choices=HARNESSES)
     parser.add_argument("--case", default="*")
@@ -126,9 +177,9 @@ def main():
         return 1
     harnesses = args.harness or list(HARNESSES)
     if args.validate_only:
-        print(f"Validated {len(payload['cases'])} forward-test cases for codex and claude.")
+        print(f"Validated {len(payload['cases'])} forward-test cases for codex, claude, and grok.")
         return 0
-    runners = {"codex": run_codex, "claude": run_claude}
+    runners = {"codex": run_codex, "claude": run_claude, "grok": run_grok}
     results = []
     failed = False
     for harness in harnesses:

@@ -12,7 +12,8 @@ class DocumentationTest(unittest.TestCase):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
         required = (
             "# Gopher Plugin", "## Skills and ownership", "## Install locally in Codex",
-            "## Install locally in Claude Code", "gopher@alvadorncorp", "--mode full",
+            "## Install locally in Claude Code", "## Install locally in Grok Build",
+            "gopher@alvadorncorp", "--mode full",
             "All repository documentation is written in English.",
         )
         self.assertTrue(all(value in text for value in required))

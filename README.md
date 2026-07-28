@@ -5,17 +5,19 @@
 </p>
 
 Gopher packages evidence-driven Go engineering workflows as one installable
-plugin for Codex and Claude Code. Its goal is to help an agent diagnose before
-it prescribes, choose idiomatic Go designs, make small reversible changes,
-review code through explicit risk lenses, and coordinate larger refactors with
-documented evidence.
+plugin for Codex, Claude Code, and Grok Build. Its goal is to help an agent
+diagnose before it prescribes, choose idiomatic Go designs, make small
+reversible changes, review code through explicit risk lenses, and coordinate
+larger refactors with documented evidence.
 
 The repository keeps one shared plugin implementation at `plugins/gopher/` and
-exposes it through native marketplace manifests for both hosts. Codex reads the
+exposes it through native marketplace manifests for each host. Codex reads the
 `.agents/plugins/marketplace.json` catalog and the plugin's
 `.codex-plugin/plugin.json` manifest. Claude Code reads
 `.claude-plugin/marketplace.json` and the plugin's `.claude-plugin/plugin.json`
-manifest. Both hosts load the same `skills/` tree.
+manifest. Grok Build reads `.grok-plugin/marketplace.json` and the plugin's
+`.grok-plugin/plugin.json` manifest. All three hosts load the same `skills/`
+tree.
 
 ## What Gopher provides
 
@@ -41,9 +43,11 @@ LSP servers, or runtime visual assets.
 
 - Codex marketplace: `.agents/plugins/marketplace.json`
 - Claude Code marketplace: `.claude-plugin/marketplace.json`
+- Grok Build marketplace: `.grok-plugin/marketplace.json`
 - Shared plugin: `plugins/gopher/`
 - Codex manifest: `plugins/gopher/.codex-plugin/plugin.json`
 - Claude Code manifest: `plugins/gopher/.claude-plugin/plugin.json`
+- Grok Build manifest: `plugins/gopher/.grok-plugin/plugin.json`
 - Shared skills: `plugins/gopher/skills/`
 - Structural and forward tests: `tests/`
 - Architecture notes: `docs/`
@@ -121,12 +125,40 @@ claude plugin marketplace list
 claude plugin list
 ```
 
+## Install locally in Grok Build
+
+From this repository root, add the local marketplace and install the plugin:
+
+```bash
+grok plugin marketplace add .
+grok plugin install gopher --trust
+```
+
+Then enable the plugin if it is listed as disabled (`grok plugin enable gopher`
+or Space in the Plugins tab) and start a new Grok session, or press `r` in the
+Plugins tab to reload.
+
+For development without installing from the marketplace, load the plugin for a
+single process with `--plugin-dir`:
+
+```bash
+grok agent --plugin-dir ./plugins/gopher --no-leader stdio
+```
+
+To confirm Grok can see the marketplace and plugin:
+
+```bash
+grok plugin marketplace list
+grok plugin list
+grok plugin validate plugins/gopher
+```
+
 ## Use Gopher
 
 After installation, ask naturally for Go engineering help or select a bundled
 skill explicitly. Codex can route from the prompt or from an installed plugin
-skill. Claude Code exposes plugin skills as namespaced commands such as
-`/gopher:review --mode full`.
+skill. Claude Code and Grok Build expose plugin skills as namespaced commands
+such as `/gopher:review --mode full`.
 
 Examples:
 
@@ -163,14 +195,15 @@ python3 tests/validate_repo.py
 python3 -m unittest discover -s tests -p 'test_*.py'
 python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/plugin-creator/scripts/validate_plugin.py" plugins/gopher
 claude plugin validate . --strict
+grok plugin validate plugins/gopher
 python3 tests/run_forward_tests.py --validate-only
 ```
 
-Live forward tests require authenticated local harnesses and installed Codex and
-Claude Code plugin snapshots:
+Live forward tests require authenticated local harnesses and installed Codex,
+Claude Code, and/or Grok Build plugin snapshots:
 
 ```bash
-python3 tests/run_forward_tests.py --harness codex --harness claude
+python3 tests/run_forward_tests.py --harness codex --harness claude --harness grok
 ```
 
 Review official, version-sensitive Go references after every stable Go release

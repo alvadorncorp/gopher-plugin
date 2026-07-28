@@ -7,15 +7,23 @@
   "plugins": [
     {
       "name": "gopher",
-      "source": "./plugins/gopher",
       "description": "Evidence-driven Go engineering workflows for design, implementation, diagnosis, security, and multi-lens review.",
       "version": "0.2.2",
       "author": {
         "name": "Igor Sant'Ana @ Alvadorn Corp"
       },
-      "license": "MIT",
-      "category": "Productivity",
-      "strict": true
+      "category": "development",
+      "source": {
+        "type": "local",
+        "path": "./plugins/gopher"
+      },
+      "keywords": [
+        "go",
+        "golang",
+        "architecture",
+        "security",
+        "code-review"
+      ]
     }
   ]
 }

@@ -102,20 +102,29 @@ def validate_repository() -> list[str]:
 
     codex_market = load_json(ROOT / ".agents/plugins/marketplace.json")
     claude_market = load_json(ROOT / ".claude-plugin/marketplace.json")
+    grok_market = load_json(ROOT / ".grok-plugin/marketplace.json")
     codex_plugin = load_json(PLUGIN / ".codex-plugin/plugin.json")
     claude_plugin = load_json(PLUGIN / ".claude-plugin/plugin.json")
+    grok_plugin = load_json(PLUGIN / ".grok-plugin/plugin.json")
 
     if codex_market.get("name") != expected["marketplace_name"]:
         errors.append("Codex marketplace name mismatch")
     if claude_market.get("name") != expected["marketplace_name"]:
         errors.append("Claude marketplace name mismatch")
+    if grok_market.get("name") != expected["marketplace_name"]:
+        errors.append("Grok marketplace name mismatch")
     for key in ("name", "version", "description", "author"):
         if codex_plugin.get(key) != claude_plugin.get(key):
             errors.append(f"plugin manifest parity mismatch: {key}")
+        if codex_plugin.get(key) != grok_plugin.get(key):
+            errors.append(f"plugin manifest parity mismatch (grok): {key}")
     if codex_plugin.get("name") != expected["plugin_name"]:
         errors.append("plugin name mismatch")
     if codex_plugin.get("version") != expected["plugin_version"]:
         errors.append("plugin version mismatch")
+    grok_source = (grok_market.get("plugins") or [{}])[0].get("source")
+    if not isinstance(grok_source, dict) or grok_source.get("path") != "./plugins/gopher":
+        errors.append("Grok marketplace source path mismatch")
 
     actual_skills = {path.name for path in SKILLS.iterdir() if path.is_dir()}
     expected_skills = set(expected["skills"])
@@ -226,7 +235,7 @@ def main() -> int:
     reference_total = sum(len(refs) for refs in expected["skills"].values())
     print(
         f"Repository validation passed ({skill_count} skills, "
-        f"{reference_total} references, 2 manifests, 2 marketplaces)."
+        f"{reference_total} references, 3 manifests, 3 marketplaces)."
     )
     return 0
 
