@@ -30,3 +30,7 @@ path = "plugins/gopher/.grok-plugin/plugin.json"
 [[groups.default.targets]]
 type = "plugin"
 path = "plugins/gopher/.kimi-plugin/plugin.json"
+
+[[groups.default.targets]]
+type = "plugin"
+path = ".kimi-plugin/plugin.json"
