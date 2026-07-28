@@ -86,8 +86,10 @@
       "references/harnesses/grok.md",
       "references/harnesses/kimi.md",
       "references/lenses/architecture.md",
-      "references/lenses/concurrency-performance.md",
+      "references/lenses/complexity.md",
+      "references/lenses/concurrency.md",
       "references/lenses/correctness.md",
+      "references/lenses/performance.md",
       "references/lenses/security.md",
       "references/lenses/tests.md",
       "references/severity.md"
@@ -136,8 +138,10 @@
   },
   "review_lenses": [
     "architecture",
-    "concurrency-performance",
+    "complexity",
+    "concurrency",
     "correctness",
+    "performance",
     "security",
     "tests"
   ],
