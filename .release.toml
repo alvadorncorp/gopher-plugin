@@ -34,3 +34,19 @@ path = "plugins/gopher/.kimi-plugin/plugin.json"
 [[groups.default.targets]]
 type = "plugin"
 path = ".kimi-plugin/plugin.json"
+
+[groups.current]
+source = "tag"
+tag = "v{version}"
+notes_paths = [
+  "plugins/gopher",
+  ".agents/plugins/marketplace.json",
+  ".claude-plugin/marketplace.json",
+  ".grok-plugin/marketplace.json",
+  ".kimi-plugin",
+  "README.md",
+  "tests",
+]
+[[groups.current.targets]]
+type = "go"
+path = "."
