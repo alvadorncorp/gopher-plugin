@@ -55,10 +55,10 @@ LOAD CONFIG -> PASSING TEST BASELINE -> MEASURE -> RANK HOTSPOTS -> PROPOSE OR A
 selected_skill: gopher:complexity
 primary_owner: gopher:complexity
 status: COMPLETE | COMPLETE_WITH_LIMITATIONS | BLOCKED
-config_status: ABSENT | VALID | INVALID | UNSUPPORTED_VERSION
+config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
 baseline_status: passing | failing | not-run
 authorization_gate: none | approval-required | blocked
-handoff: gopher:developer | gopher:architecture | null
+handoff: gopher:<skill> | null
 ```
 
 ## Authorization boundaries

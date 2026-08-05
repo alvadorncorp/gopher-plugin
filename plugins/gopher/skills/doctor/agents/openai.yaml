@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Readiness Doctor"
+  short_description: "Check Go project and toolchain readiness"
+  default_prompt: "Use $doctor to check whether this Go project is ready for the action I am about to take."

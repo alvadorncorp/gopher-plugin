@@ -77,6 +77,12 @@ relative path into a peer.
 | `test-quality` | Coverage, mutation, test effectiveness, and refactoring safety nets |
 | `modernize` | Declared-version-aware Go language, API, module, dependency, and toolchain modernization |
 | `refactor` | Repository-wide or multidimensional refactoring orchestration, sequencing, and evidence |
+| `doctor` | Proactive readiness of the project, configuration, toolchain, module state, generated output, and a pending action against known invariants |
+| `resilience` | Failure semantics, runtime safeguards, distributed degradation, recovery, and explicit reliability assessment |
+| `observability` | Telemetry contracts and instrumentation for logs, metrics, traces, profile exposure, dashboards, alerts, correlation, cardinality, and redaction |
+| `codegen` | Lifecycle and trustworthiness of generated code: inventory, provenance, reproduction, staleness, and artifact verification |
+| `cgo` | Go/C boundaries: ABI and representation, ownership and lifetime, pointer rules, callbacks and thread affinity, linking, and build matrices |
+| `fuzz` | Native Go fuzz targets and invariants, seed corpora, bounded campaigns, crash triage, and regression promotion |
 
 ## Install locally in Codex
 

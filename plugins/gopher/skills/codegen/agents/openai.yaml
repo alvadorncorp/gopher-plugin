@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Code Generation"
+  short_description: "Verify and reproduce generated Go code"
+  default_prompt: "Use $codegen to check whether this project's generated Go output is current and reproducible."

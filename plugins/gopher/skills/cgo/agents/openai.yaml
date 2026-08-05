@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go CGO Boundaries"
+  short_description: "Design and audit Go/C integration boundaries"
+  default_prompt: "Use $cgo to design or audit this Go/C boundary, its pointers, ownership, and build matrix."

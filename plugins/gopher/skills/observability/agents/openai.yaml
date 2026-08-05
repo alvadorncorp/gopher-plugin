@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Observability"
+  short_description: "Design and audit Go telemetry signals"
+  default_prompt: "Use $observability to design the signals that answer this operational question about my Go service."

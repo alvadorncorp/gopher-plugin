@@ -15,7 +15,9 @@ Gopher quality workflow; it never performs the analysis or mutation itself.
 Route routine implementation to `gopher:developer`, complexity measurement to
 `gopher:complexity`, test-suite quality to `gopher:test-quality`, version and
 API modernization to `gopher:modernize`, and multi-dimension refactoring to
-`gopher:refactor`. This skill reads and writes configuration only.
+`gopher:refactor`. Route readiness checks to `gopher:doctor`, fuzz campaigns to
+`gopher:fuzz`, and module or workspace topology to `gopher:architecture`. This
+skill reads and writes configuration only.
 
 ## Modes
 
@@ -57,6 +59,9 @@ DETECT_ROOT -> LOCATE -> PARSE -> VALIDATE -> BOOTSTRAP | EXPLAIN | INFORM
 
 - `ABSENT`: no file present; analysis is allowed and `--bootstrap` can create one.
 - `VALID`: the effective configuration can drive workflows.
+- `MIGRATION_AVAILABLE`: a past supported schema; every rule passes, so analysis
+  and explanation proceed on that contract's effective values, and only
+  `--bootstrap` may migrate it.
 - `INVALID`: explanation and diagnosis are allowed; non-config mutations block.
 - `UNSUPPORTED_VERSION`: a future schema; read-only guidance only, never rewrite.
 
@@ -77,7 +82,7 @@ selected_skill: gopher:config
 primary_owner: gopher:config
 status: COMPLETE | BLOCKED
 config_mode: none | bootstrap | explain
-config_status: ABSENT | VALID | INVALID | UNSUPPORTED_VERSION
+config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
 authorization_gate: none | confirmation-required | blocked
 handoff: gopher:<skill> | null
 ```
@@ -87,8 +92,9 @@ handoff: gopher:<skill> | null
 - `INVALID` blocks non-config mutations until the file is corrected; explanation
   and diagnosis remain allowed.
 - `UNSUPPORTED_VERSION` is read-only; never auto-rewrite a future schema.
-- Migrate an older supported schema only inside `--bootstrap`, with a preview
-  and explicit confirmation.
+- `MIGRATION_AVAILABLE` is migrated only inside `--bootstrap`, with the exact
+  diff shown and explicit confirmation, preserving every value already set.
+  Nothing is ever migrated automatically, and no other mode rewrites the file.
 - An unavailable optional tool is a limitation, not an invalid configuration,
   unless its configured mode requires it.
 - Every write — create, edit, or migrate — requires a shown preview or diff and
@@ -100,5 +106,5 @@ handoff: gopher:<skill> | null
   enum, default, and consuming workflow.
 - `references/bootstrap.md` — the `--bootstrap` absent and present flows.
 - `references/explain.md` — the `--explain` read-only output contract.
-- `references/validation.md` — validation rules and the four configuration states.
+- `references/validation.md` — validation rules and the five configuration states.
 - `templates/default.gopher-plugin.toml` — the canonical default written on bootstrap.

@@ -1,6 +1,6 @@
 ---
 name: modernize
-description: Modernizes Go language, APIs, modules, dependencies, and toolchain against the declared version, previewing changes before applying them. Use to upgrade Go syntax or APIs, adopt idioms, or review dependency and toolchain policy. Route public-API, module-topology, and cross-package contract changes to `gopher:architecture`.
+description: Modernizes Go language, APIs, modules, dependencies, and toolchain against the declared version, previewing changes before applying them. Use to upgrade Go syntax or APIs, adopt idioms, or review dependency and toolchain policy. Module lifecycle, sequenced migration, and public-API or cross-package contract change belong to `gopher:architecture`.
 ---
 
 # Go Modernize
@@ -9,11 +9,28 @@ description: Modernizes Go language, APIs, modules, dependencies, and toolchain 
 
 Own declared-version-aware modernization of Go language and APIs, modules,
 dependencies, and toolchain, always previewing before applying. Primary owner:
-`gopher:modernize`. Read the effective target and policy from `gopher:config`.
+`gopher:modernize`. This skill keeps metadata, dependencies, and toolchain
+maintenance: the declared Go and toolchain versions, the dependency version
+policy, and idiomatic language and API modernization inside the current
+contract. Read the effective target and policy from `gopher:config`.
 
-Route a public-API change, a module-topology change, or a cross-package contract
-migration to `gopher:architecture`. This skill modernizes within the declared
-contract; it does not redraw package boundaries or public interfaces.
+Module lifecycle belongs to `gopher:architecture` and its `module-lifecycle`
+mode: creating, splitting, merging, or retiring a module, `go.work` membership,
+`replace` directives, and release grouping. Sequencing a structural,
+module-topology, or public-contract change into slices — each with an entry
+condition, a compatibility guarantee, and a rollback — belongs to
+`gopher:architecture` and its `migration` mode. Public-API and cross-package
+contract change belongs to `gopher:architecture` as well.
+
+This skill sequences its own in-contract work as verified increments: the change
+stays inside the declared version and the current public contract, so the
+compatibility baseline, not a slice protocol, is the guard.
+
+Concretely: bumping a dependency to a patch release is `gopher:modernize`;
+splitting a package into a second module with its own version line is
+`gopher:architecture`. Applying a `modernize` pass in verified increments inside
+the current contract is `gopher:modernize`; sequencing a package-boundary change
+into slices with per-slice rollback is `gopher:architecture`.
 
 ## State machine
 
@@ -56,16 +73,25 @@ DETECT DECLARED VERSION -> RESOLVE TARGET -> COMPATIBILITY BASELINE -> ANALYZE -
 selected_skill: gopher:modernize
 primary_owner: gopher:modernize
 status: COMPLETE | COMPLETE_WITH_LIMITATIONS | BLOCKED
-config_status: ABSENT | VALID | INVALID | UNSUPPORTED_VERSION
+config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
 baseline_status: passing | failing | not-run
 authorization_gate: none | preview-only | approval-required | blocked
-handoff: gopher:architecture | gopher:developer | null
+handoff: gopher:<skill> | null
 ```
 
 ## Authorization boundaries
 
-- A public-API change, module-topology change, or cross-package contract
-  migration requires `gopher:architecture` and its approval gate.
+- Module lifecycle, sequenced migration, and public-API or cross-package
+  contract change belong to `gopher:architecture` and its approval gate.
+- A project contract at an older but supported schema version reports
+  `MIGRATION_AVAILABLE`; migrating it belongs to `gopher:config --bootstrap`.
+- `ABSENT`, `VALID`, and `MIGRATION_AVAILABLE` proceed on the effective values.
+  `INVALID` and `UNSUPPORTED_VERSION` permit analysis and preview and block
+  application; report `authorization_gate: blocked` and hand correction to
+  `gopher:config`.
+- A failing or unavailable baseline permits analysis and preview and blocks
+  application; report `baseline_status` with `authorization_gate: blocked` and
+  name the failing command.
 - Apply fixes only under an explicit opt-in; otherwise preview and stop.
 - Keep changes inside the declared version; a version upgrade is a separate,
   explicitly approved decision.

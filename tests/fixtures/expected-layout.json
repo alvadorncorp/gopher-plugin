@@ -102,7 +102,9 @@
     "test-quality": [
       "references/coverage.md",
       "references/effectiveness.md",
+      "references/lab-families.md",
       "references/mutation.md",
+      "references/quality-lab.md",
       "references/refactoring-safety.md",
       "references/sources.md",
       "references/tooling.md"
@@ -125,6 +127,60 @@
       "references/harnesses/kimi.md",
       "references/prioritization.md",
       "references/reports.md"
+    ],
+    "cgo": [
+      "references/abi-representation.md",
+      "references/build-matrix.md",
+      "references/callbacks-threads.md",
+      "references/ownership-lifetime.md",
+      "references/pointer-rules.md",
+      "references/sources.md",
+      "references/verification.md"
+    ],
+    "codegen": [
+      "references/adopt.md",
+      "references/inventory.md",
+      "references/provenance.md",
+      "references/reproduction.md",
+      "references/staleness.md",
+      "references/verification.md"
+    ],
+    "doctor": [
+      "references/evidence-bundle.md",
+      "references/hook-mode.md",
+      "references/overrides.md",
+      "references/profiles.md",
+      "references/rules.md"
+    ],
+    "fuzz": [
+      "references/campaigns.md",
+      "references/corpus.md",
+      "references/promotion.md",
+      "references/sources.md",
+      "references/target-design.md",
+      "references/triage.md"
+    ],
+    "observability": [
+      "references/cardinality-cost-redaction.md",
+      "references/dashboards-alerts.md",
+      "references/instrumentation-boundaries.md",
+      "references/logging-slog.md",
+      "references/metrics.md",
+      "references/profiles-runtime.md",
+      "references/signal-contracts.md",
+      "references/signal-tests.md",
+      "references/sources.md",
+      "references/tracing-context.md"
+    ],
+    "resilience": [
+      "references/assessment.md",
+      "references/chaos.md",
+      "references/distributed.md",
+      "references/failure-model.md",
+      "references/lifecycle-recovery.md",
+      "references/overload.md",
+      "references/runtime-controls.md",
+      "references/sources.md"
     ]
   },
   "review_lenses": [
