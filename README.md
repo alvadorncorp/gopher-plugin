@@ -26,7 +26,8 @@ Gopher is not a Go formatter, linter, or language server. It is a collection of
 agent skills and references that guide engineering decisions and workflows for
 Go repositories:
 
-- Diagnose vague symptoms before choosing an owner or fix path.
+- Diagnose unexplained symptoms before choosing an owner or fix path, and check
+  known readiness invariants before an action.
 - Select Go-appropriate construction, value, error, and behavior patterns.
 - Implement routine Go changes with local tests and proportional validation.
 - Review diffs through exact lenses for correctness, tests, security,
@@ -67,19 +68,19 @@ relative path into a peer.
 | `application-architecture` | Language-agnostic internal application boundaries |
 | `developer` | Routine local Go implementation, APIs, errors, tests, and tooling |
 | `architecture` | Go packages, modules/workspaces, dependency direction, seams, and public APIs |
-| `concurrency` | Goroutine lifetime, channels, synchronization, context, races, deadlocks, leaks, and backpressure |
+| `concurrency` | Goroutine lifetime, channels, synchronization, context, races, deadlocks, leaks, and backpressure mechanics |
 | `performance` | Asymptotic and algorithmic cost, allocations, GC, cache behavior, parsing, I/O amplification, benchmarks, profiles, latency, and throughput |
-| `diagnose` | Evidence-driven attribution of vague Go symptoms |
-| `security` | Go threat modeling, reachability, safe verification, and remediation |
+| `diagnose` | Evidence-driven attribution of unexplained Go symptoms |
+| `security` | Go threat modeling, reachability, safe verification, remediation, debug and profiling endpoint exposure, and the ruling on what a telemetry attribute may carry |
 | `review` | Read-only exact-mode review fan-out, consolidation, and verdict |
-| `config` | The `.gopher-plugin.toml` project contract: bootstrap, validation, explanation, and schema evolution |
+| `config` | The `.gopher-plugin.toml` project contract: bootstrap, validation, explanation, migration, and schema evolution |
 | `complexity` | Cyclomatic/cognitive complexity, hotspots, reduction plans, and complexity CI policy |
 | `test-quality` | Coverage, mutation, test effectiveness, and refactoring safety nets |
 | `modernize` | Declared-version-aware Go language, API, module, dependency, and toolchain modernization |
 | `refactor` | Repository-wide or multidimensional refactoring orchestration, sequencing, and evidence |
 | `doctor` | Proactive readiness of the project, configuration, toolchain, module state, generated output, and a pending action against known invariants |
 | `resilience` | Failure semantics, runtime safeguards, distributed degradation, recovery, and explicit reliability assessment |
-| `observability` | Telemetry contracts and instrumentation for logs, metrics, traces, profile exposure, dashboards, alerts, correlation, cardinality, and redaction |
+| `observability` | Telemetry contracts and instrumentation for logs, metrics, traces, profile exposure, dashboards, alerts, correlation, cardinality, and redaction application |
 | `codegen` | Lifecycle and trustworthiness of generated code: inventory, provenance, reproduction, staleness, and artifact verification |
 | `cgo` | Go/C boundaries: ABI and representation, ownership and lifetime, pointer rules, callbacks and thread affinity, linking, and build matrices |
 | `fuzz` | Native Go fuzz targets and invariants, seed corpora, bounded campaigns, crash triage, and regression promotion |

@@ -44,7 +44,7 @@ and reports a version-`1` file as `MIGRATION_AVAILABLE`.
 - **Integrations:** official `plugin-creator` and `skill-creator` scripts,
   native Codex/Claude/Grok validators, and local CLIs for forward tests.
 - **End-to-end flows:** intent → primary owner → specialized workflow →
-  proportional validation → handoff; vague symptom → `diagnose` → evidence →
+  proportional validation → handoff; unexplained symptom → `diagnose` → evidence →
   owner; diff → `review` → explicit lenses → consolidation → verdict.
 
 ## Ownership and Contracts
@@ -55,7 +55,7 @@ and reports a version-`1` file as `MIGRATION_AVAILABLE`.
 | `application-architecture` | language-agnostic internal application boundaries |
 | `developer` | local Go implementation, APIs, errors, tests, and tooling |
 | `architecture` | Go packages, modules, dependencies, and public contracts |
-| `concurrency` | goroutine lifecycle, synchronization, cancellation, and backpressure |
+| `concurrency` | goroutine lifecycle, synchronization, cancellation, and backpressure mechanics |
 | `performance` | algorithmic cost, allocation, GC, and measured sequential performance |
 | `diagnose` | evidence-based attribution without solution or editing |
 | `security` | threats, reachability, safe verification, and remediation |
