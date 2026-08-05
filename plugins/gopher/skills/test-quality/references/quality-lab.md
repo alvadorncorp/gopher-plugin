@@ -7,11 +7,10 @@ afford. It is entered only when the user selects it by name. Load this file and
 
 ## The eligible set is not a plan
 
-`test-quality.quality_lab_families` (schema v2) lists the families the project
-allows. An empty list means every canonical family is eligible. The list bounds
-what may be considered; it never instructs a run of every technique it names. A
-`quality-lab` run selects exactly one family per named risk and says why the
-cheaper families were rejected.
+The eligible-set gate lives in `SKILL.md`, over the
+`test-quality.quality_lab_families` value that `gopher:config` owns; read it
+there. What follows from it here: a `quality-lab` run selects exactly one family
+per named risk and says why the cheaper families were rejected.
 
 ## The five-step selection ladder
 
@@ -41,12 +40,11 @@ detector.
 > requests within one simulated window — asserted against the configured N,
 > which is stated in the contract and not read back from the limiter.
 
-An oracle that is the code under test is disqualifying: a golden file that is
-regenerated with `-update` and never reviewed, or an expected value copied from
-the current output, proves only that the code agrees with itself. Report that
-and stop rather than producing a green run with no meaning. The same rule
-governs characterization tests in `references/refactoring-safety.md`: each
-expected value comes from an independent computation or a documented contract.
+`SKILL.md` holds the rule that disqualifies an oracle which is the code under
+test; apply it here and stop the ladder when it bites. In practice it catches a
+golden file regenerated with `-update` and never reviewed, and an expected value
+copied from the current output. `references/refactoring-safety.md` applies the
+same gate to characterization tests.
 
 ### 3. Resolve the declared Go version
 

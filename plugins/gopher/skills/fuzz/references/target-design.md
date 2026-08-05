@@ -66,6 +66,12 @@ Differential is the strongest when a trusted reference exists. Metamorphic
 covers functions with no inverse and no reference. Structural is the fallback
 that still catches the largest class of reachable crashes.
 
+`Differential` and `Metamorphic` here name the shape of the invariant inside a
+fuzz target, while the identically named entries in
+`test-quality.quality_lab_families` name suite-wide technique choices owned by
+`gopher:test-quality`'s `quality-lab` mode — different decisions, different
+owners.
+
 ## The `testing.F` shape
 
 A fuzz target lives in a `_test.go` file, is named `FuzzXxx`, takes exactly one

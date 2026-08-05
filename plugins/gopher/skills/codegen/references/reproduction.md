@@ -35,9 +35,9 @@ directories and compare all three artifacts:
 | run A versus run B | whether the generator is deterministic |
 | run A versus checked-in | whether the checked-in output is current |
 
-Record this as `repro_runs: 2` in the evidence, alongside the two hashes. A
-project may configure a higher count for a generator with known instability;
-raise the count, never lower it below two.
+Record this as `repro_runs: 2` in the evidence, alongside the two hashes. An
+explicit request raises the count for a generator with known instability; that
+request is the only source of a higher count, and two runs stays the floor.
 
 ## Controlling the environment
 

@@ -1,6 +1,6 @@
 ---
 name: doctor
-description: Checks whether a Go project, its configuration, toolchain, module state, generated output, and a pending action satisfy known readiness invariants, then reports READY, WARN, BLOCKED, or LIMITED with one owner per finding. Use for a pre-flight or readiness check against rules that are already known. Route an unexplained symptom to `gopher:diagnose`, and route every repair to the canonical owner of its area such as `gopher:codegen`, `gopher:config`, `gopher:architecture`, or `gopher:modernize`.
+description: Checks whether a Go project, its configuration, toolchain, module state, generated output, and a pending action satisfy known readiness invariants, then reports READY, WARN, BLOCKED, or LIMITED with one owner per finding. Use for a health check, a doctor check, a pre-flight or readiness check, or a question about whether a Go project is set up correctly and its toolchain is in order, all against rules that are already known. Route an unexplained symptom to `gopher:diagnose`, and route every repair to the canonical owner of its area such as `gopher:codegen`, `gopher:config`, `gopher:architecture`, or `gopher:modernize`.
 ---
 
 # Go Readiness Doctor
@@ -16,8 +16,9 @@ know? `gopher:diagnose` answers a different one: why is this behaving in a way
 nobody has explained yet? Hypothesis formation, reproduction, and causal
 attribution of an unexplained symptom belong to `gopher:diagnose`.
 
-Every repair belongs to the canonical specialist of its area: a stale generated
-artifact to `gopher:codegen`, an invalid project contract to `gopher:config`, a
+Every repair belongs to the canonical specialist of its area: a generated
+artifact that no longer matches its generator to `gopher:codegen`, which also
+classifies it, an invalid project contract to `gopher:config`, a
 module or workspace inconsistency to `gopher:architecture`, a toolchain or
 declared-version issue to `gopher:modernize`, a missing or unrecorded test
 baseline to `gopher:test-quality`, and a local code fix to `gopher:developer`.
@@ -54,7 +55,12 @@ override rules (`references/rules.md`).
 
 ## Workflow
 
-1. Normalize the invocation context, the capabilities, and a safe project root.
+1. Normalize the invocation context and the capabilities, then resolve the safe
+   project root through the same `DETECT_ROOT` step `gopher:config` owns. That
+   one resolved directory is the read boundary of the whole run: every declared
+   action scope, every `project.module_roots` entry, and every evidence path
+   counts as safe while it resolves inside that directory, whatever the current
+   working directory or the configuration file's own location happens to be.
 2. Read bounded configuration and project metadata.
 3. Select rules by profile, event, tool class, and remediation exemption
    (`references/profiles.md`).
@@ -77,9 +83,11 @@ A finding blocks when all five conditions hold:
 4. The remediation is actionable inside the project's own contract.
 5. No valid unexpired override downgrades it.
 
-Every other finding warns. Each finding carries a single owner, bounded
-evidence, and actionable remediation. A check that did not run is reported as
-skipped, contributes `LIMITED`, and stays out of the passed set.
+Every other finding warns. A check that ran without completing its evidence
+warns, names the missing observation in its evidence, and contributes `LIMITED`.
+Each finding carries a single owner, bounded evidence, and actionable
+remediation. A check that did not run is reported as skipped, contributes
+`LIMITED`, and stays out of the passed set.
 
 ## Output format
 

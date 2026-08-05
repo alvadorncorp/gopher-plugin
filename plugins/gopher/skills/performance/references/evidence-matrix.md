@@ -53,6 +53,8 @@ code.
 | Blocked goroutine, contended lock, cancellation, or backpressure | `gopher:concurrency` |
 | Local reversible edit that applies the accepted plan | `gopher:developer` |
 | Package boundary, module topology, or public contract | `gopher:architecture` |
+| Dependency timeout, retry amplification, or queue growth under overload | `gopher:resilience` |
+| The evidence needed is not emitted, or the question is what the service should expose continuously | `gopher:observability` |
 
 Source: <https://go.dev/doc/diagnostics>.
 Last verified: 2026-07-28.

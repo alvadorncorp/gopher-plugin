@@ -1,8 +1,8 @@
 # Profiles and Runtime Metrics
 
-This skill owns the decision to expose profiles and runtime metrics, at what
-cost, and to whom. Interpreting a captured profile belongs to
-`gopher:performance`.
+This file covers the exposure decision for profiles and runtime metrics, the
+exposure surface it creates, the discovery rule for `runtime/metrics`, and the
+profile-adjacent runtime knobs telemetry reports.
 
 ## The exposure decision
 

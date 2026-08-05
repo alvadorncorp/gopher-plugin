@@ -32,7 +32,7 @@ budget is confirmed with the user before a campaign runs, never silently default
 
 | Mode | When | Stop condition |
 |---|---|---|
-| `design` | A function needs a fuzz target, or an existing target carries no stated invariant. | The target, a falsifiable invariant, and an independent oracle are written down. |
+| `design` | A function needs a fuzz target, or an existing target carries no stated invariant. | The target and a falsifiable invariant are written down with an independent oracle, or with a structural-only invariant when no independent oracle exists — recorded as structural in `oracle`, because that bounds what a `PASS` means. |
 | `run` | A designed target is ready to execute inside a budget. | The configured local or CI budget is exhausted, or the campaign reports a failing input. |
 | `triage` | A campaign produced a failing input. | The input is minimized and either reproduces `repro_runs` times or is attributed to the environment. |
 | `promote` | A minimized case reproduces and belongs in the checked-in corpus. | The seed lives under `testdata`, and the handoff record names the owner who fixes the defect. |
@@ -44,6 +44,10 @@ TARGET AND INVARIANT -> SEED CORPUS -> BOUNDED CAMPAIGN -> MINIMIZE -> REPRODUCE
 ```
 
 ## Workflow
+
+A mode entered directly starts at its own first step: `design` at 1, `run` at 4,
+`triage` at 5, and `promote` at 7. The earlier steps are assumed satisfied, and
+their evidence is carried into the report.
 
 1. Choose the function under test with `references/target-design.md`. Parsers,
    decoders, state machines, and round-trip pairs are the natural candidates.
@@ -74,7 +78,7 @@ budget:
 minimized_input:
 reproduction:
 authorization_gate: none | approval-required | blocked
-handoff: gopher:<skill> | null
+handoff: gopher:developer | gopher:security | gopher:concurrency | gopher:performance | gopher:diagnose | null
 ```
 
 ### Terminal states
@@ -83,7 +87,7 @@ handoff: gopher:<skill> | null
 |---|---|
 | `PASS` | The budget was exhausted with no failing input. This is a bounded negative result and not proof of correctness; report the budget that produced it. |
 | `CRASH` | A failing input was found, minimized, and reproduced. |
-| `FLAKY` | The failure stayed unreproduced across `repro_runs` and is attributed to the environment rather than to the input. |
+| `FLAKY` | The failure did not reproduce on every replay across `repro_runs` and is attributed to the environment rather than to the input. |
 | `LIMITED` | The campaign could not run at its configured shape: the budget was cut short, the seed corpus was empty or unrepresentative, a required tool was unavailable, or a failure reproduced on only one machine, operating system, or Go version. A campaign that ran its full configured budget with no failing input is `PASS`, reported with that budget. |
 | `BLOCKED` | A precondition is missing, such as a declared Go version below 1.18, a package that fails to build, or an unconfirmed budget. |
 

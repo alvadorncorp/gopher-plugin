@@ -1,6 +1,6 @@
 ---
 name: complexity
-description: Measures, ranks, and reduces Go cyclomatic and cognitive complexity, function/file size, and maintainability hotspots against configured thresholds. Use to measure complexity, find hotspots, plan reductions, or set complexity CI policy. Route local edits to `gopher:developer` and boundary or contract changes to `gopher:architecture`.
+description: Measures, ranks, and reduces Go cyclomatic and cognitive complexity, function/file size, and maintainability hotspots against configured thresholds. Use to measure complexity, find hotspots, plan reductions, or set complexity CI policy. Route local edits to `gopher:developer` and boundary or contract changes to `gopher:architecture`. Asymptotic and algorithmic cost belongs to `gopher:performance` even when the user calls it complexity.
 ---
 
 # Go Complexity
@@ -11,6 +11,10 @@ Own Go complexity measurement, hotspot ranking, reduction guidance, and
 complexity CI policy. Primary owner: `gopher:complexity`. Read the effective
 scope and thresholds from `gopher:config` and measure the configured package
 scope with a pinned analyzer and configuration.
+
+Cyclomatic complexity, cognitive complexity, function and file size, and
+maintainability thresholds stay here. Asymptotic time and space cost belongs to
+`gopher:performance`. The two are different measurements and stay separate.
 
 Hand a local, reversible reduction to `gopher:developer`. Route a boundary,
 public-contract, or module-topology change to `gopher:architecture`. This skill
@@ -44,8 +48,9 @@ LOAD CONFIG -> PASSING TEST BASELINE -> MEASURE -> RANK HOTSPOTS -> PROPOSE OR A
 - A threshold violation (a value past a configured maximum or minimum) is
   distinct from a baseline regression (a value that worsened versus the prior
   measurement). Report the two separately.
-- A legacy project below a target does not automatically fail when the measured
-  scope maintains or improves its baseline.
+- A legacy project below a target passes the change gate when the measured scope
+  maintains or improves its baseline; report the remaining threshold violations
+  separately.
 - Compare only like-for-like: the same analyzer, configuration, command, and
   tool version before and after. See `references/metrics.md`.
 
@@ -69,9 +74,12 @@ handoff: gopher:<skill> | null
 - Boundary, public-contract, module, or ADR-affecting changes retain
   `gopher:architecture` and its approval gate.
 - An unavailable analyzer is an explicit limitation, not a silent skip, unless
-  complexity is configured as `required`, which blocks the dimension.
+  `complexity.mode` is configured as `required`, which blocks the dimension.
 - Use only an adopted or already-available analyzer; report a missing tool as an
   explicit limitation.
+- Route a configuration contract that blocks work or invites migration to
+  `gopher:config`, which owns every configuration state and the only migration
+  path.
 
 ## References
 

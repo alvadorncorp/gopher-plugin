@@ -1,6 +1,6 @@
 ---
 name: config
-description: Bootstraps, validates, edits, and explains the `.gopher-plugin.toml` project contract that drives Gopher's quality workflows. Use to create project configuration, run `--bootstrap` or `--explain`, or inspect thresholds, tool policy, and refactoring safeguards. Route code, complexity, test, modernization, and refactor work to their canonical owners.
+description: Bootstraps, validates, migrates, edits, and explains the `.gopher-plugin.toml` project contract that drives Gopher's quality workflows. Use to create project configuration, run `--bootstrap` or `--explain`, or inspect thresholds, tool policy, refactoring safeguards, doctor profiles, fuzz budgets, and module policy. Route code, complexity, test, modernization, and refactor work to their canonical owners.
 ---
 
 # Go Project Config
@@ -41,6 +41,30 @@ skill reads and writes configuration only.
 DETECT_ROOT -> LOCATE -> PARSE -> VALIDATE -> BOOTSTRAP | EXPLAIN | INFORM
 ```
 
+## Configuration states and precedence
+
+- `ABSENT`: no file present; analysis is allowed and `--bootstrap` can create one.
+- `VALID`: every rule passes at the current schema version; the effective
+  configuration can drive workflows.
+- `MIGRATION_AVAILABLE`: a past supported schema; every rule passes, so analysis
+  and explanation proceed on that contract's effective values, and only
+  `--bootstrap` may migrate it.
+- `INVALID`: at least one validation rule fails; explanation and diagnosis are
+  allowed, and non-config mutations block.
+- `UNSUPPORTED_VERSION`: a future schema; read-only guidance only, never rewrite.
+  Recovery belongs to the user: update Gopher to a release that supports the
+  schema, or edit the file directly to a supported version.
+
+Effective-value precedence, highest first:
+
+1. Explicit instruction for the current session.
+2. `.gopher-plugin.toml`.
+3. Adopted project configuration and commands.
+4. Gopher defaults (`templates/default.gopher-plugin.toml`).
+
+This precedence selects scope, metrics, and targets. It never relaxes an
+authorization or safety boundary.
+
 ## Workflow
 
 1. Detect the project root and locate `.gopher-plugin.toml`.
@@ -55,26 +79,6 @@ DETECT_ROOT -> LOCATE -> PARSE -> VALIDATE -> BOOTSTRAP | EXPLAIN | INFORM
 6. Resolve every effective value by precedence, report which tier supplied it,
    and carry `config_mode` and `config_status` in the output.
 
-## Configuration states
-
-- `ABSENT`: no file present; analysis is allowed and `--bootstrap` can create one.
-- `VALID`: the effective configuration can drive workflows.
-- `MIGRATION_AVAILABLE`: a past supported schema; every rule passes, so analysis
-  and explanation proceed on that contract's effective values, and only
-  `--bootstrap` may migrate it.
-- `INVALID`: explanation and diagnosis are allowed; non-config mutations block.
-- `UNSUPPORTED_VERSION`: a future schema; read-only guidance only, never rewrite.
-
-Effective-value precedence, highest first:
-
-1. Explicit instruction for the current session.
-2. `.gopher-plugin.toml`.
-3. Adopted project configuration and commands.
-4. Gopher defaults (`templates/default.gopher-plugin.toml`).
-
-This precedence selects scope, metrics, and targets. It never relaxes an
-authorization or safety boundary.
-
 ## Output format
 
 ```yaml
@@ -84,8 +88,12 @@ status: COMPLETE | BLOCKED
 config_mode: none | bootstrap | explain
 config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
 authorization_gate: none | confirmation-required | blocked
+effective_values: # one entry per value: table.key, value, source tier (session | file | adopted | default)
 handoff: gopher:<skill> | null
 ```
+
+`effective_values` carries every resolved value in every mode. Under `--explain`,
+expand each entry with the full per-value contract in `references/explain.md`.
 
 ## Authorization boundaries
 
@@ -99,6 +107,15 @@ handoff: gopher:<skill> | null
   unless its configured mode requires it.
 - Every write — create, edit, or migrate — requires a shown preview or diff and
   explicit user confirmation.
+
+## Quality checklist
+
+- Name the source tier for every effective value reported.
+- Write only after a shown preview or diff and explicit user confirmation.
+- Migrate a `MIGRATION_AVAILABLE` file only inside `--bootstrap`.
+- Keep `--explain` and no-mode runs read-only.
+- Report an unavailable optional tool as a limitation, with its configured mode.
+- Name a real `gopher:<skill>` in `handoff`, or leave it `null`.
 
 ## References
 

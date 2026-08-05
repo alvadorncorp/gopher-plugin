@@ -1,6 +1,6 @@
 ---
 name: cgo
-description: Designs, implements, and audits Go/C boundaries across ABI and representation, memory ownership and lifetime, the cgo pointer-passing rules, callbacks, thread affinity, blocking calls, linking, build tags, sanitizers, and build matrices. Use for cgo integration design, pointer-rule audits, `//export` callbacks, `LockOSThread` affinity, and `CGO_ENABLED` or cross-compilation matrices. Route an unattributed crash or hang to `gopher:diagnose` and goroutine mechanics to `gopher:concurrency`.
+description: Designs, implements, and audits Go/C boundaries across ABI and representation, memory ownership and lifetime, the cgo pointer-passing rules, callbacks, thread affinity, blocking calls, linking, build tags, sanitizers, and build matrices. Use to wrap a C library or bind to a native library from Go, and for cgo integration design, pointer-rule audits, `//export` callbacks, `LockOSThread` affinity, and `CGO_ENABLED` or cross-compilation matrices. Route an unattributed crash or hang to `gopher:diagnose` and goroutine mechanics to `gopher:concurrency`.
 ---
 
 # Go CGO Boundaries
@@ -89,9 +89,9 @@ handoff: gopher:<skill> | null
   moves or reclaims the object.
 - An unattributed crash keeps its owner: `gopher:diagnose`. Report the symptom
   and hand it back rather than treating a stack trace as a boundary finding.
-- Toolchains and tools outside the project's contract are not installed. An
-  unavailable cross-compiler, sanitizer, header, or library is reported as a
-  limitation together with the exact requirement.
+- Use the toolchains and tools the project's contract declares, and report an
+  unavailable cross-compiler, sanitizer, header, or library as a limitation
+  together with the exact requirement.
 - Use the compilers, linkers, sanitizers, and test commands the project already
   declares. Adding a dependency, a system package, or a new link mode is an
   approval-gated change.

@@ -158,6 +158,7 @@ the project declares.
 ## Effective-value precedence
 
 The authoritative four-tier precedence and the rule that it never relaxes an
-authorization or safety boundary live in the `## Configuration states` section
-of `SKILL.md`. Resolve every effective value there, then apply the per-table
-ranges, enums, and defaults above.
+authorization or safety boundary live in the
+`## Configuration states and precedence` section of `SKILL.md`. Resolve every
+effective value there, then apply the per-table ranges, enums, and defaults
+above.

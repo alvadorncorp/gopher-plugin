@@ -33,9 +33,10 @@ builds.
 
 ## Use the project's own test command
 
-Read the declared test command from `gopher:config`, the Makefile, or the CI
-workflow, and run that command. An invented substitute can pass where the real
-gate fails, which turns verification into a false assurance. When the declared
+The test command comes from the project's own surfaces: a Makefile target, a CI
+workflow step, or the `go test` invocation the project has adopted. Read it
+there and run that command. An invented substitute can pass where the real gate
+fails, which turns verification into a false assurance. When the declared
 command is unavailable, report that as a limitation and record the narrower
 command actually used.
 

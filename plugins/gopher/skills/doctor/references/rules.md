@@ -11,7 +11,7 @@ project file), and `subprocess` (invoke an already-available project command).
 |---|---|---|---|---|---|---|---|---|
 | `action.scope-declared` | `gopher:doctor` | quick, standard, strict | metadata | yes | The pending action names the files, packages, or modules it touches, and that scope resolves inside the safe project root | The declared scope and the resolved project root | Declare the scope, or narrow it to paths inside the project root | none — the caller restates the action scope |
 | `config.contract-valid` | `gopher:config` | quick, standard, strict | parse | yes | When `.gopher-plugin.toml` exists it parses, uses canonical tables, and declares a supported `schema_version` | `config_status` plus the offending table or key path | Correct the key, or migrate the contract through the `gopher:config` bootstrap flow | `gopher:config` |
-| `generated.output-current` | `gopher:codegen` | standard, strict | subprocess | no | Committed generated artifacts match what their declared generator produces from the current inputs | The generator directive, the compared input and artifact identities, and the differing artifact paths | Regenerate through the project's generation entry point and commit the result | `gopher:codegen` |
+| `generated.output-current` | `gopher:codegen` | standard, strict | subprocess | no | One reproduction of the declared generator matches the committed artifacts, which is a determinism-unverified staleness signal until `gopher:codegen` reproduces a second time | The generator directive, the compared input and artifact identities, the differing artifact paths, and the single-run scope of the comparison | Report the differing artifacts as a determinism-unverified staleness signal and leave the `FRESH`, `STALE`, or `NONDETERMINISTIC` classification to `gopher:codegen` | `gopher:codegen` |
 | `module.go-mod-present` | `gopher:architecture` | quick, standard, strict | metadata | yes | The resolved project root, or each root declared in `project.module_roots`, carries a `go.mod` | The roots searched and the root that lacks the file | Initialize the module, or correct `project.module_roots` | `gopher:architecture` |
 | `module.go-sum-consistent` | `gopher:architecture` | standard, strict | subprocess | no | Every requirement in `go.mod` has a matching verified entry in `go.sum` | The verification command, its exit status, and the modules it named | Run the project's tidy and verify flow, then commit the refreshed `go.sum` | `gopher:architecture` |
 | `module.replace-policy` | `gopher:architecture` | standard, strict | parse | no | Every `replace` directive is permitted by the effective `architecture.replace_mode` | The directive lines and the effective mode | Remove the directive, or record the mode the project accepts | `gopher:architecture` |
@@ -26,9 +26,10 @@ Three of the ten rules are block-eligible. Each one is cheap, deterministic,
 evidence-complete after a single read, and repairable inside the project's own
 contract, which is what conditions 3 and 4 of the blocking policy require.
 
-- `action.scope-declared` guards the authorization boundary of the run itself. A
-  scope that resolves outside the safe project root leaves the doctor without a
-  defensible read boundary, so it blocks and the caller restates the scope.
+- `action.scope-declared` guards the authorization boundary of the run itself.
+  The safe project root is the single directory workflow step 1 of `SKILL.md`
+  resolves, so a scope that resolves inside it keeps a defensible read boundary
+  and any other scope blocks until the caller restates it.
 - `config.contract-valid` decides rule selection. An unparsable or unsupported
   contract makes every later selection untrustworthy, and the remediation is a
   single key in a file the project owns.
@@ -43,6 +44,10 @@ contract, which is what conditions 3 and 4 of the blocking policy require.
   restricted environment turns them into skipped checks rather than blocks.
 - `toolchain.resolvable` also fails condition 4: installing or selecting a
   toolchain happens outside the project's own contract.
+- `generated.output-current` also stops short of a verdict: a single comparison
+  separates neither a stale artifact from a nondeterministic generator nor an
+  intentional local change, and `gopher:codegen` settles that with a second
+  reproduction run before it classifies.
 - `module.replace-policy` and `workspace.membership-consistent` measure a
   topology decision that `gopher:architecture` owns and enforces at its own
   gate; doctor surfaces the drift early.

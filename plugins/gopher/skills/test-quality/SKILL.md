@@ -52,8 +52,9 @@ PASSING BASELINE -> COVERAGE -> BEHAVIOR EFFECTIVENESS -> OPTIONAL MUTATION -> I
 
 `test-quality.quality_lab_families` (schema v2, default empty, where empty means
 every canonical family is eligible) is the ELIGIBLE SET: what may be considered,
-never an instruction to run every technique it names. Selection starts from five
-inputs and stops at the first technique that satisfies all of them:
+never an instruction to run every technique it names. Selection works five
+ordered steps and stops at the cheapest surviving technique that satisfies all
+five:
 
 1. **A named risk** — the specific claim about the code that might be false.
 2. **An independent oracle** — something other than the code under test that can say the claim is false.
@@ -121,14 +122,19 @@ The `quality_lab` block is filled in `quality-lab` mode and omitted in `default`
   when `test-quality.mutation_mode` is `required`.
 - Use only adopted or already-available tools; report a missing tool as an
   explicit limitation.
+- A `config_status` of `INVALID` or `UNSUPPORTED_VERSION` keeps the run
+  read-only: measure and report, and route the configuration fix to
+  `gopher:config` before any test file is written.
 - In `quality-lab` mode, adjacent work keeps its own canonical owner:
 
 | Work | Owner |
 |---|---|
 | a native Go fuzz target, its invariant, its seed corpus, and its bounded campaign | `gopher:fuzz` |
+| a race, deadlock, goroutine leak, or synchronization defect surfaced by a `race-leak` or `deterministic-concurrency` run | `gopher:concurrency` |
 | benchmarks, profiles, and performance measurement | `gopher:performance` |
 | chaos experiments against a failure model | `gopher:resilience` |
 | security testing and adversarial security probes | `gopher:security` |
+| creating the production seam a selected technique needs | `gopher:developer`, or `gopher:refactor` when the seam comes from a behavior-preserving restructure |
 | application end-to-end testing | the project's own end-to-end owner, named as outside this mode |
 
 The fuzz split is sharp: choosing which technique falsifies a named risk across

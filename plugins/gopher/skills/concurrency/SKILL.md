@@ -1,6 +1,6 @@
 ---
 name: concurrency
-description: Diagnoses and fixes Go concurrency defects across goroutine lifetime, channels, mutexes, atomics, context cancellation, races, deadlocks, goroutine leaks, and backpressure. Use for hangs, leaked goroutines, race detector output, unclear ownership, or synchronization design. Route asymptotic cost, allocation, GC, and throughput analysis to `gopher:performance`.
+description: Diagnoses and fixes Go concurrency defects across goroutine lifetime, channels, mutexes, atomics, context cancellation, races, deadlocks, goroutine leaks, and backpressure mechanics. Use for hangs, leaked goroutines, race detector output, unclear ownership, or synchronization design. Route asymptotic cost, allocation, GC, and throughput analysis to `gopher:performance`, and the overload policy decision behind backpressure to `gopher:resilience`.
 ---
 
 # Go Concurrency
@@ -8,7 +8,13 @@ description: Diagnoses and fixes Go concurrency defects across goroutine lifetim
 ## Context and ownership
 
 Own goroutine lifetime, channels, synchronization, atomics, context, races,
-deadlocks, goroutine leaks, and backpressure. Primary owner: `gopher:concurrency`.
+deadlocks, goroutine leaks, and backpressure mechanics. Primary owner:
+`gopher:concurrency`.
+
+The overload policy decision — whether to shed, degrade, or queue, and with what
+budget — belongs to `gopher:resilience`, which chooses where backpressure must be
+felt and what happens at that point; this skill implements the propagation with
+goroutines, channels, and permits.
 
 Route asymptotic cost, allocation, GC, cache behavior, parsing, I/O
 amplification, benchmark, profile, latency, and throughput analysis to

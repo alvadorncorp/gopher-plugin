@@ -1,4 +1,4 @@
 interface:
   display_name: "Go Diagnosis"
-  short_description: "Attribute vague Go symptoms with evidence"
+  short_description: "Attribute unexplained Go symptoms with evidence"
   default_prompt: "Use $diagnose to attribute this Go symptom before proposing a solution."

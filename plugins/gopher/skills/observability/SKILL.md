@@ -1,6 +1,6 @@
 ---
 name: observability
-description: Designs, instruments, and audits Go telemetry across logs, metrics, traces, profiles, dashboards, alerts, correlation, sampling, cardinality, cost, and redaction, using `log/slog`, OpenTelemetry, W3C Trace Context, and Prometheus conventions. Use to choose the signals that answer an operational question, place instrumentation at the correct boundary, or audit telemetry coverage, safety, and cost. Route reliability objectives to `gopher:resilience`, incident attribution to `gopher:diagnose`, profile interpretation to `gopher:performance`, and debug-endpoint exposure to `gopher:security`.
+description: Designs, instruments, and audits Go telemetry across logs, metrics, traces, profiles, dashboards, alerts, correlation, sampling, cardinality, cost, and redaction application, using `log/slog`, OpenTelemetry, W3C Trace Context, and Prometheus conventions. Use to choose the signals that answer an operational question, place instrumentation at the correct boundary, or audit telemetry coverage, safety, and cost. Route reliability objectives to `gopher:resilience`, incident attribution to `gopher:diagnose`, profile interpretation to `gopher:performance`, and both debug-endpoint exposure and the ruling on whether a value class may be carried at all to `gopher:security`.
 ---
 
 # Go Observability
@@ -49,7 +49,8 @@ local reversible edits that apply an accepted instrumentation plan go to
    cardinality budget, sampling, retention, cost, redaction, correlation keys,
    consumer, and acceptance test per `references/signal-contracts.md`. Resolve
    the Go version, the telemetry modules in use, and the applicable
-   semantic-convention version before committing to an API or an attribute name.
+   semantic-convention version before committing to an API or an attribute name,
+   per `references/sources.md`.
 3. **Place instrumentation at the correct boundary.** Apply
    `references/instrumentation-boundaries.md`: a library exposes hooks and
    accepts providers; the composition root configures exporters, samplers,
@@ -112,8 +113,9 @@ Terminal states:
 
 - Every signal names the operational question and the consumer it serves.
 - Every attribute has a bounded value set and a stated cardinality budget.
-- Resolve the Go version, the telemetry module versions, and the applicable
-  semantic-convention version before recommending an API or an attribute name.
+- Every recommendation records the resolved Go version, telemetry module
+  versions, and semantic-convention version, plus the stability of each
+  attribute it uses.
 - Discover runtime-metric support for the declared Go version rather than
   assuming a metric name exists.
 - Keep library instrumentation free of global providers, exporters, and default

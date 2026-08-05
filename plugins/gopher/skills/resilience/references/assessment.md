@@ -56,6 +56,12 @@ list, never the `proven_controls` list, however convincing the code reads.
 | `missing_evidence` | A failure-model row whose control, detection, or recovery cannot be assessed from the available evidence, with the named probe that would close it |
 | `residual_risk` | What survives the proven controls, including absent objectives and untested paths |
 
+`observed` evidence admits a control to `proven_controls` when its artifact is
+reproducible from the repository — a recorded experiment, a named test, or an
+incident report carrying the signal. A single observation that no artifact
+reproduces stays in `proposed_controls`, with the promoting reproduction named
+in `missing_evidence`.
+
 ## The gap rule
 
 A gap in evidence is reported as a gap rather than filled by assumption. Three

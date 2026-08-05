@@ -87,7 +87,8 @@ downstream parser will re-split.
 
 Deciding who may reach `net/http/pprof`, `/debug/vars`, a metrics endpoint, or a
 trace-debug endpoint is an authorization boundary owned by `gopher:security`.
-This skill states what each endpoint reveals, its cost, and the redaction it
-needs; `gopher:security` decides the exposure and the controls.
+This skill states what each endpoint reveals, its cost, and applies the
+redaction `gopher:security` rules on; `gopher:security` decides the exposure and
+the controls.
 
 Last verified: 2026-08-05.

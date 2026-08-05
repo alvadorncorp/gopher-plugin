@@ -1,6 +1,6 @@
 ---
 name: resilience
-description: Models Go failure behavior and recovery across time budgets, retries, idempotency, backoff and jitter, circuit breakers, bulkheads, overload and load shedding, graceful shutdown, dependency criticality, delivery semantics, degraded modes, failover, disaster recovery, SLO-driven alerting, chaos hypotheses, and residual risk. Use to decide how a Go service fails, degrades, and returns to health. Goroutine and synchronization mechanics belong to `gopher:concurrency`, causal attribution of an incident to `gopher:diagnose`, and telemetry implementation to `gopher:observability`.
+description: Models Go failure behavior and recovery across time budgets, retries, idempotency, backoff and jitter, circuit breakers, bulkheads, overload and load shedding, graceful shutdown, dependency criticality, delivery semantics, degraded modes, failover, disaster recovery, SLO-driven alerting, chaos hypotheses, and residual risk. Use to decide how a Go service fails, degrades, and returns to health, when it falls over because a database is slow, when deploys drop requests, when retries storm a dependency, and to assess how reliable a service is and what evidence backs that. Goroutine, channel, and backpressure propagation mechanics belong to `gopher:concurrency`, causal attribution of an incident to `gopher:diagnose`, telemetry implementation to `gopher:observability`, and cost and throughput tuning to `gopher:performance`.
 ---
 
 # Go Resilience
@@ -16,6 +16,7 @@ residual risk that survives them. Adjacent concerns keep their canonical owner:
 | Adjacent concern | Owner |
 |---|---|
 | goroutine and synchronization mechanics | `gopher:concurrency` |
+| backpressure propagation mechanics (goroutines, channels, permits) | `gopher:concurrency` |
 | causal attribution of an incident | `gopher:diagnose` |
 | performance tuning | `gopher:performance` |
 | telemetry implementation | `gopher:observability` |
@@ -26,7 +27,9 @@ residual risk that survives them. Adjacent concerns keep their canonical owner:
 A goroutine that leaks after cancellation is `gopher:concurrency`; whether a
 dependency timeout should shed load or degrade is `gopher:resilience`. This
 skill states WHAT signal must detect a failure mode, and
-`gopher:observability` designs and implements that signal.
+`gopher:observability` designs and implements that signal. On the same split,
+`gopher:resilience` chooses where backpressure must be felt and what happens at
+that point; `gopher:concurrency` implements the propagation.
 
 ## Modes
 
@@ -60,6 +63,11 @@ BOUNDARY AND WORKLOAD -> FAILURE MODEL -> RUNTIME CONTROLS -> OVERLOAD AND DEGRA
 | `BLOCKED` | The boundary, workload, or dependency set stays unknown, or the requested work needs an authorization that is absent |
 
 ## Workflow
+
+Steps 1, 2, and 6 run in every mode; steps 3, 4, and 5 specify controls in
+`runtime` and `distributed`, and in `assessment` they are read as evidence
+checks against existing artifacts under the read-only contract in
+`references/assessment.md`.
 
 1. Define the boundary, workload, dependencies, objectives, invariants, and
    recovery assumptions, plus the project's declared Go version.

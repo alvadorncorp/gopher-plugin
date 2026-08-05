@@ -65,6 +65,6 @@ Migration is the only path that changes `schema_version`, and it runs only here.
 
 ## Never-overwrite rule
 
-Presence of a file is never a reason to replace it. Editing preserves unchanged
-content; migration preserves compatible values; both require an explicit,
-previewed confirmation before any write.
+Editing preserves unchanged content, migration preserves compatible values, and
+both require an explicit, previewed confirmation before any write. Presence of a
+file is therefore never a reason to replace it.

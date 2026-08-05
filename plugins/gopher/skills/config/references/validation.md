@@ -5,24 +5,27 @@ what work the effective configuration may drive.
 
 ## Rules
 
-1. Schema version: `[gopher].schema_version` must be present and an integer.
+1. Parse: the file must be valid TOML. Every rule below presupposes a parsed
+   document, so a parse failure is `INVALID` on its own. Report the parse-error
+   location and offer the correction under `--bootstrap`.
+2. Schema version: `[gopher].schema_version` must be present and an integer.
    A value newer than this skill supports is `UNSUPPORTED_VERSION`. A value
    older than the current schema but still supported is `MIGRATION_AVAILABLE`
    once every other rule passes; it is not a failure. `schema_version` is
-   classified by this rule alone: rules 5 and 6 below do not apply to it, so
+   classified by this rule alone: rules 6 and 7 below do not apply to it, so
    `2` is `VALID`, `1` is `MIGRATION_AVAILABLE`, and any higher value is
    `UNSUPPORTED_VERSION`.
-2. Canonical tables: only `gopher`, `project`, `complexity`, `test-quality`,
+3. Canonical tables: only `gopher`, `project`, `complexity`, `test-quality`,
    `modernize`, `refactor`, `tools`, `doctor`, `fuzz`, and `architecture` are
    allowed. Root-level loose keys and dotted keys are not canonical. The one
    canonical nested array of tables is `[[doctor.overrides]]`.
-3. Known keys: every key must be defined for its table in
+4. Known keys: every key must be defined for its table in
    `references/schema.md`. An unknown key in the current schema is invalid.
-4. Value types: each value must match its documented type (integer, boolean,
+5. Value types: each value must match its documented type (integer, boolean,
    string, or list of string).
-5. Ranges: numeric values must fall inside their documented range (for example
+6. Ranges: numeric values must fall inside their documented range (for example
    `coverage_target` within `0`–`100`, `cyclomatic_max` greater than `0`).
-6. Enums: string values constrained to an enum must match a documented member
+7. Enums: string values constrained to an enum must match a documented member
    (for example `mode` is `advisory` or `required`).
 
 ## States
@@ -34,9 +37,10 @@ what work the effective configuration may drive.
 - `MIGRATION_AVAILABLE`: the file parses and every rule passes, but its
   `schema_version` is older than the version this skill supports. This is not an
   invalid file. Analysis and explanation proceed on the older contract's
-  effective values; only `--bootstrap` may migrate it.
-- `INVALID`: at least one rule fails. Explanation and diagnosis are allowed, but
-  non-config mutations are blocked until the file is corrected.
+  effective values.
+- `INVALID`: at least one rule fails, including a parse failure under rule 1.
+  Explanation and diagnosis are allowed, but non-config mutations are blocked
+  until the file is corrected.
 - `UNSUPPORTED_VERSION`: the schema version is newer than supported. Read-only
   guidance is allowed; automatic rewriting is forbidden.
 

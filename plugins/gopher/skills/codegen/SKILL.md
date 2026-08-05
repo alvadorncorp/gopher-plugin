@@ -1,6 +1,6 @@
 ---
 name: codegen
-description: Inventories Go generators, records provenance, reproduces generation in a temporary location, and classifies checked-in output as fresh, stale, or nondeterministic before verifying the artifacts. Use to check whether generated Go code is current and reproducible, to regenerate on request, or to adopt an ad hoc generator. Route generator implementation to `gopher:developer` and generated-contract changes to `gopher:architecture`.
+description: Inventories Go generators, records provenance, reproduces generation in a temporary location, and classifies checked-in output as fresh, stale, or nondeterministic before verifying the artifacts. Use for `go generate`, a file carrying a `DO NOT EDIT` header, or mocks, protobuf, sqlc, and stringer output: to check whether generated Go code is current and reproducible, to regenerate on request, or to adopt an ad hoc generator. Route generator implementation to `gopher:developer` and generated-contract changes to `gopher:architecture`.
 ---
 
 # Go Code Generation
@@ -41,9 +41,13 @@ Terminal states:
 
 - `FRESH`: two runs from identical inputs agree with each other and with the
   checked-in output, and the verified artifacts pass their gates.
-- `STALE`: the runs agree with each other and differ from the checked-in output.
-  Generation is deterministic and the inputs moved, so regeneration produces one
-  known, reviewable result.
+- `STALE`: the runs agree with each other, at least one input hash moved, and the
+  reproduced output differs from the checked-in output. Generation is
+  deterministic and the inputs moved, so regeneration produces one known,
+  reviewable result. An intentional local change — the runs agree, every input
+  hash is unchanged, and the artifact still differs — is reported as `STALE`
+  too, with the unchanged input hashes and the hand-edit finding recorded in
+  `comparison_evidence`.
 - `NONDETERMINISTIC`: two runs from identical inputs disagree. The generator is
   unstable, so staleness stays undecidable until determinism is restored.
 - `BLOCKED`: a missing pin, declared command, input, or authorization keeps
@@ -77,11 +81,14 @@ provenance:
 comparison_evidence:
 verified_artifacts:
 authorization_gate: none | approval-required | blocked
-handoff: gopher:<skill> | null
+handoffs:  # one entry per finding: {finding, owner: gopher:<skill>, evidence}
 ```
 
 ## Authorization boundaries
 
+- `authorization_gate` is `none` in `check` and in an explicitly selected
+  `generate`, `approval-required` in `adopt`, and `blocked` when a required
+  authorization is withheld.
 - Remediate a generated file at its input or its generator, then regenerate and
   re-verify; when the generated contract itself must change — an exported API, a
   wire schema, a persisted shape — that decision is `gopher:architecture`.

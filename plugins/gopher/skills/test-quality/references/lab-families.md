@@ -15,7 +15,7 @@ build and to run, not wall-clock alone: `low`, `medium`, `high`, `highest`.
 | `integration` | the components agree once really wired together | high |
 | `contract` | both sides of an interface still agree | medium |
 | `hermetic` | the result depends only on the code and its declared inputs | low |
-| `flake` | this suite's failures and passes are real signal | low to run, high in wall-clock |
+| `flake` | this suite's failures and passes are real signal | low (wall-clock grows with `-count`) |
 | `race-leak` | shared access is synchronized and goroutines end with their work | low |
 | `golden` | serialized output is stable and intentional | low |
 | `property` | an invariant holds across the input domain, not only the chosen examples | medium |

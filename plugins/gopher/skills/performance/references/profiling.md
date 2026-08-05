@@ -38,9 +38,11 @@ go tool pprof http://<host>/debug/pprof/allocs
 go tool pprof http://<host>/debug/pprof/heap
 ```
 
-Importing `net/http/pprof` exposes these endpoints. Production capture requires
-explicit authorization, a bounded collection window, and a plan for the
-artifact.
+Importing `net/http/pprof` exposes these endpoints. Deciding that a service
+exposes them continuously, at what cost and retention, is `gopher:observability`;
+who may reach them is `gopher:security`; this skill reads what an authorized
+capture produced. Production capture requires explicit authorization, a bounded
+collection window, and a plan for the artifact.
 
 ## Execution traces
 
