@@ -1,5 +1,5 @@
 [gopher]
-schema_version = 1
+schema_version = 2
 
 [project]
 module_roots = []
@@ -18,6 +18,7 @@ coverage_target = 80
 coverage_regression_max = 0
 mutation_mode = "advisory"
 mutation_target = 75
+quality_lab_families = []
 
 [modernize]
 target_go = "declared"
@@ -32,3 +33,20 @@ require_behavior_tests = true
 complexity = "auto"
 mutation = "auto"
 modernize = "auto"
+
+[doctor]
+profile = "standard"
+deadline_ms = 2000
+max_findings = 20
+required_rules = []
+
+[fuzz]
+local_budget_seconds = 60
+ci_budget_seconds = 300
+repro_runs = 3
+
+[architecture]
+workspace_mode = "advisory"
+tidy_mode = "advisory"
+release_mode = "independent"
+replace_mode = "local-only"

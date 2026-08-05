@@ -59,6 +59,9 @@ each one starts from a known passing state (`references/controller.md`).
 - A failing test baseline blocks refactoring but permits analysis.
 - Missing behavior tests block production refactoring; an explicitly approved
   safety-net phase may add characterization tests first.
+- `MIGRATION_AVAILABLE` is a supported past schema whose rules all pass:
+  analysis and remediation proceed on that contract's effective values, and
+  migrating it belongs to `gopher:config --bootstrap`.
 - A dirty working tree permits analysis; edits stay scoped and preserve
   unrelated user changes.
 - A missing optional tool is a limitation; a tool configured as required blocks
@@ -82,7 +85,7 @@ each one starts from a known passing state (`references/controller.md`).
 selected_skill: gopher:refactor
 primary_owner: gopher:refactor
 status: COMPLETE | COMPLETE_WITH_LIMITATIONS | BLOCKED
-config_status: ABSENT | VALID | INVALID | UNSUPPORTED_VERSION
+config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
 baseline_status: passing | failing | not-run
 selected_dimensions: [correctness, security, tests, complexity, concurrency, performance, modernization]
 authorization_gate: none | approval-required | blocked

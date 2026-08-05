@@ -20,5 +20,6 @@ needs a passing baseline, focused tests, and a re-measurement.
 - A change to a public contract, package boundary, or module topology is handed
   to `gopher:architecture`; complexity does not perform cross-package
   restructuring.
-- Do not trade a complexity number for worse behavior, weaker error handling, or
-  a broken abstraction. A reduction that harms clarity is not an improvement.
+- Keep behavior, error handling, and abstraction at least as strong as before. A
+  reduction that lowers the metric while harming any of the three is reported as
+  rejected, with the reason.

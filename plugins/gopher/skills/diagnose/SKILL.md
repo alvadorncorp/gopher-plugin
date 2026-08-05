@@ -1,15 +1,23 @@
 ---
 name: diagnose
-description: Attributes vague Go symptoms through reproducible evidence and falsifiable hypotheses, then hands off to one canonical owner or returns UNKNOWN. Use when the cause is unclear. Stop after attribution; solution selection and code edits belong to the receiving owner.
+description: Attributes unexplained Go symptoms through reproducible evidence and falsifiable hypotheses, then hands off to one canonical owner or returns UNKNOWN. Use when something fails, hangs, crashes, or regresses with no known cause and the symptom needs reproduction and causal attribution before an owner can be named. Route a pre-flight or readiness check against already-known invariants to `gopher:doctor`. Stop after attribution; solution selection and code edits belong to the receiving owner.
 ---
 
 # Diagnose Go Symptoms
 
 ## Context and ownership
 
-Own evidence-driven attribution of vague Go symptoms. Primary owner:
+Own evidence-driven attribution of unexplained Go symptoms. Primary owner:
 `gopher:diagnose`. Produce an evidence bundle and stop; the receiving owner
 selects and implements a solution.
+
+`gopher:diagnose` keeps the unexplained symptom: the one that needs
+reproduction and causal attribution before anyone can name an owner. Readiness
+checked against invariants that are already written down belongs to
+`gopher:doctor`. The split is testable: "is this project ready for the change I
+am about to make?" is `gopher:doctor`; "why is this behaving in a way nobody
+has explained yet?" is `gopher:diagnose`. A `gopher:doctor` finding whose own
+cause is unexplained arrives here for attribution.
 
 ## State machine
 

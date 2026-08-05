@@ -1,6 +1,6 @@
 ---
 name: performance
-description: Analyzes and plans Go sequential performance work across asymptotic and algorithmic cost, data structures, allocations, GC, cache behavior, parsing, I/O amplification, benchmarks, profiles, latency, and throughput. Use to make existing Go code faster, remove a quadratic or cubic scan, or interpret testing.B, pprof, and go tool trace evidence. Route goroutine, synchronization, and backpressure work to `gopher:concurrency` and local edits to `gopher:developer`. Asymptotic cost stays here even when the user calls it complexity; cyclomatic and cognitive complexity metrics belong to `gopher:complexity`.
+description: Analyzes and plans Go sequential performance work across asymptotic and algorithmic cost, data structures, allocations, GC, cache behavior, parsing, I/O amplification, latency, and throughput. Use to make existing Go code faster, remove a quadratic or cubic scan, or interpret already-captured testing.B, pprof, and go tool trace evidence. Route goroutine, synchronization, and backpressure work to `gopher:concurrency`, telemetry signal and exporter design to `gopher:observability`, failure behavior under dependency failure or overload to `gopher:resilience`, and local edits to `gopher:developer`. Asymptotic cost stays here even when the user calls it complexity; cyclomatic and cognitive complexity metrics belong to `gopher:complexity`.
 ---
 
 # Go Performance
@@ -12,25 +12,46 @@ structure selection, allocations, GC pressure, cache behavior, parsing, I/O
 amplification, benchmarking, profiling, latency, and throughput. Primary owner:
 `gopher:performance`.
 
+## State machine
+
+```text
+CORRECTNESS AND COST MODEL -> MAGNITUDE -> ATTRIBUTION -> GATED TIMELINE -> OPTIMIZATION PLAN -> HANDOFF -> LIKE-FOR-LIKE RE-MEASUREMENT
+```
+
+## Routing
+
 This skill analyzes and produces an optimization plan. Local reversible
 implementation goes to `gopher:developer` together with the exact before and
 after verification. An independent revalidation by this skill after the change
 happens when the user asks for it.
 
 Route goroutine lifetime, channel, synchronization, cancellation, race,
-deadlock, goroutine leak, and backpressure remedies to `gopher:concurrency`. Route a
+deadlock, goroutine leak, and backpressure mechanics to `gopher:concurrency`. Route a
 package boundary, module topology, or public-contract change to
 `gopher:architecture`. Route an unattributed symptom to `gopher:diagnose`.
+
+Interpretation of profiles and execution traces belongs here, including
+attribution to a function, an allocation site, a lock, a syscall, or a
+scheduling stall.
+
+Route the design of signals and exporters to `gopher:observability`: which
+telemetry a service emits, at what cost and cardinality, and how it is exported
+and correlated, including the decision to expose profiles continuously in
+production. Reading an already-captured CPU profile to find the hot path is
+`gopher:performance`; deciding that the service must continuously expose
+profiles, and at what cost, is `gopher:observability`; who may reach them is
+`gopher:security`.
+
+Route throughput work whose real subject is failure behavior under dependency
+failure or overload — retries, backoff, load shedding, degradation — to
+`gopher:resilience`. The cost of that work, once its semantics are settled,
+stays here. What a retry loop costs per request in allocations and latency is
+`gopher:performance`; whether the call retries at all, with what budget, and
+what it does when the budget is exhausted, is `gopher:resilience`.
 
 Asymptotic time and space cost belong here. Cyclomatic complexity, cognitive
 complexity, function and file size, and maintainability thresholds belong to
 `gopher:complexity`. The two are different measurements and stay separate.
-
-## State machine
-
-```text
-CORRECTNESS AND COST MODEL -> MAGNITUDE -> ATTRIBUTION -> GATED TIMELINE -> OPTIMIZATION PLAN -> HANDOFF -> LIKE-FOR-LIKE RE-MEASUREMENT
-```
 
 ## Workflow
 
@@ -93,7 +114,7 @@ optimization_options:
 selected_option_and_tradeoffs:
 verification_plan:
 authorization_gate: none | approval-required | blocked
-handoff: gopher:developer | gopher:concurrency | gopher:architecture | gopher:diagnose | null
+handoff: gopher:developer | gopher:concurrency | gopher:architecture | gopher:observability | gopher:resilience | gopher:diagnose | null
 ```
 
 ## Authorization boundaries

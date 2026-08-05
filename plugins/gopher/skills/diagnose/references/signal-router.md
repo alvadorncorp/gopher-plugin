@@ -15,6 +15,25 @@
 | Coverage, mutation score, or whether tests detect behavioral faults | `gopher:test-quality` |
 | Go version, API, module, dependency, or toolchain modernization | `gopher:modernize` |
 | Repository-wide or multidimensional remediation across two or more dimensions | `gopher:refactor` |
+| A known project, configuration, toolchain, module-state, or generated-output invariant that a written rule already covers | `gopher:doctor` |
+| Failure semantics, retry and idempotency behavior, overload, degradation, or recovery under dependency failure | `gopher:resilience` |
+| A missing, ambiguous, or costly telemetry signal, or a correlation, cardinality, sampling, or redaction question | `gopher:observability` |
+| Generated output that is stale, nondeterministic, or of unclear provenance | `gopher:codegen` |
+| An attributed defect at a Go/C boundary — pointer, ownership, lifetime, callback, thread affinity, or linking | `gopher:cgo` |
+| An input-driven defect in a parser, decoder, or state machine that a falsifiable invariant can expose | `gopher:fuzz` |
+
+A crash or hang at a Go/C boundary that has not been attributed stays in
+`gopher:diagnose` until the evidence supports the boundary as the dominant
+signal. The presence of `import "C"` is a keyword, not attribution; route to
+`gopher:cgo` once a probe ties the observed failure to the boundary itself.
+
+`gopher:doctor` owns a signal only while the request is still a readiness check
+against an already-written rule. Once evidence attributes a cause, name the
+specialist that performs the remedy — `gopher:codegen` for a stale artifact,
+`gopher:config` for an invalid project contract, `gopher:architecture` for a
+module or workspace inconsistency, `gopher:modernize` for a toolchain or
+declared-version issue — and record the readiness rule in
+`recommended_next_step`.
 
 Mixed symptoms still receive one owner: choose the domain whose risk and
 evidence explain the observed failure. Put secondary constraints in

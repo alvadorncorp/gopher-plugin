@@ -12,11 +12,21 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests/fixtures/forward-tests.json"
 SCHEMA_PATH = ROOT / "tests/fixtures/response-schema.json"
+LAYOUT_PATH = ROOT / "tests/fixtures/expected-layout.json"
 HARNESSES = ("codex", "claude", "grok", "kimi")
 
 
 def load_json(path: Path):
     return json.loads(path.read_text(encoding="utf-8"))
+
+
+def required_owners():
+    """Every installed skill must own at least one corpus case.
+
+    Derived from the layout fixture rather than a literal so a newly added
+    skill cannot ship without a routing case that selects it.
+    """
+    return {f"gopher:{name}" for name in load_json(LAYOUT_PATH)["skills"]}
 
 
 def validate_corpus(payload):
@@ -42,7 +52,7 @@ def validate_corpus(payload):
     if duplicates:
         errors.append(f"duplicate case ids: {duplicates}")
     selected_skills = {case.get("expected", {}).get("selected_skill") for case in cases}
-    required = {"gopher:design-patterns", "gopher:application-architecture", "gopher:developer", "gopher:architecture", "gopher:concurrency", "gopher:performance", "gopher:diagnose", "gopher:security", "gopher:review", "gopher:config", "gopher:complexity", "gopher:test-quality", "gopher:modernize", "gopher:refactor"}
+    required = required_owners()
     if not required.issubset(selected_skills):
         errors.append(f"routing coverage missing skills: {sorted(required - selected_skills)}")
     return errors

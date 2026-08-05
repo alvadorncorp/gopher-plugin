@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Resilience"
+  short_description: "Model Go failure behavior and recovery"
+  default_prompt: "Use $resilience to model how this Go service fails, degrades, and recovers."

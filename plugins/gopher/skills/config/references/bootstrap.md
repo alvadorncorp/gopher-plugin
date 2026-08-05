@@ -28,6 +28,9 @@ Ask only what the user wants to change; accept the default for anything skipped:
 - Modernize: `target_go`, `apply_fixes`, `dependency_updates`.
 - Refactor safeguards: `require_passing_baseline`, `require_behavior_tests`.
 - Tool policy: `complexity`, `mutation`, `modernize` under `[tools]`.
+- Doctor: `profile`, `deadline_ms`, `max_findings`, `required_rules`.
+- Fuzz budgets: `local_budget_seconds`, `ci_budget_seconds`, `repro_runs`.
+- Architecture: `workspace_mode`, `tidy_mode`, `release_mode`, `replace_mode`.
 
 Validate every supplied value against `references/schema.md` before preview.
 
@@ -38,15 +41,30 @@ Validate every supplied value against `references/schema.md` before preview.
    only the invalid values; keep every valid value unchanged.
 3. If the state is `UNSUPPORTED_VERSION`, stop: the file is read-only and is not
    rewritten. Report the unsupported version.
-4. For an older but supported `schema_version`, offer migration to the current
-   version, preserving every compatible value.
+4. If the state is `MIGRATION_AVAILABLE`, run the migration flow below.
 5. Apply requested edits in memory, preserving all unchanged content, comments,
    and key order where possible.
 6. Show the exact diff.
 7. Require confirmation, then write once. Report the resulting state.
 
+## Migration flow (`MIGRATION_AVAILABLE`)
+
+Migration is the only path that changes `schema_version`, and it runs only here.
+
+1. Report the `schema_version` found and the version this skill supports.
+2. Build the migration in memory. From schema 1 to schema 2 that means the
+   version bump `schema_version = 1` to `schema_version = 2`, the added tables
+   `[doctor]`, `[fuzz]`, and `[architecture]` at their documented defaults, and
+   the added key `quality_lab_families = []` in `[test-quality]`.
+3. Preserve every value the user already set. Migration adds what schema 2
+   introduces and changes nothing the existing file already states.
+4. Show the exact diff of the version bump and the added tables and keys.
+5. Require explicit confirmation. Declining leaves the file untouched and keeps
+   the state `MIGRATION_AVAILABLE`; workflows continue on the older contract.
+6. On confirmation, write once and report the resulting `VALID` state.
+
 ## Never-overwrite rule
 
-Presence of a file is never a reason to replace it. Editing preserves unchanged
-content; migration preserves compatible values; both require an explicit,
-previewed confirmation before any write.
+Editing preserves unchanged content, migration preserves compatible values, and
+both require an explicit, previewed confirmation before any write. Presence of a
+file is therefore never a reason to replace it.

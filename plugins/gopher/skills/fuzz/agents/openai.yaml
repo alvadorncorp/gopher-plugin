@@ -1,0 +1,4 @@
+interface:
+  display_name: "Go Fuzzing"
+  short_description: "Design and run bounded native Go fuzz campaigns"
+  default_prompt: "Use $fuzz to design a native Go fuzz target and run a bounded campaign against it."

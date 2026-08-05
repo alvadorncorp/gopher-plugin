@@ -21,7 +21,7 @@ safe_reproduction:
 remediation:
 validation:
 residual_risk:
-owner: gopher:security | gopher:developer | gopher:architecture
+owner: gopher:<skill>
 ```
 
 ## Report
