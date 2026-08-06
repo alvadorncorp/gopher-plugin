@@ -1,6 +1,6 @@
 # Doctor Rule Catalog
 
-Ten rules, and only these ten. Each rule states one invariant that is already
+Eleven rules, and only these eleven. Each rule states one invariant that is already
 known, the evidence that decides it, the owner of the area, and the remediation
 route. Rules execute in stable rule-id order so a truncated run is reproducible.
 
@@ -10,6 +10,7 @@ project file), and `subprocess` (invoke an already-available project command).
 | Rule id | Owner | Profiles | Cost | Block-eligible | Invariant | Evidence | Remediation | Handoff |
 |---|---|---|---|---|---|---|---|---|
 | `action.scope-declared` | `gopher:doctor` | quick, standard, strict | metadata | yes | The pending action names the files, packages, or modules it touches, and that scope resolves inside the safe project root | The declared scope and the resolved project root | Declare the scope, or narrow it to paths inside the project root | none — the caller restates the action scope |
+| `agents.policy-declared` | `gopher:config` | quick, standard, strict | parse | no | The `[agents]` policy is self-consistent: a role model or effort other than `shipped` is accompanied by an explicit `policy_divergence`, and `enabled = false` is not combined with any non-default role declaration | The declared `[agents]` keys, their effective values, and the schema version that supplied them | Set `policy_divergence` explicitly for a non-`shipped` declaration, return the role keys to `shipped`, or drop the role declarations from a disabled roster | `gopher:config` |
 | `config.contract-valid` | `gopher:config` | quick, standard, strict | parse | yes | When `.gopher-plugin.toml` exists it parses, uses canonical tables, and declares a supported `schema_version` | `config_status` plus the offending table or key path | Correct the key, or migrate the contract through the `gopher:config` bootstrap flow | `gopher:config` |
 | `generated.output-current` | `gopher:codegen` | standard, strict | subprocess | no | One reproduction of the declared generator matches the committed artifacts, which is a determinism-unverified staleness signal until `gopher:codegen` reproduces a second time | The generator directive, the compared input and artifact identities, the differing artifact paths, and the single-run scope of the comparison | Report the differing artifacts as a determinism-unverified staleness signal and leave the `FRESH`, `STALE`, or `NONDETERMINISTIC` classification to `gopher:codegen` | `gopher:codegen` |
 | `module.go-mod-present` | `gopher:architecture` | quick, standard, strict | metadata | yes | The resolved project root, or each root declared in `project.module_roots`, carries a `go.mod` | The roots searched and the root that lacks the file | Initialize the module, or correct `project.module_roots` | `gopher:architecture` |
@@ -22,7 +23,7 @@ project file), and `subprocess` (invoke an already-available project command).
 
 ## Block-eligible rules
 
-Three of the ten rules are block-eligible. Each one is cheap, deterministic,
+Three of the eleven rules are block-eligible. Each one is cheap, deterministic,
 evidence-complete after a single read, and repairable inside the project's own
 contract, which is what conditions 3 and 4 of the blocking policy require.
 
@@ -36,8 +37,22 @@ contract, which is what conditions 3 and 4 of the blocking policy require.
 - `module.go-mod-present` is the precondition of every module, toolchain, and
   generated-output rule. Without it the rest of the catalog reports on nothing.
 
-## Why the other seven warn
+## Why the other eight warn
 
+- `agents.policy-declared` describes a declaration that is inconsistent rather
+  than one that is broken, and the run proceeds on the shipped agent bindings
+  whatever it says. It is also the one rule whose subject doctor cannot fully
+  observe: the packaged agent bindings live in the host's plugin installation,
+  outside the safe project root that workflow step 1 resolves, so this rule
+  reports declaration consistency only. The applied-versus-declared comparison is
+  reported by each agent as `policy_status` at run time, not here.
+  This rule's own remediation carries a trap worth stating. Setting
+  `policy_divergence` explicitly satisfies the rule with either member, and
+  choosing `block` beside a role model or effort other than `shipped` disables
+  the roster on every run: no host exposes a way to observe an active binding
+  today, so such a declaration resolves to `UNVERIFIABLE`, which `block` turns
+  into `BLOCKED_BY_POLICY`. Prefer `report`, or return the role keys to
+  `shipped`.
 - `module.go-sum-consistent`, `toolchain.resolvable`, and
   `generated.output-current` depend on a subprocess whose availability is
   environmental. Their evidence is complete only when that command runs, so a

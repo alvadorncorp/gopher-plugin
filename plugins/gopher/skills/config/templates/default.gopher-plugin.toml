@@ -1,5 +1,5 @@
 [gopher]
-schema_version = 2
+schema_version = 3
 
 [project]
 module_roots = []
@@ -50,3 +50,15 @@ workspace_mode = "advisory"
 tidy_mode = "advisory"
 release_mode = "independent"
 replace_mode = "local-only"
+
+[agents]
+enabled = true
+developer_model = "shipped"
+developer_effort = "shipped"
+architect_model = "shipped"
+architect_effort = "shipped"
+reviewer_model = "shipped"
+reviewer_effort = "shipped"
+reviewer_max_parallel = 7
+authorization = "handback"
+policy_divergence = "report"

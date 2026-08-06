@@ -15,8 +15,14 @@ class DocumentationTest(unittest.TestCase):
             "## Install locally in Claude Code", "## Install locally in Grok Build",
             "## Install locally in Kimi Code", "gopher@alvadorncorp", "--mode full",
             "All repository documentation is written in English.",
+            "## Agents", "plugins/gopher/agents/",
+            "Kimi Code does not load packaged plugin agents",
+            "policy_status",
+            "It may narrow an agent and it can never widen one.",
         )
-        self.assertTrue(all(value in text for value in required))
+        for value in required:
+            # assertIn would dump the whole README on failure; name the string instead.
+            self.assertTrue(value in text, f"README is missing {value!r}")
 
     def test_license_is_mit_for_project_author(self):
         text = (ROOT / "LICENSE").read_text(encoding="utf-8")

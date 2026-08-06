@@ -24,7 +24,7 @@ declared-version issue to `gopher:modernize`, a missing or unrecorded test
 baseline to `gopher:test-quality`, and a local code fix to `gopher:developer`.
 Doctor names the owner and the remediation.
 
-Read table `[doctor]` from `gopher:config`, schema v2: `profile` (`quick`,
+Read table `[doctor]` from `gopher:config`, schema v3: `profile` (`quick`,
 `standard`, `strict`; default `standard`) selects the rule set, `deadline_ms`
 (default `2000`) bounds a single run, `max_findings` (default `20`) caps
 reported findings without changing the terminal state, `required_rules` (default
@@ -135,7 +135,7 @@ handoffs:
 
 ## References
 
-- `references/rules.md` — the ten-rule catalog with owners, costs, evidence, and handoffs.
+- `references/rules.md` — the eleven-rule catalog with owners, costs, evidence, and handoffs.
 - `references/profiles.md` — what `quick`, `standard`, and `strict` include, and how `required_rules` composes.
 - `references/hook-mode.md` — the automatic-mode contract, fail-open semantics, and delivery scope.
 - `references/overrides.md` — the `[[doctor.overrides]]` shape, `deny -> warn` limits, and expiry handling.

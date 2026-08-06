@@ -2,9 +2,9 @@
 
 Every value lives inside a canonical table. Root-level loose keys and dotted
 keys (for example `complexity.cyclomatic_max = 15` at the root) are not
-canonical and fail validation. The ten canonical tables are `gopher`,
+canonical and fail validation. The eleven canonical tables are `gopher`,
 `project`, `complexity`, `test-quality`, `modernize`, `refactor`, `tools`,
-`doctor`, `fuzz`, and `architecture`.
+`doctor`, `fuzz`, `architecture`, and `agents`.
 
 Defaults are configurable targets, not universal claims about Go code. A legacy
 project below a target does not automatically fail when the measured scope
@@ -14,7 +14,7 @@ maintains or improves its baseline.
 
 | Key | Type | Range / enum | Default | Consumed by |
 |---|---|---|---|---|
-| `schema_version` | integer | `1` (supported, migratable) \| `2` (current) | `2` | validation, every workflow |
+| `schema_version` | integer | `1` \| `2` (supported, migratable) \| `3` (current) | `3` | validation, every workflow |
 
 `schema_version` pins the contract. A newer value than this skill supports is
 `UNSUPPORTED_VERSION` and is treated read-only. An older but still supported
@@ -154,6 +154,72 @@ workspace layout and a tidy module graph are ignored, recommended, or enforced.
 group. `replace_mode` bounds `replace` directives: `forbid` allows none,
 `local-only` allows local development paths, and `allow` permits any replacement
 the project declares.
+
+## `[agents]`
+
+| Key | Type | Range / enum | Default | Consumed by |
+|---|---|---|---|---|
+| `enabled` | boolean | `true` \| `false` | `true` | the packaged `developer`, `architect`, and `reviewer` agents |
+| `developer_model` | string | `shipped` \| `inherit` \| `haiku` \| `sonnet` \| `opus` | `shipped` | the packaged `developer` agent |
+| `developer_effort` | string | `shipped` \| `inherit` \| `low` \| `medium` \| `high` \| `xhigh` | `shipped` | the packaged `developer` agent |
+| `architect_model` | string | `shipped` \| `inherit` \| `haiku` \| `sonnet` \| `opus` | `shipped` | the packaged `architect` agent |
+| `architect_effort` | string | `shipped` \| `inherit` \| `low` \| `medium` \| `high` \| `xhigh` | `shipped` | the packaged `architect` agent |
+| `reviewer_model` | string | `shipped` \| `inherit` \| `haiku` \| `sonnet` \| `opus` | `shipped` | the packaged `reviewer` agent |
+| `reviewer_effort` | string | `shipped` \| `inherit` \| `low` \| `medium` \| `high` \| `xhigh` | `shipped` | the packaged `reviewer` agent |
+| `reviewer_max_parallel` | integer | `1`–`7` | `7` | the `gopher:review` controller, however the review was entered; the Kimi review adapter |
+| `authorization` | string | `handback` \| `request-approval` \| `inherit-session` | `handback` | the packaged `developer` and `architect` agents; the Kimi refactor adapter |
+| `policy_divergence` | string | `report` \| `block` | `report` | all three packaged agents |
+
+Each packaged agent ships with a fixed binding for its model, its reasoning
+effort, and its tools. The host reads that binding when it loads the agent, so no
+project file can rebind it. This table is the project's declared policy over that
+binding. It may narrow an agent and it can never widen it beyond that binding,
+and a declared value is never presented as an applied one.
+
+`shipped` accepts the packaged binding, so a default file states nothing to
+compare and can never diverge. `inherit` states that the project prefers the
+session binding over the packaged pin; when the host honors the pin instead, the
+agent reports the difference rather than claiming the declared value was applied.
+
+`authorization` selects how an agent resolves a gate it cannot put to the user,
+and it moves along one axis only. `handback`, the default, is the most
+restrictive: return the evidence and the named owner. `request-approval` returns
+an explicit approval request instead. `inherit-session` is the least restrictive:
+the agent proceeds on the delegating session's authorization, up to but never
+past the capability the packaged binding already grants. Raising this key
+therefore relaxes a default the package chose, which is the one direction this
+table can move against the shipped posture; it still cannot grant a capability
+the binding withheld. `gopher:doctor` reports any non-default value through the
+`agents.policy-declared` rule so the relaxation is never silent. The packaged
+`reviewer` has no gated action, so this key does not reach it.
+
+`reviewer_max_parallel` bounds the review fan-out window; a window narrowed by
+this key is reported as `parallel_window: bounded-by-policy` and is never
+reported as `degradation: sequential_no_parallel_support`, which states only that
+the host could not run the lenses together. Lower it when seven concurrent
+reviewers would exhaust a rate limit or a context budget; the default of `7`
+equals the lens count and so never binds. It reaches a review dispatched through
+the packaged `reviewer` agent or the Kimi adapter. A review invoked directly as
+`gopher:review` reads it through `references/controller.md`.
+
+Every packaged agent reports one `policy_status` alongside its skill's own
+output, and so does `gopher:review` when the skill is invoked directly. The five
+values are an ordered partition: evaluate them top to bottom and report the first
+that holds.
+
+| Value | Holds when |
+|---|---|
+| `BLOCKED_BY_POLICY` | `enabled` is `false`, or `policy_divergence` is `block` and the value that would otherwise hold is `UNVERIFIABLE` or `DIVERGED`. The agent does no work and hands back |
+| `NOT_CONFIGURED` | The parsed contract declares no `[agents]` table. The packaged binding is authoritative and nothing can diverge |
+| `UNVERIFIABLE` | A role model or effort declares anything other than `shipped` and the host exposes no way to observe the active binding. No host exposes one today, so this is the usual result of declaring a model or an effort |
+| `DIVERGED` | An observable binding contradicts a declared one, listed field by field, and the run continued because `policy_divergence` is `report` |
+| `ALIGNED` | Nothing above holds. This includes every declaration left at `shipped`, because `shipped` accepts the packaged binding and states nothing to compare |
+
+A version-`1` or version-`2` file usually reports `NOT_CONFIGURED` because it
+predates this table, but the classification follows the parsed document and not
+the schema version: rules 3 and 4 of `references/validation.md` are
+version-independent, so an older file that does declare `[agents]` is read like
+any other and its `enabled` and `policy_divergence` values take effect.
 
 ## Effective-value precedence
 

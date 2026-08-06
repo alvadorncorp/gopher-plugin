@@ -23,7 +23,7 @@ The boundary with `gopher:test-quality` is sharp. Choosing which testing
 technique falsifies a named risk across the suite is its `quality-lab` mode;
 designing a fuzz target, its invariant, and its campaign is `gopher:fuzz`.
 
-Read the `[fuzz]` table of `.gopher-plugin.toml` (schema v2) through
+Read the `[fuzz]` table of `.gopher-plugin.toml` (schema v3) through
 `gopher:config`: `local_budget_seconds` (default `60`), `ci_budget_seconds`
 (default `300`), and `repro_runs` (default `3`). An absent configuration means the
 budget is confirmed with the user before a campaign runs, never silently defaulted.

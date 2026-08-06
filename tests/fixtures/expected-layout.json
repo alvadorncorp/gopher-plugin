@@ -1,7 +1,7 @@
 {
   "marketplace_name": "alvadorncorp",
   "plugin_name": "gopher",
-  "plugin_version": "0.3.0",
+  "plugin_version": "0.4.0",
   "skills": {
     "design-patterns": [
       "references/behavior.md",
@@ -197,5 +197,59 @@
     "codex",
     "grok",
     "kimi"
-  ]
+  ],
+  "agents": {
+    "markdown": [
+      "architect.md",
+      "developer.md",
+      "reviewer.md"
+    ],
+    "codex": [
+      "architect.toml",
+      "developer.toml",
+      "reviewer.toml"
+    ],
+    "skill_ids": {
+      "architect": "gopher:architecture",
+      "developer": "gopher:developer",
+      "reviewer": "gopher:review"
+    },
+    "frontmatter": {
+      "architect": {
+        "tools": "Read, Grep, Glob, Bash, Edit",
+        "skills": "[\"gopher:architecture\"]",
+        "model": "opus",
+        "effort": "high",
+        "color": "blue"
+      },
+      "developer": {
+        "tools": "Read, Grep, Glob, Edit, Write, Bash",
+        "skills": "[\"gopher:developer\"]",
+        "model": "sonnet",
+        "effort": "medium",
+        "color": "green"
+      },
+      "reviewer": {
+        "disallowedTools": "Edit, Write, NotebookEdit",
+        "skills": "[\"gopher:review\"]",
+        "model": "opus",
+        "effort": "high",
+        "color": "cyan"
+      }
+    },
+    "codex_sandbox": {
+      "architect": "read-only",
+      "developer": "workspace-write",
+      "reviewer": "read-only"
+    },
+    "policy_contract_marker": "It may narrow this agent and it can never widen it beyond that binding.",
+    "kimi_policy_contract_marker": "The declared policy may narrow this run and it can never widen it.",
+    "policy_status_values": [
+      "BLOCKED_BY_POLICY",
+      "NOT_CONFIGURED",
+      "UNVERIFIABLE",
+      "DIVERGED",
+      "ALIGNED"
+    ]
+  }
 }

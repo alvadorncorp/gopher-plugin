@@ -19,6 +19,11 @@ API modernization to `gopher:modernize`, and multi-dimension refactoring to
 `gopher:fuzz`, and module or workspace topology to `gopher:architecture`. This
 skill reads and writes configuration only.
 
+The `[agents]` table declares the project's policy for the packaged `developer`,
+`architect`, and `reviewer` agents. This skill validates and explains that table
+and never applies it, because each agent's binding is read by the host when it
+loads the agent.
+
 ## Modes
 
 - No mode: detect the project root, locate the file, report its path and

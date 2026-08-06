@@ -42,7 +42,7 @@ next mode needs.
 
 ## Policy gating
 
-The `[architecture]` table of the project contract (`gopher:config`, schema v2)
+The `[architecture]` table of the project contract (`gopher:config`, schema v3)
 constrains what these modes may propose.
 
 | Key | Values | Default | What it restricts |

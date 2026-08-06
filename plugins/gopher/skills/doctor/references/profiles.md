@@ -7,6 +7,7 @@ every `quick` rule, and `strict` contains every `standard` rule.
 | Rule id | Cost | quick | standard | strict |
 |---|---|---|---|---|
 | `action.scope-declared` | metadata | yes | yes | yes |
+| `agents.policy-declared` | parse | yes | yes | yes |
 | `config.contract-valid` | parse | yes | yes | yes |
 | `module.go-mod-present` | metadata | yes | yes | yes |
 | `test.baseline-known` | metadata | yes | yes | yes |
@@ -19,7 +20,7 @@ every `quick` rule, and `strict` contains every `standard` rule.
 
 ## `quick`
 
-Five rules, all `metadata` or `parse`, all answerable from files the project
+Six rules, all `metadata` or `parse`, all answerable from files the project
 already contains. This is the profile automatic mode runs, and it is the profile
 to choose when a readiness answer is needed inside a few hundred milliseconds.
 
@@ -37,7 +38,7 @@ to choose when a readiness answer is needed inside a few hundred milliseconds.
 
 ## `standard`
 
-Eight rules: the `quick` set plus the three that answer whether the current
+Nine rules: the `quick` set plus the three that answer whether the current
 module is internally consistent and its generated output is current. This is the
 default for a manual `check` before an action that edits code.
 
@@ -49,7 +50,7 @@ compares committed artifacts against their generator, and
 
 ## `strict`
 
-All ten rules: the `standard` set plus the two whose scope reaches beyond the
+All eleven rules: the `standard` set plus the two whose scope reaches beyond the
 current module. `workspace.membership-consistent` compares `go.work` against
 every discovered module root, and `toolchain.resolvable` checks the environment
 against the declared toolchain. Choose `strict` before a release, a module

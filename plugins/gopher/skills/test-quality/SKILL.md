@@ -50,7 +50,7 @@ PASSING BASELINE -> COVERAGE -> BEHAVIOR EFFECTIVENESS -> OPTIONAL MUTATION -> I
 
 ## Quality-lab selection
 
-`test-quality.quality_lab_families` (schema v2, default empty, where empty means
+`test-quality.quality_lab_families` (schema v3, default empty, where empty means
 every canonical family is eligible) is the ELIGIBLE SET: what may be considered,
 never an instruction to run every technique it names. Selection works five
 ordered steps and stops at the cheapest surviving technique that satisfies all

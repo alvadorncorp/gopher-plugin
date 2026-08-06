@@ -13,6 +13,8 @@ CODEX_PLUGIN = PLUGIN / ".codex-plugin/plugin.json"
 CLAUDE_PLUGIN = PLUGIN / ".claude-plugin/plugin.json"
 GROK_PLUGIN = PLUGIN / ".grok-plugin/plugin.json"
 KIMI_PLUGIN = PLUGIN / ".kimi-plugin/plugin.json"
+ROOT_KIMI_PLUGIN = ROOT / ".kimi-plugin/plugin.json"
+LAYOUT = ROOT / "tests/fixtures/expected-layout.json"
 
 
 def load(path: Path):
@@ -44,8 +46,10 @@ class BootstrapPackageTest(unittest.TestCase):
             self.assertEqual(codex_plugin[key], grok_plugin[key])
             self.assertEqual(codex_plugin[key], kimi_plugin[key])
         self.assertEqual("gopher", codex_plugin["name"])
-        self.assertEqual("0.3.0", codex_plugin["version"])
+        self.assertEqual(load(LAYOUT)["plugin_version"], codex_plugin["version"])
         self.assertTrue((PLUGIN / "skills").is_dir())
+        self.assertTrue((PLUGIN / "agents").is_dir())
+        self.assertTrue((PLUGIN / "agents/codex").is_dir())
 
     def test_v1_declares_no_optional_runtime_components(self):
         manifest = load(CODEX_PLUGIN)
@@ -53,6 +57,18 @@ class BootstrapPackageTest(unittest.TestCase):
             self.assertNotIn(forbidden, manifest)
         for forbidden_path in (".app.json", ".mcp.json", ".lsp.json", "hooks", "assets"):
             self.assertFalse((PLUGIN / forbidden_path).exists())
+
+    def test_kimi_manifests_declare_no_packaged_agents(self):
+        """Kimi Code discards packaged plugin agents, so declaring them would
+        advertise a capability the host drops. The other three manifests declare
+        nothing either, but only two of them are verified: `grok plugin validate
+        plugins/gopher` reports the agent directory, and `claude plugin validate
+        . --strict` passes with the directory undeclared. Codex discovery of
+        `agents/codex/` is unverified here: its manifest declares `skills`
+        explicitly and its plugin validator has no packaged-agent concept, so
+        this test asserts nothing about it."""
+        for manifest in (KIMI_PLUGIN, ROOT_KIMI_PLUGIN):
+            self.assertNotIn("agents", load(manifest))
 
 
 if __name__ == "__main__":

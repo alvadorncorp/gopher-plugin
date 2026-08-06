@@ -33,10 +33,14 @@ recommend lenses with reasons, and wait for confirmation before dispatch.
 3. Run shared verification once before fan-out; reviewers receive results and
    do not execute shared build/test targets.
 4. Load the active harness adapter and one lens file per selected lens.
-5. Dispatch one distinct read-only reviewer per selected lens in one parallel
-   window. If concurrency is unavailable, run the same isolated reviews
+5. Dispatch one distinct read-only reviewer per selected lens, in successive
+   parallel windows of at most `agents.reviewer_max_parallel` reviewers each.
+   The windows partition the selection, so no selected lens is ever left
+   undispatched. If concurrency is unavailable, run the same isolated reviews
    sequentially and report the degradation.
-6. Drain all in-flight reviewers. Retry one failed lens once with corrected context.
+6. Drain every reviewer in a window before opening the next, and drain the union
+   of all windows before consolidating. Retry one failed lens once with corrected
+   context; the retry opens a window of its own and stays inside the same bound.
 7. Preserve each report and consolidate using `references/consolidation.md`.
 8. Use one narrow read-only adjudicator only for a genuine validity/impact
    disagreement; it receives the conflict and cannot search for new findings.
@@ -70,6 +74,24 @@ MISSING_EVIDENCE:
 
 A new diff invalidates prior approval. Fixes occur in a separate phase and a
 fresh review receives a new immutable bundle.
+
+A lens is never left undispatched, so no verdict describes that state. A bound
+below the selected lens count changes how many windows the run opens and changes
+nothing about which lenses run.
+
+## Parallel window
+
+Every run reports one `parallel_window` value with its verdict:
+
+- `full` — every selected lens ran in one window.
+- `bounded-by-policy` — the effective `agents.reviewer_max_parallel` is below the
+  selected lens count, so the selection ran in successive windows of at most that
+  many reviewers.
+
+`parallel_window` is never the same thing as
+`degradation: sequential_no_parallel_support`. A bound of `1` is still
+`parallel_window: bounded-by-policy`, because the project chose it; the
+degradation states only that the host could not run lenses together.
 
 ## References
 

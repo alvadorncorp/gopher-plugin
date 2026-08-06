@@ -39,7 +39,8 @@ Go repositories:
   and evidence.
 
 The installable plugin package intentionally ships no hooks, MCP servers, apps,
-LSP servers, or runtime visual assets.
+LSP servers, or runtime visual assets. It does ship three packaged role agents,
+described below.
 
 ## Package layout
 
@@ -53,6 +54,8 @@ LSP servers, or runtime visual assets.
 - Grok Build manifest: `plugins/gopher/.grok-plugin/plugin.json`
 - Kimi Code manifest: `plugins/gopher/.kimi-plugin/plugin.json`
 - Shared skills: `plugins/gopher/skills/`
+- Packaged agents (Claude Code, Grok Build): `plugins/gopher/agents/`
+- Packaged agents (Codex): `plugins/gopher/agents/codex/`
 - Structural and forward tests: `tests/`
 - Architecture notes: `docs/`
 
@@ -84,6 +87,47 @@ relative path into a peer.
 | `codegen` | Lifecycle and trustworthiness of generated code: inventory, provenance, reproduction, staleness, and artifact verification |
 | `cgo` | Go/C boundaries: ABI and representation, ownership and lifetime, pointer rules, callbacks and thread affinity, linking, and build matrices |
 | `fuzz` | Native Go fuzz targets and invariants, seed corpora, bounded campaigns, crash triage, and regression promotion |
+
+## Agents
+
+Gopher ships three packaged role agents. Each one is a thin wrapper over a
+canonical skill: the agent carries the binding and the constraint envelope, and
+the skill keeps the workflow, the evidence discipline, and the output. The agents
+add no ownership row and no orchestrator, so each one's primary owner stays the
+skill it wraps.
+
+| Agent | Skill | Markdown binding | Codex binding | Declared edit envelope |
+|---|---|---|---|---|
+| `developer` | `gopher:developer` | `sonnet`, effort `medium` | sandbox `workspace-write` | local and reversible, inside one package |
+| `architect` | `gopher:architecture` | `opus`, effort `high` | sandbox `read-only` | existing files only, under an explicit approval; never creates a file |
+| `reviewer` | `gopher:review` | `opus`, effort `high` | sandbox `read-only` | none |
+
+The markdown dialect binds the model, the reasoning effort, and the tool set. The
+Codex agent dialect accepts `name`, `description`, `sandbox_mode`, and
+`developer_instructions` and nothing else, so a Codex agent binds the sandbox
+alone and its model and reasoning effort stay whatever the session carries.
+
+The last column states what each agent is instructed to do, not what a host
+prevents. All three agents retain `Bash`, and `Bash` can write, so outside the
+Codex `read-only` sandbox these envelopes rest on the agent instructions rather
+than on the host.
+
+Claude Code and Grok Build load `plugins/gopher/agents/*.md`, and Codex loads
+`plugins/gopher/agents/codex/*.toml`.
+Kimi Code does not load packaged plugin agents, so the Kimi review and refactor
+adapters restate the constraint envelope inline as instruction text with no
+binding behind it at all: the review adapter dispatches through the runtime
+`Agent` and `AgentSwarm` tools, and the refactor adapter through `Agent`.
+
+The definitions shipped in the package are the authoritative binding: the host
+reads them when it loads the agent, so a project file cannot rebind the model,
+the effort, or the tools an agent actually receives. The `[agents]` table of
+`.gopher-plugin.toml` is the project's declared policy — disable the roster,
+bound the reviewer's parallel window, tighten the authorization gate.
+It may narrow an agent and it can never widen one.
+Every agent reports a `policy_status` of `NOT_CONFIGURED`, `ALIGNED`,
+`DIVERGED`, `UNVERIFIABLE`, or `BLOCKED_BY_POLICY`, so a declared value is never
+presented as an applied one.
 
 ## Install locally in Codex
 
@@ -223,7 +267,8 @@ plugins/gopher/skills/config/templates/default.gopher-plugin.toml
 ```
 
 Use the `config` skill to bootstrap, validate, or explain the effective project
-configuration.
+configuration. Schema version `3` adds the `[agents]` policy table; a version `1`
+or version `2` file keeps working and reports `MIGRATION_AVAILABLE`.
 
 ## Development and validation
 

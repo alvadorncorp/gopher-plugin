@@ -10,8 +10,14 @@ VALIDATION_DOC = ROOT / "plugins/gopher/skills/config/references/validation.md"
 
 CANONICAL_TABLES = (
     "gopher", "project", "complexity", "test-quality", "modernize", "refactor", "tools",
-    "doctor", "fuzz", "architecture",
+    "doctor", "fuzz", "architecture", "agents",
 )
+
+AGENT_ROLES = ("developer", "architect", "reviewer")
+AGENT_MODELS = ("shipped", "inherit", "haiku", "sonnet", "opus")
+AGENT_EFFORTS = ("shipped", "inherit", "low", "medium", "high", "xhigh")
+AGENT_AUTHORIZATIONS = ("handback", "request-approval", "inherit-session")
+AGENT_DIVERGENCE_MODES = ("report", "block")
 
 QUALITY_LAB_FAMILIES = (
     "deterministic-concurrency", "integration", "contract", "hermetic", "flake",
@@ -28,7 +34,7 @@ def load_template():
 class ConfigContractTest(unittest.TestCase):
     def test_schema_version_and_canonical_tables(self):
         data = load_template()
-        self.assertEqual(2, data["gopher"]["schema_version"])
+        self.assertEqual(3, data["gopher"]["schema_version"])
         self.assertEqual(set(CANONICAL_TABLES), set(data.keys()))
 
     def test_no_root_loose_or_dotted_keys(self):
@@ -79,6 +85,28 @@ class ConfigContractTest(unittest.TestCase):
         self.assertEqual(60, fuzz["local_budget_seconds"])
         self.assertEqual(300, fuzz["ci_budget_seconds"])
         self.assertEqual(3, fuzz["repro_runs"])
+
+    def test_agents_policy_types_and_enums(self):
+        agents = load_template()["agents"]
+        self.assertIsInstance(agents["enabled"], bool)
+        self.assertTrue(agents["enabled"])
+        self.assertIsInstance(agents["reviewer_max_parallel"], int)
+        self.assertTrue(1 <= agents["reviewer_max_parallel"] <= 7)
+        self.assertEqual(7, agents["reviewer_max_parallel"])
+        for role in AGENT_ROLES:
+            self.assertEqual("shipped", agents[f"{role}_model"])
+            self.assertEqual("shipped", agents[f"{role}_effort"])
+        self.assertEqual("handback", agents["authorization"])
+        self.assertEqual("report", agents["policy_divergence"])
+
+    def test_agents_enum_members_are_documented(self):
+        """The template pins exactly one member of each `[agents]` enum, so
+        testing that member against its own enum proves nothing. The enum is
+        only checkable against the document that defines it."""
+        doc = SCHEMA_DOC.read_text(encoding="utf-8")
+        members = AGENT_MODELS + AGENT_EFFORTS + AGENT_AUTHORIZATIONS + AGENT_DIVERGENCE_MODES
+        for member in members:
+            self.assertIn(f"`{member}`", doc, f"schema.md omits agents enum member {member}")
 
     def test_enum_values(self):
         data = load_template()

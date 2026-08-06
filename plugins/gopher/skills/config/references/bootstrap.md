@@ -31,6 +31,8 @@ Ask only what the user wants to change; accept the default for anything skipped:
 - Doctor: `profile`, `deadline_ms`, `max_findings`, `required_rules`.
 - Fuzz budgets: `local_budget_seconds`, `ci_budget_seconds`, `repro_runs`.
 - Architecture: `workspace_mode`, `tidy_mode`, `release_mode`, `replace_mode`.
+- Agents: `enabled`, the per-role model and effort policy,
+  `reviewer_max_parallel`, `authorization`, and `policy_divergence`.
 
 Validate every supplied value against `references/schema.md` before preview.
 
@@ -52,12 +54,15 @@ Validate every supplied value against `references/schema.md` before preview.
 Migration is the only path that changes `schema_version`, and it runs only here.
 
 1. Report the `schema_version` found and the version this skill supports.
-2. Build the migration in memory. From schema 1 to schema 2 that means the
-   version bump `schema_version = 1` to `schema_version = 2`, the added tables
-   `[doctor]`, `[fuzz]`, and `[architecture]` at their documented defaults, and
-   the added key `quality_lab_families = []` in `[test-quality]`.
-3. Preserve every value the user already set. Migration adds what schema 2
-   introduces and changes nothing the existing file already states.
+2. Build the migration in memory. What it adds depends on the version found:
+
+   | From | The migration adds |
+   |---|---|
+   | `1` | the version bump to `schema_version = 3`, the tables `[doctor]`, `[fuzz]`, `[architecture]`, and `[agents]` at their documented defaults, and the key `quality_lab_families = []` in `[test-quality]` |
+   | `2` | the version bump to `schema_version = 3` and the table `[agents]` at its documented defaults |
+
+3. Preserve every value the user already set. Migration adds what the current
+   schema introduces and changes nothing the existing file already states.
 4. Show the exact diff of the version bump and the added tables and keys.
 5. Require explicit confirmation. Declining leaves the file untouched and keeps
    the state `MIGRATION_AVAILABLE`; workflows continue on the older contract.

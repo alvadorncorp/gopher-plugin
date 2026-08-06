@@ -4,12 +4,38 @@ from __future__ import annotations
 import json
 import re
 import sys
+import tomllib
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins/gopher"
 SKILLS = PLUGIN / "skills"
+AGENTS = PLUGIN / "agents"
 FIXTURE = ROOT / "tests/fixtures/expected-layout.json"
+
+CODEX_AGENT_KEYS = {"name", "description", "sandbox_mode", "developer_instructions"}
+# A packaged agent carries a binding and a constraint envelope. Restating the
+# wrapped skill's own surface is what makes the two drift apart. This is a
+# bounded gate, not a proof of non-duplication: it names headings and field
+# labels, so prose that reproduces a workflow without them still passes.
+AGENT_BANNED_SURFACE = (
+    "## Workflow", "## Output format", "## Modes", "## Quality checklist",
+    "## References", "## Authorization", "selected_skill:", "primary_owner:", "references/",
+)
+# A line count measures wrap width rather than content: reflowing a body to
+# narrow columns trips it, while a whole SKILL.md body pasted unwrapped slips
+# under it. Collapse whitespace and cap the characters instead. Calibration: the
+# smallest wrapped skill body is over 4000 normalized characters and the largest
+# agent body is under 3000, so this cap separates the two. Headroom is thin, so
+# an agent that needs more should shed envelope prose rather than raise it.
+AGENT_BODY_MAX_CHARS = 3000
+
+# `parse_frontmatter` strips quotes and does nothing else, so its value agrees
+# with a real YAML parser only for an unambiguous plain scalar. A leading
+# indicator character, a colon-space, an inline ` #` comment, or a backslash
+# escape all make the host's parsed string differ from the one compared here, so
+# an agent description that carries any of them is rejected outright.
+YAML_INDICATOR_LEADERS = "-?:,[]{}#&*!|>'\"%@`"
 
 FORBIDDEN_PLACEHOLDERS = (
     "[TO" + "DO:",
@@ -38,6 +64,13 @@ PORTUGUESE_MARKERS = (
 FRONTMATTER = re.compile(r"^---\n(.*?)\n---\n", re.DOTALL)
 CATALOG_ROW = re.compile(r"^\| (pattern\.[a-z0-9-]+) \| (full|diagnostic|deferred|boundary) \|")
 MAPPING_ROW = re.compile(r"^\| `(pattern\.[a-z0-9-]+)` \| `(go\.[a-z0-9-]+)` \|")
+DOCTOR_RULE_ROW = re.compile(
+    r"^\| `([a-z]+\.[a-z-]+)` \| `(gopher:[a-z-]+)` \| ([a-z, ]+) \| ([a-z]+) \| (yes|no) \|"
+)
+DOCTOR_PROFILE_ROW = re.compile(
+    r"^\| `([a-z]+\.[a-z-]+)` \| ([a-z]+) \|([^|]*)\|([^|]*)\|([^|]*)\|"
+)
+DOCTOR_PROFILE_NAMES = ("quick", "standard", "strict")
 
 
 def load_json(path: Path):
@@ -62,6 +95,203 @@ def parse_frontmatter(path: Path):
     if not metadata:
         raise ValueError("frontmatter is not an object")
     return metadata
+
+
+def agent_body(path: Path) -> str:
+    text = path.read_text(encoding="utf-8")
+    match = FRONTMATTER.match(text)
+    return text[match.end():] if match else text
+
+
+def normalized_size(text: str) -> int:
+    return len(" ".join(text.split()))
+
+
+def plain_scalar_problem(value: str) -> str | None:
+    """Reject anything a real YAML parser would read differently from the flat
+    parser above. See `YAML_INDICATOR_LEADERS` for why this has to be strict."""
+    if not value.strip():
+        return "must not be empty"
+    if value[0] in YAML_INDICATOR_LEADERS:
+        return f"must not start with the YAML indicator {value[0]!r}"
+    if ": " in value:
+        return "must not contain a colon-space"
+    if " #" in value:
+        return "must not contain an inline comment marker"
+    if "\\" in value:
+        return "must not contain a backslash"
+    return None
+
+
+def validate_agents(expected) -> list[str]:
+    errors: list[str] = []
+    spec = expected.get("agents")
+    if not isinstance(spec, dict):
+        return ["layout fixture declares no agents"]
+    required = {
+        "markdown", "codex", "skill_ids", "frontmatter", "codex_sandbox",
+        "policy_contract_marker", "policy_status_values",
+    }
+    absent = sorted(required - set(spec))
+    if absent:
+        return [f"layout fixture agents block is missing {absent}"]
+    marker = spec["policy_contract_marker"]
+    statuses = spec["policy_status_values"]
+
+    codex_dir = AGENTS / "codex"
+    md_names = sorted(path.name for path in AGENTS.glob("*.md")) if AGENTS.is_dir() else []
+    toml_names = sorted(path.name for path in codex_dir.glob("*.toml")) if codex_dir.is_dir() else []
+    if md_names != spec["markdown"]:
+        errors.append(f"agent markdown mismatch: expected={spec['markdown']} actual={md_names}")
+    if toml_names != spec["codex"]:
+        errors.append(f"codex agent mismatch: expected={spec['codex']} actual={toml_names}")
+
+    for role, skill_id in sorted(spec["skill_ids"].items()):
+        markdown = AGENTS / f"{role}.md"
+        codex_path = codex_dir / f"{role}.toml"
+        if not markdown.is_file() or not codex_path.is_file():
+            errors.append(f"{role}: missing packaged agent pair")
+            continue
+        try:
+            metadata = parse_frontmatter(markdown)
+        except ValueError as exc:
+            errors.append(f"agents/{role}.md: {exc}")
+            continue
+
+        if metadata.get("name") != role:
+            errors.append(f"agents/{role}.md: frontmatter name must match the filename")
+        description = metadata.get("description", "")
+        problem = plain_scalar_problem(description)
+        if problem:
+            errors.append(f"agents/{role}.md: description {problem}")
+        pinned = spec["frontmatter"].get(role)
+        if not isinstance(pinned, dict):
+            errors.append(f"agents/{role}.md: fixture declares no frontmatter for this role")
+            pinned = {}
+        # This exact key-set check already rejects every unsupported key, so no
+        # separate allow-list runs beside it and one defect yields one error.
+        if set(metadata) - {"name", "description"} != set(pinned):
+            errors.append(f"agents/{role}.md: frontmatter key set must match the fixture exactly")
+        for key, value in pinned.items():
+            if metadata.get(key) != value:
+                errors.append(
+                    f"agents/{role}.md: {key} expected {value!r}, found {metadata.get(key)!r}"
+                )
+
+        body = agent_body(markdown)
+        if skill_id not in body:
+            errors.append(f"agents/{role}.md: body must delegate to {skill_id}")
+        if marker not in body:
+            errors.append(f"agents/{role}.md: body must carry the shared policy contract sentence")
+        for status in statuses:
+            if status not in body:
+                errors.append(f"agents/{role}.md: body must report policy_status {status}")
+        for banned in AGENT_BANNED_SURFACE:
+            if banned in body:
+                errors.append(f"agents/{role}.md: body duplicates the skill surface ({banned!r})")
+        size = normalized_size(body)
+        if size > AGENT_BODY_MAX_CHARS:
+            errors.append(
+                f"agents/{role}.md: body must stay a thin wrapper "
+                f"({size} normalized characters, cap {AGENT_BODY_MAX_CHARS})"
+            )
+
+        try:
+            with codex_path.open("rb") as handle:
+                codex = tomllib.load(handle)
+        except (OSError, tomllib.TOMLDecodeError) as exc:
+            errors.append(f"agents/codex/{role}.toml: {exc}")
+            continue
+        if set(codex) != CODEX_AGENT_KEYS:
+            errors.append(
+                f"agents/codex/{role}.toml: key set must be exactly {sorted(CODEX_AGENT_KEYS)}"
+            )
+        if codex.get("name") != role:
+            errors.append(f"agents/codex/{role}.toml: name must match the filename")
+        if codex.get("description") != description:
+            errors.append(f"{role}: Claude and Codex descriptions must be identical")
+        sandbox = spec["codex_sandbox"].get(role)
+        if sandbox is None:
+            errors.append(f"agents/codex/{role}.toml: fixture declares no sandbox for this role")
+        elif codex.get("sandbox_mode") != sandbox:
+            errors.append(f"agents/codex/{role}.toml: sandbox_mode expected {sandbox!r}")
+        instructions = codex.get("developer_instructions", "")
+        reference = "$" + skill_id.split(":", 1)[1]
+        if reference not in instructions:
+            errors.append(f"agents/codex/{role}.toml: instructions must reference {reference}")
+        if marker not in instructions:
+            errors.append(
+                f"agents/codex/{role}.toml: instructions must carry the shared policy contract sentence"
+            )
+        for status in statuses:
+            if status not in instructions:
+                errors.append(
+                    f"agents/codex/{role}.toml: instructions must report policy_status {status}"
+                )
+        for banned in AGENT_BANNED_SURFACE:
+            if banned in instructions:
+                errors.append(
+                    f"agents/codex/{role}.toml: instructions duplicate the skill surface ({banned!r})"
+                )
+        size = normalized_size(instructions)
+        if size > AGENT_BODY_MAX_CHARS:
+            errors.append(
+                f"agents/codex/{role}.toml: instructions must stay a thin wrapper "
+                f"({size} normalized characters, cap {AGENT_BODY_MAX_CHARS})"
+            )
+    return errors
+
+
+def validate_doctor_catalog() -> list[str]:
+    """The rule count and the three profile counts are written out in prose in
+    two files. Derive them from the tables so a moved row fails here first."""
+    errors: list[str] = []
+    rules_text = (SKILLS / "doctor/references/rules.md").read_text(encoding="utf-8")
+    profiles_text = (SKILLS / "doctor/references/profiles.md").read_text(encoding="utf-8")
+
+    rules: dict[str, tuple[set[str], bool]] = {}
+    for line in rules_text.splitlines():
+        match = DOCTOR_RULE_ROW.match(line)
+        if match:
+            rule_id, _owner, declared, _cost, blocking = match.groups()
+            rules[rule_id] = ({item.strip() for item in declared.split(",")}, blocking == "yes")
+    if len(rules) != 11:
+        errors.append(f"doctor catalog must contain 11 rules, found {len(rules)}")
+    block_eligible = sorted(rule for rule, (_, flag) in rules.items() if flag)
+    if len(block_eligible) != 3:
+        errors.append(f"doctor must declare 3 block-eligible rules, found {block_eligible}")
+
+    matrix: dict[str, set[str]] = {}
+    for line in profiles_text.splitlines():
+        match = DOCTOR_PROFILE_ROW.match(line)
+        if match:
+            cells = match.group(3), match.group(4), match.group(5)
+            matrix[match.group(1)] = {
+                name for name, cell in zip(DOCTOR_PROFILE_NAMES, cells) if cell.strip() == "yes"
+            }
+    if set(matrix) != set(rules):
+        errors.append("doctor profile matrix and rule catalog list different rules")
+    counts = {name: sum(name in row for row in matrix.values()) for name in DOCTOR_PROFILE_NAMES}
+    if counts != {"quick": 6, "standard": 9, "strict": 11}:
+        errors.append(f"doctor profile counts mismatch: {counts}")
+    for rule_id, profiles in sorted(matrix.items()):
+        declared = rules.get(rule_id, (set(), False))[0]
+        if declared != profiles:
+            errors.append(
+                f"doctor rule {rule_id}: rules.md declares {sorted(declared)} "
+                f"and profiles.md declares {sorted(profiles)}"
+            )
+
+    for phrase, text, label in (
+        ("Eleven rules, and only these eleven", rules_text, "rules.md rule count"),
+        ("Three of the eleven rules are block-eligible", rules_text, "rules.md blocking count"),
+        ("Six rules,", profiles_text, "profiles.md quick count"),
+        ("Nine rules:", profiles_text, "profiles.md standard count"),
+        ("All eleven rules:", profiles_text, "profiles.md strict count"),
+    ):
+        if phrase not in text:
+            errors.append(f"{label} prose disagrees with the derived count ({phrase!r})")
+    return errors
 
 
 def repository_markdown():
@@ -118,6 +348,13 @@ def validate_repository() -> list[str]:
         errors.append("Grok marketplace name mismatch")
     if kimi_market.get("name") != expected["marketplace_name"]:
         errors.append("Kimi marketplace name mismatch")
+    # The release engine bumps only the plugin manifests, so the catalogs that do
+    # carry a version are pinned to the fixture here instead of drifting silently.
+    # The Codex catalog carries no version and is deliberately not checked.
+    for label, market in (("Claude", claude_market), ("Grok", grok_market), ("Kimi", kimi_market)):
+        entry = (market.get("plugins") or [{}])[0]
+        if entry.get("version") != expected["plugin_version"]:
+            errors.append(f"{label} marketplace version mismatch")
     for key in ("name", "version", "description", "author"):
         if codex_plugin.get(key) != claude_plugin.get(key):
             errors.append(f"plugin manifest parity mismatch: {key}")
@@ -230,6 +467,9 @@ def validate_repository() -> list[str]:
     if harnesses != expected["review_harnesses"]:
         errors.append(f"review harness mismatch: {harnesses}")
 
+    errors.extend(validate_agents(expected))
+    errors.extend(validate_doctor_catalog())
+
     return errors
 
 
@@ -243,9 +483,11 @@ def main() -> int:
     expected = load_json(FIXTURE)
     skill_count = len(expected["skills"])
     reference_total = sum(len(refs) for refs in expected["skills"].values())
+    agent_count = len(expected["agents"]["skill_ids"])
     print(
         f"Repository validation passed ({skill_count} skills, "
-        f"{reference_total} references, 4 manifests, 4 marketplaces)."
+        f"{reference_total} references, {agent_count} agents, "
+        f"4 manifests, 4 marketplaces)."
     )
     return 0
 

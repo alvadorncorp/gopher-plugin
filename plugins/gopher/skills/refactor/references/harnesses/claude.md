@@ -10,10 +10,14 @@
    passing boundary before the next begins.
 5. Inherit the session model when per-task model controls are unavailable and
    report the limitation.
+   The packaged `developer` and `architect` agents pin those two roles; every
+   other owner task stays on the session model.
 6. Degrade to sequential analysis with
    `degradation: sequential_no_parallel_support` when concurrency is unavailable.
 7. Close with a read-only `gopher:review` task over the accumulated diff; the
-   orchestrator applies no fixes during review.
+   orchestrator applies no fixes during review. That closing task invokes the
+   skill and is not the packaged `reviewer` agent, so it carries no packaged
+   binding; the pin in step 5 covers `developer` and `architect` only.
 
 The controller performs no owned analysis. Each specialist keeps its gate, and no
 two mutating phases run concurrently on intersecting scope.

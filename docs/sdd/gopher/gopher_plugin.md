@@ -5,7 +5,7 @@ context: gopher
 title: Package Go engineering workflows for Codex, Claude, and Grok
 status: Accepted
 tags: [go, codex, claude, grok, skills, marketplace]
-related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005]
+related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005, adr:gopher:006, adr:gopher:007]
 date: 2026-07-14
 ---
 # SDD: Package Go engineering workflows for Codex, Claude, and Grok
@@ -23,13 +23,15 @@ and `adr:gopher:001`, with the third host recorded in `adr:gopher:003`.
 
 ## Solution Overview
 
-Publish marketplace `alvadorncorp` with plugin `gopher` version `0.3.0`.
+Publish marketplace `alvadorncorp` with plugin `gopher` version `0.4.0`.
 Codex, Claude, and Grok receive native manifests while loading the same physical
 tree at `plugins/gopher/skills/`. Twenty peer skills have canonical ownership
 and a textual decision and handoff contract. A `.gopher-plugin.toml` project
 contract, owned by `gopher:config`, carries thresholds, tool policy, and
-refactoring safeguards for the quality workflows; it is at schema version `2`
-and reports a version-`1` file as `MIGRATION_AVAILABLE`.
+refactoring safeguards for the quality workflows; it is at schema version `3`
+and reports a version-`1` or version-`2` file as `MIGRATION_AVAILABLE`. Three
+packaged role agents wrap `gopher:developer`, `gopher:architecture`, and
+`gopher:review` with a fixed per-role binding.
 
 ## Architecture
 
@@ -38,7 +40,8 @@ and reports a version-`1` file as `MIGRATION_AVAILABLE`.
   `architecture`, `concurrency`, `performance`, `diagnose`, `security`,
   `review`, `config`, `complexity`, `test-quality`, `modernize`, `refactor`,
   `doctor`, `resilience`, `observability`, `codegen`, `cgo`, `fuzz`);
-  references; validators; cross-harness corpus.
+  references; three packaged role agents (`developer`, `architect`, `reviewer`)
+  in Claude/Grok markdown and Codex TOML form; validators; cross-harness corpus.
 - **Data:** versioned Markdown, YAML, and JSON only. No database, production
   state, generated copies, or symlinks.
 - **Integrations:** official `plugin-creator` and `skill-creator` scripts,
@@ -71,6 +74,13 @@ and reports a version-`1` file as `MIGRATION_AVAILABLE`.
 | `codegen` | generated-output provenance, reproduction, staleness, and verification |
 | `cgo` | Go/C boundary representation, ownership, pointers, threads, and build matrix |
 | `fuzz` | native fuzz targets, corpora, bounded campaigns, triage, and promotion |
+
+The packaged role agents add no ownership row. Each one's `primary_owner` is the
+skill it wraps, and the shipped definition is the authoritative binding because
+the host reads it at load time. The `[agents]` table of the project contract is a
+declared policy that narrows an agent and never widens one. Kimi Code discards
+packaged agents, so its review and refactor adapters reproduce the same
+constraint envelope inline.
 
 Explicitly requested local and reversible changes may proceed. Cross-package,
 public-contract, boundary, persistence, security-boundary, or ADR-affecting
@@ -108,6 +118,11 @@ changes require evidence, alternatives, and explicit approval before editing.
 - Migrate the project contract to schema version `2` with a fifth configuration
   state, `MIGRATION_AVAILABLE` — recorded in `adr:gopher:006`, as
   `adr:gopher:005` required for any schema migration.
+- Package three role agents as thin skill wrappers with a fixed per-role binding,
+  adding no owner and no orchestrator — recorded in `adr:gopher:007`.
+- Migrate the project contract to schema version `3` with the `[agents]`
+  declared-policy table — recorded in `adr:gopher:007`, as `adr:gopher:005`
+  required for any schema migration.
 
 ## Risks and Trade-offs
 
@@ -116,6 +131,10 @@ changes require evidence, alternatives, and explicit approval before editing.
 - Stale Go guidance → official sources, `last_verified`, and version gates.
 - Unavailable parallel review → explicit sequential degradation with the same output.
 - Forward-test cost → execution under operator approval and budget.
+- Declared agent policy the host cannot apply → `policy_status` reporting plus the
+  `agents.policy-declared` readiness rule.
+- Kimi discards packaged agents → the constraint envelope duplicated inline in
+  both Kimi adapters, with its presence enforced by test.
 
 ## Evolution Plan
 
@@ -132,6 +151,10 @@ changes require evidence, alternatives, and explicit approval before editing.
   `test-quality`, and configuration schema `2` (`adr:gopher:006`). The release
   version for this phase is not yet assigned; packaging and manifests are
   unchanged by it.
+- Phase 7: three packaged role agents, the `[agents]` policy table at schema `3`,
+  the Kimi inline fallback, and the `agents.policy-declared` readiness rule
+  (`adr:gopher:007`) — version `0.4.0`, already carried by every manifest and by
+  every versioned marketplace catalog.
 - After a real non-Go consumer exists: evaluate extracting `design-patterns`
   and `application-architecture` without changing handoff identifiers.
 - After every stable Go release and at least quarterly: review
