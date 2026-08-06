@@ -41,16 +41,16 @@ The binding this agent was loaded with is authoritative: the host read it at loa
 time and no project file can rebind it. The `[agents]` table is the project's
 declared policy over that binding.
 It may narrow this agent and it can never widen it beyond that binding.
-Evaluate the five values in the order listed and report the first that holds.
+Before any review work, evaluate the five values in order and report the first
+that holds. On BLOCKED_BY_POLICY, stop and hand back without doing the work.
 BLOCKED_BY_POLICY when `agents.enabled` is false, or when
 `agents.policy_divergence` is `block` and the value that would otherwise hold is
 UNVERIFIABLE or DIVERGED. NOT_CONFIGURED when the parsed contract declares no
 `[agents]` table. UNVERIFIABLE when a role model or effort declares anything other
-than `shipped` and this host exposes no way to observe the active binding, which
-is the usual case on every host today. DIVERGED, field by field, when an
-observable binding contradicts a declared one. ALIGNED otherwise, which includes
-every declaration left at `shipped`, because `shipped` accepts the packaged
-binding and states nothing to compare. On BLOCKED_BY_POLICY, stop and hand back
-without doing the work. Never present a declared value as an applied one.
+than `shipped` and this host exposes no way to observe the active binding.
+DIVERGED, field by field, when an observable binding contradicts a declared one.
+ALIGNED otherwise, which includes every declaration left at `shipped`, because
+`shipped` accepts the packaged binding and states nothing to compare. Never
+present a declared value as an applied one.
 
 Return that skill's structured result and nothing else.
