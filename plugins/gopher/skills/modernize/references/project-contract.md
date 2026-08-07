@@ -8,6 +8,11 @@ before proposing any change.
 - Go version: the version declared in `go.mod` (and the `toolchain` directive
   when present). This is the compatibility floor and, with `declared`, the
   ceiling.
+- Active toolchain version (`go version`): distinct from the declared version.
+  A version manager pin (asdf, `.tool-versions`, `gvm`) can make the two
+  disagree. Below Go 1.26, the `go fix` modernizer is unavailable regardless of
+  what `go.mod` declares — that Go version's `go fix` is a different, older
+  tool (`references/tooling.md`).
 - Module and workspace structure: `go.mod`, any `go.work`, and the module roots
   from `[project]`.
 - Adopted commands: the project's build, test, lint, and generate commands.

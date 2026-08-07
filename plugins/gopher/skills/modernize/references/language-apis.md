@@ -13,14 +13,30 @@ one reviewable increment at a time.
 - Deprecated-API replacement, when the replacement exists at the declared
   version.
 
-## The `modernize` analysis pass
+## The `go fix` modernizer suite
 
-- The official `modernize` analysis pass proposes many of these rewrites. Use it
-  only when it is compatible with the declared Go version.
-- Its bulk apply mode changes many files at once, so preview its diagnostics,
-  apply the suggested fixes incrementally, and validate after each increment.
-- Record the exact tool version; a different version can propose different
-  rewrites.
+The `modernize` analyzers ship inside the Go toolchain and run through `go fix`
+(`references/tooling.md`). Use them only when the active toolchain is Go 1.26
+or newer and compatible with the declared version.
+
+Default-enabled analyzers propose most of these rewrites: `any` (interface{} ->
+any), `fmtappendf`, `forvar`, `hostport`, `inline`, `mapsloop`, `minmax`,
+`newexpr`, `omitzero`, `plusbuild`, `rangeint`, `reflecttypefor`,
+`slicescontains`, `slicessort`, `stditerators`, `stringsbuilder`,
+`stringscut`, `stringscutprefix`, `stringsseq`, `testingcontext`, `waitgroup`,
+plus the `buildtag` vet check. Four analyzers are off by default because their
+fix can change observable behavior and require explicit judgment before
+enabling: `appendclipped`, `bloop`, `slicesdelete`, `errorsastype`.
+
+- `any` is disproportionately high-volume; review it as its own increment:
+  `go fix -any=true ./...` first, then `go fix -any=false ./...` for the rest.
+- A bulk `go fix` apply changes many files at once, so preview diagnostics with
+  `go fix -diff ./...`, apply the suggested fixes incrementally
+  (`references/migration.md`), and validate after each increment.
+- Record the exact Go toolchain version (`go version`); a different version can
+  add analyzers, change defaults, or propose different rewrites.
+- A loop collapsed into a single call can discard comments that were inside
+  it — review is still required, not just a diff scan.
 
 ## Boundaries
 

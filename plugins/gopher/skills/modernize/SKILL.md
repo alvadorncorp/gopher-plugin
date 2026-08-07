@@ -45,11 +45,14 @@ DETECT DECLARED VERSION -> RESOLVE TARGET -> COMPATIBILITY BASELINE -> ANALYZE -
 2. Resolve the target from `modernize.target_go`; keep `declared` non-upgrading.
 3. Establish a compatibility baseline: a passing build and test run under the
    current versions.
-4. Analyze for language, API, module, and toolchain modernizations using
-   `references/language-apis.md` and `references/modules-toolchain.md`.
-5. Preview every change first. With `apply_fixes = false`, stop at the preview.
-6. Apply increments only when authorized, one reviewable step at a time
-   (`references/migration.md`), then verify against the baseline.
+4. Analyze for language, API, module, and toolchain modernizations, using
+   `go fix` for language and API modernization when the active toolchain is Go
+   1.26 or newer (`references/language-apis.md`,
+   `references/modules-toolchain.md`).
+5. Preview every change first — `go fix -diff ./...` for language and API
+   modernization. With `apply_fixes = false`, stop at the preview.
+6. Apply increments only when authorized, using the bulk-then-triage loop for
+   `go fix` (`references/migration.md`), then verify against the baseline.
 7. Report applied changes, previews, exact tool and target versions,
    limitations, and handoffs.
 
@@ -66,6 +69,10 @@ DETECT DECLARED VERSION -> RESOLVE TARGET -> COMPATIBILITY BASELINE -> ANALYZE -
 - Record the exact tool and target versions with every change.
 - Require manual review for merge conflicts, generated or machine-authored
   comments, and any change that touches a contract.
+- An active toolchain below Go 1.26 makes the `go fix` modernizer unavailable;
+  report it as a limitation rather than substituting the legacy `go fix` tool.
+- A partial apply (some fixes applied, some remain) is
+  `COMPLETE_WITH_LIMITATIONS`, never a silent `COMPLETE`; name the residue.
 
 ## Output format
 
@@ -101,8 +108,8 @@ handoff: gopher:<skill> | null
 ## References
 
 - `references/project-contract.md` — declared versions, structure, and policy semantics.
-- `references/language-apis.md` — language and API modernization with the `modernize` pass.
+- `references/language-apis.md` — language and API modernization with `go fix`.
 - `references/modules-toolchain.md` — module, workspace, and dependency modernization.
 - `references/migration.md` — incremental application, preview-first, versioned records.
-- `references/tooling.md` — `auto` discovery and the `modernize` analysis pass.
+- `references/tooling.md` — `auto` discovery and `go fix` commands.
 - `references/sources.md` — version-sensitive official references and review cadence.
