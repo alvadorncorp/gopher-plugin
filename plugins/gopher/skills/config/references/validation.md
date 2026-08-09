@@ -13,18 +13,22 @@ what work the effective configuration may drive.
    older than the current schema but still supported is `MIGRATION_AVAILABLE`
    once every other rule passes; it is not a failure. `schema_version` is
    classified by this rule alone: rules 6 and 7 below do not apply to it, so
-   `3` is `VALID`, `1` and `2` are `MIGRATION_AVAILABLE`, and any higher value is
-   `UNSUPPORTED_VERSION`.
+   `4` is `VALID`, `1`, `2`, and `3` are `MIGRATION_AVAILABLE`, and any higher
+   value is `UNSUPPORTED_VERSION`. A missing `[developer]` table — and therefore
+   missing `idiom_policy` and `test_workflow` values — never invalidates versions
+   `1`, `2`, or `3`; those supported older contracts resolve both values to their
+   documented defaults until a confirmed migration writes them.
 3. Canonical tables: only `gopher`, `project`, `complexity`, `test-quality`,
    `modernize`, `refactor`, `tools`, `doctor`, `fuzz`, `architecture`, and
-   `agents` are allowed. Root-level loose keys and dotted keys are not canonical.
+   `agents`, and `developer` are allowed. Root-level loose keys and dotted keys are not canonical.
    The one canonical nested array of tables is `[[doctor.overrides]]`.
 4. Known keys: every key must be defined for its table in
    `references/schema.md`. An unknown key in the current schema is invalid. A
    table or a key the current schema adds is simply absent from an older file,
    and that absence is never an unknown key. This covers a key added to a table
    that already existed, such as `test-quality.quality_lab_families`, as much as
-   it covers a whole added table such as `[agents]`.
+   it covers a whole added table such as `[agents]` or `[developer]`. For the
+   latter, the current keys are `idiom_policy` and `test_workflow`.
 5. Value types: each value must match its documented type (integer, boolean,
    string, or list of string).
 6. Ranges: numeric values must fall inside their documented range (for example

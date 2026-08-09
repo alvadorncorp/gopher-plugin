@@ -33,6 +33,7 @@ Ask only what the user wants to change; accept the default for anything skipped:
 - Architecture: `workspace_mode`, `tidy_mode`, `release_mode`, `replace_mode`.
 - Agents: `enabled`, the per-role model and effort policy,
   `reviewer_max_parallel`, `authorization`, and `policy_divergence`.
+- Developer: `idiom_policy` and `test_workflow` under `[developer]`.
 
 Validate every supplied value against `references/schema.md` before preview.
 
@@ -58,8 +59,9 @@ Migration is the only path that changes `schema_version`, and it runs only here.
 
    | From | The migration adds |
    |---|---|
-   | `1` | the version bump to `schema_version = 3`, the tables `[doctor]`, `[fuzz]`, `[architecture]`, and `[agents]` at their documented defaults, and the key `quality_lab_families = []` in `[test-quality]` |
-   | `2` | the version bump to `schema_version = 3` and the table `[agents]` at its documented defaults |
+   | `1` | the version bump to `schema_version = 4`, the tables `[doctor]`, `[fuzz]`, `[architecture]`, and `[agents]` at their documented defaults, the key `quality_lab_families = []` in `[test-quality]`, and `[developer]` with `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"` |
+   | `2` | the version bump to `schema_version = 4`, the table `[agents]` at its documented defaults, and `[developer]` with `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"` |
+   | `3` | the version bump to `schema_version = 4` and `[developer]` with `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"` |
 
 3. Preserve every value the user already set. Migration adds what the current
    schema introduces and changes nothing the existing file already states.

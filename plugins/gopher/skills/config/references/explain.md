@@ -24,7 +24,7 @@ For every effective value, report:
 
 - Group values by canonical table (`gopher`, `project`, `complexity`,
   `test-quality`, `modernize`, `refactor`, `tools`, `doctor`, `fuzz`,
-  `architecture`, `agents`).
+  `architecture`, `agents`, `developer`).
 - Mark any value that differs from its default, and name the source tier that
   overrode it.
 - When the state is `INVALID` or `UNSUPPORTED_VERSION`, explain the effective
@@ -38,6 +38,10 @@ older contract as usual and add:
 - The `schema_version` found in the file and the version this skill supports.
 - The values that would change under migration: the version bump itself, the
   tables and keys the current schema adds, and the default each one would take.
+  For schema 4, name `[developer]` and its `idiom_policy = "latest-compatible"`
+  and `test_workflow = "adaptive-tdd"` defaults. Explain that `idiom_policy`
+  selects compatible idioms for `gopher:developer`, while `test_workflow`
+  selects its test and implementation sequencing.
 - The fact that every value the file already sets is preserved by migration.
 - The fact that `--explain` writes nothing. Migration happens only inside
   `--bootstrap`, with a shown diff and explicit confirmation.
