@@ -12,7 +12,51 @@
     "handoffs": {"type": "array", "items": {"type": "object"}}, "mode": {"type": "string"},
     "config_mode": {"type": "string"}, "config_status": {"type": "string"},
     "selected_dimensions": {"type": "array", "items": {"type": "string"}},
-    "baseline_status": {"type": "string"}
+    "baseline_status": {"type": "string"},
+    "project_contract": {
+      "type": "object",
+      "properties": {
+        "config_status": {"type": "string", "enum": ["ABSENT", "VALID", "MIGRATION_AVAILABLE", "INVALID", "UNSUPPORTED_VERSION"]},
+        "declared_go": {"type": ["string", "null"]},
+        "idiom_policy": {
+          "type": "object",
+          "properties": {
+            "value": {"type": "string", "enum": ["latest-compatible", "project-aligned", "explicit-only"]},
+            "source": {"type": "string", "enum": ["session", "file", "adopted", "default"]}
+          }
+        },
+        "test_workflow": {
+          "type": "object",
+          "properties": {
+            "value": {"type": "string", "enum": ["adaptive-tdd", "strict-tdd", "test-after"]},
+            "source": {"type": "string", "enum": ["session", "file", "adopted", "default"]}
+          }
+        }
+      }
+    },
+    "requested_behavior": {"type": "object"},
+    "change_class": {"type": "string", "enum": ["behavior", "bug-fix", "refactor", "mechanical", "test-only"]},
+    "test_evidence": {
+      "type": "object",
+      "properties": {
+        "pre_change": {"type": "object"},
+        "first_signal": {
+          "type": "object",
+          "properties": {
+            "kind": {"type": "string", "enum": ["red", "characterization", "test-after", "exception", "not-applicable"]},
+            "command": {"type": ["string", "null"]},
+            "observed": {"type": ["string", "null"]},
+            "reason": {"type": ["string", "null"]}
+          }
+        },
+        "green": {"type": "object"},
+        "refactor": {"type": "object"}
+      }
+    },
+    "implementation": {"type": "object"},
+    "pattern_decision": {"type": "object"},
+    "validation": {"type": "object"},
+    "limitations": {"type": ["array", "object", "string", "null"]}
   },
   "additionalProperties": true
 }

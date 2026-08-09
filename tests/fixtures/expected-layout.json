@@ -1,7 +1,6 @@
 {
   "marketplace_name": "alvadorncorp",
   "plugin_name": "gopher",
-  "plugin_version": "0.4.0",
   "skills": {
     "design-patterns": [
       "references/behavior.md",

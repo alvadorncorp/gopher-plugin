@@ -69,7 +69,7 @@ relative path into a peer.
 |---|---|
 | `design-patterns` | Language-agnostic code/module pattern diagnosis and selection |
 | `application-architecture` | Language-agnostic internal application boundaries |
-| `developer` | Routine local Go implementation, APIs, errors, tests, and tooling |
+| `developer` | Config-aware, local and reversible Go implementation with adaptive test-first evidence; hands broad modernization and specialist work to their canonical owners |
 | `architecture` | Go packages, modules/workspaces, dependency direction, seams, and public APIs |
 | `concurrency` | Goroutine lifetime, channels, synchronization, context, races, deadlocks, leaks, and backpressure mechanics |
 | `performance` | Asymptotic and algorithmic cost, allocations, GC, cache behavior, parsing, I/O amplification, benchmarks, profiles, latency, and throughput |
@@ -267,8 +267,29 @@ plugins/gopher/skills/config/templates/default.gopher-plugin.toml
 ```
 
 Use the `config` skill to bootstrap, validate, or explain the effective project
-configuration. Schema version `3` adds the `[agents]` policy table; a version `1`
-or version `2` file keeps working and reports `MIGRATION_AVAILABLE`.
+configuration. The current schema version `4` adds the `[developer]` policy
+table:
+
+```toml
+[developer]
+idiom_policy = "latest-compatible"
+test_workflow = "adaptive-tdd"
+```
+
+`idiom_policy` accepts `latest-compatible`, `project-aligned`, or
+`explicit-only`; `test_workflow` accepts `adaptive-tdd`, `strict-tdd`, or
+`test-after`. The defaults are `latest-compatible` and `adaptive-tdd`.
+Each key resolves independently in this order: an explicit current-session
+instruction, `.gopher-plugin.toml`, adopted project configuration and commands,
+then the Gopher default.
+
+Schema versions `1`, `2`, and `3` keep working as `MIGRATION_AVAILABLE`.
+Before migration, missing `[developer]` values use the defaults without writing
+them to the project. Only a confirmed `config --bootstrap` migration persists
+the schema-4 additions; it preserves existing values. The developer workflow
+uses these policies for local implementation and its focused test evidence. It
+does not perform broad modernization or rewrite unrelated code; those remain
+with the appropriate specialist skill.
 
 ## Development and validation
 

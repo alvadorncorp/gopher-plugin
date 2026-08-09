@@ -1,9 +1,13 @@
 [gopher]
-schema_version = 3
+schema_version = 4
 
 [project]
 module_roots = []
 package_patterns = ["./..."]
+
+[developer]
+idiom_policy = "latest-compatible"
+test_workflow = "adaptive-tdd"
 
 [complexity]
 mode = "advisory"

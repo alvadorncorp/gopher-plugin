@@ -24,6 +24,15 @@ The `[agents]` table declares the project's policy for the packaged `developer`,
 and never applies it, because each agent's binding is read by the host when it
 loads the agent.
 
+The `[developer]` table declares the `gopher:developer` workflow policy through
+`idiom_policy` and `test_workflow`. This skill validates, bootstraps, migrates,
+and explains those values; `gopher:developer` consumes them when it performs
+work. For a version `1`, `2`, or `3` file with no `[developer]` table, resolve
+the missing values to `idiom_policy = "latest-compatible"` and
+`test_workflow = "adaptive-tdd"` from `references/schema.md` and
+`references/validation.md`. Keep those effective defaults unpersisted until a
+confirmed `--bootstrap` migration writes them.
+
 ## Modes
 
 - No mode: detect the project root, locate the file, report its path and

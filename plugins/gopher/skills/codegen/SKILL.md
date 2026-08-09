@@ -1,6 +1,6 @@
 ---
 name: codegen
-description: Inventories Go generators, records provenance, reproduces generation in a temporary location, and classifies checked-in output as fresh, stale, or nondeterministic before verifying the artifacts. Use for `go generate`, a file carrying a `DO NOT EDIT` header, or mocks, protobuf, sqlc, and stringer output: to check whether generated Go code is current and reproducible, to regenerate on request, or to adopt an ad hoc generator. Route generator implementation to `gopher:developer` and generated-contract changes to `gopher:architecture`.
+description: "Inventories generated Go output and checks its provenance, reproducibility, and staleness. Use when checking `go generate`, a file carrying a `DO NOT EDIT` header, or mocks, protobuf, sqlc, or stringer output; regenerating it; or adopting an ad hoc generator. Routes generator implementation to `gopher:developer` and generated-contract changes to `gopher:architecture`."
 ---
 
 # Go Code Generation
@@ -10,12 +10,12 @@ description: Inventories Go generators, records provenance, reproduces generatio
 Own the lifecycle and trustworthiness of generated Go code: which generators a
 project declares, what provenance each artifact carries, whether the checked-in
 output still reproduces from its inputs, and whether the artifacts verify.
-Primary owner: `gopher:codegen`. Read the analysis scope from `gopher:config`
-(`[project].module_roots`, `[project].package_patterns`) and carry its contract
-state as `config_status`. Declared commands and generator pins come from the
-project surfaces in `references/inventory.md`: `//go:generate` directives,
-Makefile targets, registry configs, the `tool` directive in `go.mod`, and
-`tools.go`.
+Primary owner: `gopher:codegen`. Before inventory, resolve the project contract
+through `gopher:config`; record its `config_status` and scope the run with the
+effective `[project].module_roots` and `[project].package_patterns`. Declared
+commands and generator pins come from the project surfaces in
+`references/inventory.md`: `//go:generate` directives, Makefile targets,
+registry configs, the `tool` directive in `go.mod`, and `tools.go`.
 
 Keep the split sharp: writing the generator's own Go code is `gopher:developer`;
 deciding whether the checked-in output still matches its inputs is
@@ -55,18 +55,32 @@ Terminal states:
 
 ## Workflow
 
-1. Inventory generation: `go:generate` directives, build tags, the `tool`
-   directive, `tools.go`, Makefiles, and registries (`references/inventory.md`).
-2. Record provenance per artifact: generator identity, pinned version, exact
-   command, input hashes, toolchain, header (`references/provenance.md`).
-3. Reproduce generation in a temporary location, at least twice from identical
-   inputs, with the environment controlled (`references/reproduction.md`).
-4. Compare hashes and diffs, byte level first and semantic equality second.
-5. Classify the result as fresh, stale, or nondeterministic output, or an
-   intentional local change (`references/staleness.md`).
-6. Verify that the artifacts compile, the project's own test command passes, and
-   the public surface is what it claims (`references/verification.md`).
-7. Report the state, the evidence, the verified artifacts, and the handoffs.
+1. Resolve the project contract through `gopher:config`; record `config_status`
+   and apply its effective scope.
+2. Inventory generation: `go:generate` directives, build tags, the `tool`
+   directive, `tools.go`, Makefiles, and registries; record every producer
+   (`references/inventory.md`).
+3. Record provenance per artifact: generator identity, pinned version, exact
+   command, input hashes, toolchain, and header (`references/provenance.md`).
+4. Reproduce generation in a temporary location at least twice from identical
+   inputs with the environment controlled; record both outputs or hashes and
+   the controlled variables (`references/reproduction.md`).
+5. Compare hashes and diffs byte level first, then semantic equality; retain the
+   byte-level evidence (`references/reproduction.md`).
+6. Classify the result as `FRESH`, `STALE`, `NONDETERMINISTIC`, or `BLOCKED`
+   using the decision table. Report an intentional local change as `STALE` with
+   its hand-edit finding (`references/staleness.md`).
+7. Verify the artifacts in ladder order — compilation, toolchain checks, project
+   tests, then public surface — stopping at the first failing rung and recording
+   the exact commands, exit status, tags, and highest verified level
+   (`references/verification.md`).
+8. Report the state, evidence, verified artifacts, limitations, and handoffs.
+
+Advance only after the current step's evidence is recorded. When a required pin,
+declared command, input, or authorization is unavailable, stop at that gate with
+`BLOCKED` and name the exact missing item; classify evidence as observed,
+inferred, or unknown. A limitation that affects only a later verification rung
+reports the highest verified level instead of claiming full verification.
 
 ## Output format
 
@@ -76,10 +90,10 @@ primary_owner: gopher:codegen
 mode: check | generate | adopt
 status: FRESH | STALE | NONDETERMINISTIC | BLOCKED
 config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
-generators:
-provenance:
-comparison_evidence:
-verified_artifacts:
+generators:  # one entry per discovered producer
+provenance:  # one entry per artifact
+comparison_evidence:  # two run hashes, checked-in hash, diffs, input-hash comparison
+verified_artifacts:  # one entry per artifact and highest passing verification level
 authorization_gate: none | approval-required | blocked
 handoffs:  # one entry per finding: {finding, owner: gopher:<skill>, evidence}
 ```
@@ -100,9 +114,11 @@ handoffs:  # one entry per finding: {finding, owner: gopher:<skill>, evidence}
   limitation with the exact pin line the project would add; obtaining or
   installing it stays with the project's own dependency workflow, and adopting it
   runs behind the approval gate in `references/adopt.md`.
-- Declared commands are the only commands that run, and a command writes into
-  the working tree only in `generate`, explicitly selected. `check` reproduces
-  into a temporary location and leaves the working tree untouched.
+- Run only declared generator commands for generation. A generator command writes
+  generated artifacts into the working tree only in explicitly selected
+  `generate`; `check` reproduces into a temporary location and leaves the working
+  tree untouched. Verification commands come from the project's own command
+  surfaces (`references/verification.md`).
 - Adoption edits project files, so it carries an approval gate; a declined
   adoption is reported as a plan (`references/adopt.md`).
 - Route a generator defect to `gopher:developer` and a public-surface movement

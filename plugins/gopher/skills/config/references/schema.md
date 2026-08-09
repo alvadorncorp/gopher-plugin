@@ -2,9 +2,9 @@
 
 Every value lives inside a canonical table. Root-level loose keys and dotted
 keys (for example `complexity.cyclomatic_max = 15` at the root) are not
-canonical and fail validation. The eleven canonical tables are `gopher`,
+canonical and fail validation. The twelve canonical tables are `gopher`,
 `project`, `complexity`, `test-quality`, `modernize`, `refactor`, `tools`,
-`doctor`, `fuzz`, `architecture`, and `agents`.
+`doctor`, `fuzz`, `architecture`, `agents`, and `developer`.
 
 Defaults are configurable targets, not universal claims about Go code. A legacy
 project below a target does not automatically fail when the measured scope
@@ -14,13 +14,34 @@ maintains or improves its baseline.
 
 | Key | Type | Range / enum | Default | Consumed by |
 |---|---|---|---|---|
-| `schema_version` | integer | `1` \| `2` (supported, migratable) \| `3` (current) | `3` | validation, every workflow |
+| `schema_version` | integer | `1` \| `2` \| `3` (supported, migratable) \| `4` (current) | `4` | validation, every workflow |
 
 `schema_version` pins the contract. A newer value than this skill supports is
 `UNSUPPORTED_VERSION` and is treated read-only. An older but still supported
 value is `MIGRATION_AVAILABLE`: the contract stays usable on its own effective
 values, and migration to the current schema happens only inside `--bootstrap`,
 with a shown diff and explicit confirmation.
+
+## `[developer]`
+
+| Key | Type | Range / enum | Default | Consumed by |
+|---|---|---|---|---|
+| `idiom_policy` | string | `latest-compatible` \| `project-aligned` \| `explicit-only` | `latest-compatible` | `gopher:developer` |
+| `test_workflow` | string | `adaptive-tdd` \| `strict-tdd` \| `test-after` | `adaptive-tdd` | `gopher:developer` |
+
+`idiom_policy` selects how newly written or directly changed code chooses
+idioms. It is always capped by the project's declared Go version and never
+consumes `modernize.target_go`. `latest-compatible` prefers the newest suitable
+idiom within that cap, `project-aligned` gives nearby adopted conventions
+priority, and `explicit-only` introduces a newer idiom only when the current
+request explicitly asks for it.
+
+`test_workflow` selects the test and implementation sequencing plus the
+required evidence for `gopher:developer`. Schema versions `1`, `2`, and `3`
+remain supported and migratable; until a confirmed
+`gopher:config --bootstrap` migration writes them, an absent `[developer]`
+table resolves `idiom_policy` and `test_workflow` to these defaults without
+persisting them.
 
 ## `[project]`
 

@@ -7,10 +7,13 @@ ROOT = Path(__file__).resolve().parents[1]
 TEMPLATE = ROOT / "plugins/gopher/skills/config/templates/default.gopher-plugin.toml"
 SCHEMA_DOC = ROOT / "plugins/gopher/skills/config/references/schema.md"
 VALIDATION_DOC = ROOT / "plugins/gopher/skills/config/references/validation.md"
+CONFIG_SKILL = ROOT / "plugins/gopher/skills/config/SKILL.md"
+BOOTSTRAP_DOC = ROOT / "plugins/gopher/skills/config/references/bootstrap.md"
+EXPLAIN_DOC = ROOT / "plugins/gopher/skills/config/references/explain.md"
 
 CANONICAL_TABLES = (
     "gopher", "project", "complexity", "test-quality", "modernize", "refactor", "tools",
-    "doctor", "fuzz", "architecture", "agents",
+    "doctor", "fuzz", "architecture", "agents", "developer",
 )
 
 AGENT_ROLES = ("developer", "architect", "reviewer")
@@ -18,6 +21,8 @@ AGENT_MODELS = ("shipped", "inherit", "haiku", "sonnet", "opus")
 AGENT_EFFORTS = ("shipped", "inherit", "low", "medium", "high", "xhigh")
 AGENT_AUTHORIZATIONS = ("handback", "request-approval", "inherit-session")
 AGENT_DIVERGENCE_MODES = ("report", "block")
+DEVELOPER_IDIOM_POLICIES = ("latest-compatible", "project-aligned", "explicit-only")
+DEVELOPER_TEST_WORKFLOWS = ("adaptive-tdd", "strict-tdd", "test-after")
 
 QUALITY_LAB_FAMILIES = (
     "deterministic-concurrency", "integration", "contract", "hermetic", "flake",
@@ -34,7 +39,7 @@ def load_template():
 class ConfigContractTest(unittest.TestCase):
     def test_schema_version_and_canonical_tables(self):
         data = load_template()
-        self.assertEqual(3, data["gopher"]["schema_version"])
+        self.assertEqual(4, data["gopher"]["schema_version"])
         self.assertEqual(set(CANONICAL_TABLES), set(data.keys()))
 
     def test_no_root_loose_or_dotted_keys(self):
@@ -108,6 +113,25 @@ class ConfigContractTest(unittest.TestCase):
         for member in members:
             self.assertIn(f"`{member}`", doc, f"schema.md omits agents enum member {member}")
 
+    def test_developer_policy_defaults_types_and_enums(self):
+        developer = load_template()["developer"]
+        self.assertEqual(
+            {
+                "idiom_policy": "latest-compatible",
+                "test_workflow": "adaptive-tdd",
+            },
+            developer,
+        )
+        self.assertIsInstance(developer["idiom_policy"], str)
+        self.assertIn(developer["idiom_policy"], DEVELOPER_IDIOM_POLICIES)
+        self.assertIsInstance(developer["test_workflow"], str)
+        self.assertIn(developer["test_workflow"], DEVELOPER_TEST_WORKFLOWS)
+
+    def test_developer_enum_members_are_documented(self):
+        doc = SCHEMA_DOC.read_text(encoding="utf-8")
+        for member in DEVELOPER_IDIOM_POLICIES + DEVELOPER_TEST_WORKFLOWS:
+            self.assertIn(f"`{member}`", doc, f"schema.md omits developer enum member {member}")
+
     def test_enum_values(self):
         data = load_template()
         self.assertEqual("advisory", data["complexity"]["mode"])
@@ -144,6 +168,42 @@ class ConfigContractTest(unittest.TestCase):
             "ABSENT", "VALID", "MIGRATION_AVAILABLE", "INVALID", "UNSUPPORTED_VERSION",
         ):
             self.assertIn(state, doc, f"validation.md omits state {state}")
+
+    def test_schema_v4_developer_policy_is_normative_across_config_workflow(self):
+        """Schema 4 must keep legacy contracts usable until a confirmed migration."""
+        documents = {
+            "SKILL.md": CONFIG_SKILL.read_text(encoding="utf-8"),
+            "bootstrap.md": BOOTSTRAP_DOC.read_text(encoding="utf-8"),
+            "validation.md": VALIDATION_DOC.read_text(encoding="utf-8"),
+            "explain.md": EXPLAIN_DOC.read_text(encoding="utf-8"),
+        }
+        for name, document in documents.items():
+            with self.subTest(document=name):
+                self.assertIn("`idiom_policy`", document)
+                self.assertIn("`test_workflow`", document)
+
+        bootstrap = documents["bootstrap.md"]
+        for version in (1, 2, 3):
+            with self.subTest(version=version):
+                self.assertIn(f"| `{version}` |", bootstrap)
+        self.assertIn("schema_version = 4", bootstrap)
+        self.assertIn("[developer]", bootstrap)
+        self.assertIn('idiom_policy = "latest-compatible"', bootstrap)
+        self.assertIn('test_workflow = "adaptive-tdd"', bootstrap)
+        self.assertIn("Preserve every value the user already set", bootstrap)
+        self.assertIn("Declining leaves the file untouched", bootstrap)
+
+        validation = documents["validation.md"]
+        self.assertIn("`4` is `VALID`", validation)
+        self.assertIn("`1`, `2`, and `3` are `MIGRATION_AVAILABLE`", validation)
+        self.assertIn("missing `[developer]` table", validation)
+
+        explain = documents["explain.md"]
+        self.assertIn("`idiom_policy`", explain)
+        self.assertIn("`test_workflow`", explain)
+        self.assertIn("latest-compatible", explain)
+        self.assertIn("adaptive-tdd", explain)
+        self.assertIn("`--explain` writes nothing", explain)
 
 
 if __name__ == "__main__":

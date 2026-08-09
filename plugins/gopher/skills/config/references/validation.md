@@ -13,24 +13,55 @@ what work the effective configuration may drive.
    older than the current schema but still supported is `MIGRATION_AVAILABLE`
    once every other rule passes; it is not a failure. `schema_version` is
    classified by this rule alone: rules 6 and 7 below do not apply to it, so
-   `3` is `VALID`, `1` and `2` are `MIGRATION_AVAILABLE`, and any higher value is
-   `UNSUPPORTED_VERSION`.
+   `4` is `VALID`, `1`, `2`, and `3` are `MIGRATION_AVAILABLE`, and any higher
+   value is `UNSUPPORTED_VERSION`. A missing `[developer]` table — and therefore
+   missing `idiom_policy` and `test_workflow` values — never invalidates versions
+   `1`, `2`, or `3`; those supported older contracts resolve both values to their
+   documented defaults until a confirmed migration writes them.
 3. Canonical tables: only `gopher`, `project`, `complexity`, `test-quality`,
    `modernize`, `refactor`, `tools`, `doctor`, `fuzz`, `architecture`, and
-   `agents` are allowed. Root-level loose keys and dotted keys are not canonical.
+   `agents`, and `developer` are allowed. Root-level loose keys and dotted keys are not canonical.
    The one canonical nested array of tables is `[[doctor.overrides]]`.
 4. Known keys: every key must be defined for its table in
    `references/schema.md`. An unknown key in the current schema is invalid. A
    table or a key the current schema adds is simply absent from an older file,
    and that absence is never an unknown key. This covers a key added to a table
    that already existed, such as `test-quality.quality_lab_families`, as much as
-   it covers a whole added table such as `[agents]`.
+   it covers a whole added table such as `[agents]` or `[developer]`. For the
+   latter, the current keys are `idiom_policy` and `test_workflow`.
 5. Value types: each value must match its documented type (integer, boolean,
    string, or list of string).
 6. Ranges: numeric values must fall inside their documented range (for example
    `coverage_target` within `0`–`100`, `cyclomatic_max` greater than `0`).
 7. Enums: string values constrained to an enum must match a documented member
    (for example `mode` is `advisory` or `required`).
+
+## Decision order and diagnostic evidence
+
+Use the file as observed evidence and `references/schema.md` as the expected
+contract. For every failure or limitation, report the rule number and TOML path
+(or the parse-error location for rule 1), the observed value or structure, the
+expected type, range, enum, or canonical location, and the resulting state with
+allowed or blocked work.
+
+Apply the gates in this order:
+
+1. Return `ABSENT` before parsing when the file does not exist.
+2. Parse first. On failure, return `INVALID`, report the parse-error location,
+   and stop the remaining rules.
+3. For a parsed file, classify `schema_version` before rules 3–7. A missing or
+   non-integer value is `INVALID`. A value above the supported version is
+   `UNSUPPORTED_VERSION`; report the found and supported versions, keep the
+   result read-only, and treat future-schema fields as unknown rather than
+   inferring their meaning.
+4. For a supported version, evaluate canonical tables, known keys, value types,
+   ranges, and enums. Any failure is `INVALID`. When all rules pass, version `4`
+   is `VALID` and versions `1`, `2`, and `3` are `MIGRATION_AVAILABLE`.
+5. For `MIGRATION_AVAILABLE`, report the found and supported versions and the
+   exact additions that `--bootstrap` would preview from `references/bootstrap.md`.
+   Migration still requires the explicit confirmation described below.
+6. If required evidence cannot be observed, label it `unknown`, name the exact
+   evidence needed, and stop the affected gate instead of inferring a result.
 
 ## States
 

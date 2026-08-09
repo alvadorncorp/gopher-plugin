@@ -7,7 +7,7 @@
       "id": "gopher",
       "displayName": "Gopher",
       "description": "Evidence-driven Go engineering workflows for design, implementation, diagnosis, security, and multi-lens review.",
-      "version": "0.4.0",
+      "version": "0.5.1",
       "author": {
         "name": "Igor Sant'Ana @ Alvadorn Corp"
       },
