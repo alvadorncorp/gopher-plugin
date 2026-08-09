@@ -5,7 +5,7 @@ context: gopher
 title: Package Go engineering workflows for Codex, Claude, and Grok
 status: Accepted
 tags: [go, codex, claude, grok, skills, marketplace]
-related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005, adr:gopher:006, adr:gopher:007]
+related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005, adr:gopher:006, adr:gopher:007, adr:gopher:008]
 date: 2026-07-14
 ---
 # SDD: Package Go engineering workflows for Codex, Claude, and Grok
@@ -23,13 +23,16 @@ and `adr:gopher:001`, with the third host recorded in `adr:gopher:003`.
 
 ## Solution Overview
 
-Publish marketplace `alvadorncorp` with plugin `gopher` version `0.4.0`.
+Publish marketplace `alvadorncorp` with plugin `gopher` version `0.5.1`.
 Codex, Claude, and Grok receive native manifests while loading the same physical
 tree at `plugins/gopher/skills/`. Twenty peer skills have canonical ownership
 and a textual decision and handoff contract. A `.gopher-plugin.toml` project
 contract, owned by `gopher:config`, carries thresholds, tool policy, and
-refactoring safeguards for the quality workflows; it is at schema version `3`
-and reports a version-`1` or version-`2` file as `MIGRATION_AVAILABLE`. Three
+refactoring safeguards for the quality workflows; it is at schema version `4`
+and reports a version-`1`, version-`2`, or version-`3` file as
+`MIGRATION_AVAILABLE`. The `[developer]` policy carries idiom and test-workflow
+choices, resolved independently by session, file, adopted project policy, then
+default. Versions `1`–`3` remain `MIGRATION_AVAILABLE`. Three
 packaged role agents wrap `gopher:developer`, `gopher:architecture`, and
 `gopher:review` with a fixed per-role binding.
 
@@ -86,6 +89,12 @@ Explicitly requested local and reversible changes may proceed. Cross-package,
 public-contract, boundary, persistence, security-boundary, or ADR-affecting
 changes require evidence, alternatives, and explicit approval before editing.
 
+The developer owns local Go implementation, APIs, errors, tests, and tooling.
+Its evidence flow records the selected idiom policy and policy source, declared
+Go-version compatibility, baseline conventions, and test evidence before
+handoff. `adaptive-tdd` selects the smallest useful red-green-refactor loop for
+the change while keeping modernization specialist-owned.
+
 ## Considered Alternatives
 
 ### Alternative 1: One physical tree with native packaging per harness
@@ -123,6 +132,10 @@ changes require evidence, alternatives, and explicit approval before editing.
 - Migrate the project contract to schema version `3` with the `[agents]`
   declared-policy table — recorded in `adr:gopher:007`, as `adr:gopher:005`
   required for any schema migration.
+- Add the bounded `[developer]` policy and migrate the project contract to
+  schema version `4`, preserving opt-in migration for versions `1`–`3` —
+  recorded in `adr:gopher:008`, as `adr:gopher:005` requires for any schema
+  migration.
 
 ## Risks and Trade-offs
 
@@ -155,6 +168,9 @@ changes require evidence, alternatives, and explicit approval before editing.
   the Kimi inline fallback, and the `agents.policy-declared` readiness rule
   (`adr:gopher:007`) — version `0.4.0`, already carried by every manifest and by
   every versioned marketplace catalog.
+- Phase 8: adaptive developer policy, schema `4`, migration compatibility for
+  versions `1`–`3`, and the developer evidence flow (`adr:gopher:008`) — the
+  existing `0.5.1` release state.
 - After a real non-Go consumer exists: evaluate extracting `design-patterns`
   and `application-architecture` without changing handoff identifiers.
 - After every stable Go release and at least quarterly: review

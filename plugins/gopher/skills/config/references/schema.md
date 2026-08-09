@@ -37,9 +37,10 @@ priority, and `explicit-only` introduces a newer idiom only when the current
 request explicitly asks for it.
 
 `test_workflow` selects the test and implementation sequencing plus the
-required evidence for `gopher:developer`. Versions `1`, `2`, and `3` remain
-supported and migratable; before a confirmed `gopher:config --bootstrap`
-migration, an absent `[developer]` table resolves to these defaults without
+required evidence for `gopher:developer`. Schema versions `1`, `2`, and `3`
+remain supported and migratable; until a confirmed
+`gopher:config --bootstrap` migration writes them, an absent `[developer]`
+table resolves `idiom_policy` and `test_workflow` to these defaults without
 persisting them.
 
 ## `[project]`

@@ -9,7 +9,8 @@ description: Implements and maintains idiomatic Go code, including local APIs, t
 
 Own routine, local Go implementation and maintenance. Primary owner:
 `gopher:developer`. Use the target project's declared Go version, conventions,
-dependencies, commands, and adopted tooling; this skill has no global Go baseline.
+dependencies, commands, and adopted tooling as the baseline for each decision;
+resolve missing project values through `references/project-detection.md`.
 
 | Question | Owner |
 |---|---|
@@ -37,32 +38,46 @@ build-matrix decision is `gopher:cgo`.
 ## Workflow
 
 1. **CLASSIFY CONFIG** using `references/project-detection.md`. `INVALID` and
-   `UNSUPPORTED_VERSION` permit read-only diagnosis only and block production
-   edits.
+   `UNSUPPORTED_VERSION` permit read-only diagnosis only, block production
+   edits, and route recovery to `gopher:config`. Record the config status and
+   validation evidence.
 2. **RESOLVE IDIOM POLICY** and **RESOLVE TEST WORKFLOW** independently using
    `session | file | adopted | default`; use `latest-compatible` and
-   `adaptive-tdd` when their values are absent or migratable. Do not persist
-   effective defaults outside the `gopher:config` bootstrap flow.
+   `adaptive-tdd` when their values are absent or migratable. Record each
+   resolved value and source. Keep effective defaults session-scoped and persist
+   them only through the `gopher:config` bootstrap flow.
 3. Detect the declared Go version, project commands, and conventions using
-   `references/project-detection.md`.
-4. **ESTABLISH FOCUSED BASELINE** with the smallest relevant existing command
-   before classifying a change or editing production behavior.
+   `references/project-detection.md`, and record the detected values.
+4. **ESTABLISH FOCUSED BASELINE** with the narrowest adopted command that
+   exercises the affected package or behavior; record its exact command, exit
+   status, and observation before classifying a change or editing production
+   behavior.
 5. **CLASSIFY CHANGE** as behavior, bug-fix, refactor, mechanical, or test-only;
    restate its behavior, affected local API,
    error semantics, and compatibility constraints.
 6. Load `references/testing.md` and **COLLECT FIRST SIGNAL** required by the
-   resolved `test_workflow` before production behavior code.
+   resolved `test_workflow`; record that signal before editing production
+   behavior.
 7. Inspect callers, tests, and nearby conventions before editing.
 8. Prefer direct code, concrete types, functions, and useful zero values.
-9. When a `pattern.*` handoff exists, load `references/pattern-mappings.md` and
+9. When the request or project supplies a `pattern.*` mapping, load
+   `references/pattern-mappings.md` and
    accept, adapt, or veto it with Go-specific evidence.
 10. For a local reversible refactor, load `references/refactoring.md` and follow
    its FOCUSED workflow; hand multidimensional or repository-wide work to
    `gopher:refactor`.
-11. **IMPLEMENT** the smallest cohesive change and behavior-focused tests.
-12. **CONFIRM GREEN** with the same focused command, then **REFACTOR WHILE GREEN**.
-13. Run **FINAL VALIDATION** proportionally using existing project commands.
+11. **IMPLEMENT** the smallest cohesive change that satisfies the requested
+   behavior, with tests for changed observable behavior.
+12. **CONFIRM GREEN** with the same focused command and record its evidence,
+   then **REFACTOR WHILE GREEN**.
+13. Run **FINAL VALIDATION** with the affected-risk ladder in
+   `references/tooling.md` and existing project commands.
 14. Report files, behavior, validation, limitations, and any handoff.
+
+For each workflow gate, classify supporting claims as `observed`, `inferred`, or
+`unknown`. If an unknown blocks the next gate, stop at that gate and record the
+exact evidence or user/owner decision required in `limitations`; route to the
+owning skill when the unresolved decision is outside this skill's scope.
 
 ## Output format
 
@@ -108,13 +123,13 @@ omitting the entry.
 
 ## Authorization
 
-Explicitly requested local and reversible changes may proceed, except an edit to
-a file carrying a `// Code generated ... DO NOT EDIT.` header: change its input
-or its generator and route the regeneration decision to `gopher:codegen`.
+Proceed with explicitly requested local and reversible changes. For a file
+carrying a `// Code generated ... DO NOT EDIT.` header, change its input or its
+generator and route the regeneration decision to `gopher:codegen`.
 Cross-package, public-contract, persistence, security-boundary, or ADR-affecting
 changes need evidence, alternatives, and explicit approval before editing.
-Existing project tools may run locally; installing tools or probing production
-requires approval.
+Existing project tools may run locally. Request approval before installing tools
+or probing production.
 
 When the evidence leaves it undecided whether a boundary is already designed or
 whether a file is generated, record the ambiguity in `limitations` and hand off

@@ -36,6 +36,33 @@ what work the effective configuration may drive.
 7. Enums: string values constrained to an enum must match a documented member
    (for example `mode` is `advisory` or `required`).
 
+## Decision order and diagnostic evidence
+
+Use the file as observed evidence and `references/schema.md` as the expected
+contract. For every failure or limitation, report the rule number and TOML path
+(or the parse-error location for rule 1), the observed value or structure, the
+expected type, range, enum, or canonical location, and the resulting state with
+allowed or blocked work.
+
+Apply the gates in this order:
+
+1. Return `ABSENT` before parsing when the file does not exist.
+2. Parse first. On failure, return `INVALID`, report the parse-error location,
+   and stop the remaining rules.
+3. For a parsed file, classify `schema_version` before rules 3–7. A missing or
+   non-integer value is `INVALID`. A value above the supported version is
+   `UNSUPPORTED_VERSION`; report the found and supported versions, keep the
+   result read-only, and treat future-schema fields as unknown rather than
+   inferring their meaning.
+4. For a supported version, evaluate canonical tables, known keys, value types,
+   ranges, and enums. Any failure is `INVALID`. When all rules pass, version `4`
+   is `VALID` and versions `1`, `2`, and `3` are `MIGRATION_AVAILABLE`.
+5. For `MIGRATION_AVAILABLE`, report the found and supported versions and the
+   exact additions that `--bootstrap` would preview from `references/bootstrap.md`.
+   Migration still requires the explicit confirmation described below.
+6. If required evidence cannot be observed, label it `unknown`, name the exact
+   evidence needed, and stop the affected gate instead of inferring a result.
+
 ## States
 
 - `ABSENT`: no file exists. Analysis is allowed; `--bootstrap` can create the
