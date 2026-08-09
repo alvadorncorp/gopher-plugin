@@ -36,27 +36,61 @@ build-matrix decision is `gopher:cgo`.
 
 ## Workflow
 
-1. Detect the project contract using `references/project-detection.md`.
-2. Restate the requested behavior, affected local API, error semantics, and
-   compatibility constraints.
-3. Inspect callers, tests, and nearby conventions before editing.
-4. Prefer direct code, concrete types, functions, and useful zero values.
-5. When a `pattern.*` handoff exists, load `references/pattern-mappings.md` and
+1. **CLASSIFY CONFIG** using `references/project-detection.md`. `INVALID` and
+   `UNSUPPORTED_VERSION` permit read-only diagnosis only and block production
+   edits.
+2. **RESOLVE IDIOM POLICY** and **RESOLVE TEST WORKFLOW** independently using
+   `session | file | adopted | default`; use `latest-compatible` and
+   `adaptive-tdd` when their values are absent or migratable. Do not persist
+   effective defaults outside the `gopher:config` bootstrap flow.
+3. Detect the declared Go version, project commands, and conventions using
+   `references/project-detection.md`.
+4. **ESTABLISH FOCUSED BASELINE** with the smallest relevant existing command
+   before classifying a change or editing production behavior.
+5. **CLASSIFY CHANGE** as behavior, bug-fix, refactor, mechanical, or test-only;
+   restate its behavior, affected local API,
+   error semantics, and compatibility constraints.
+6. Load `references/testing.md` and **COLLECT FIRST SIGNAL** required by the
+   resolved `test_workflow` before production behavior code.
+7. Inspect callers, tests, and nearby conventions before editing.
+8. Prefer direct code, concrete types, functions, and useful zero values.
+9. When a `pattern.*` handoff exists, load `references/pattern-mappings.md` and
    accept, adapt, or veto it with Go-specific evidence.
-6. For a local reversible refactor, load `references/refactoring.md` and follow
+10. For a local reversible refactor, load `references/refactoring.md` and follow
    its FOCUSED workflow; hand multidimensional or repository-wide work to
    `gopher:refactor`.
-7. Implement the smallest cohesive change and behavior-focused tests.
-8. Format and validate proportionally using existing project commands.
-9. Report files, behavior, validation, limitations, and any handoff.
+11. **IMPLEMENT** the smallest cohesive change and behavior-focused tests.
+12. **CONFIRM GREEN** with the same focused command, then **REFACTOR WHILE GREEN**.
+13. Run **FINAL VALIDATION** proportionally using existing project commands.
+14. Report files, behavior, validation, limitations, and any handoff.
 
 ## Output format
 
 ```yaml
 selected_skill: gopher:developer
 primary_owner: gopher:developer
+status: COMPLETE | COMPLETE_WITH_LIMITATIONS | BLOCKED
 project_contract:
+  config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
+  declared_go:
+  idiom_policy:
+    value: latest-compatible | project-aligned | explicit-only
+    source: session | file | adopted | default
+  test_workflow:
+    value: adaptive-tdd | strict-tdd | test-after
+    source: session | file | adopted | default
 requested_behavior:
+change_class: behavior | bug-fix | refactor | mechanical | test-only
+baseline_status: passing | failing | not-run
+test_evidence:
+  pre_change:
+  first_signal:
+    kind: red | characterization | test-after | exception | not-applicable
+    command:
+    observed:
+    reason:
+  green:
+  refactor:
 implementation:
 pattern_decision:
   general_id: pattern.<id> | none
@@ -64,8 +98,13 @@ pattern_decision:
   disposition: accepted | adapted | vetoed | not-applicable
 validation:
 limitations:
+authorization_gate: none | approval-required | blocked
 handoff: gopher:<skill> | null
 ```
+
+Evidence entries record the exact command, exit status, and concise observation.
+When a stage is skipped or not applicable, record an explicit reason rather than
+omitting the entry.
 
 ## Authorization
 

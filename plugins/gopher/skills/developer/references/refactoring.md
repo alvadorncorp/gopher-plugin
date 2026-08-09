@@ -7,15 +7,18 @@ multidimensional orchestration to their canonical owners.
 ## Focused workflow
 
 ```text
-FOCUSED BASELINE -> LOAD EFFECTIVE CONFIG -> LOCAL REVERSIBLE REFACTOR -> FOCUSED TESTS -> RE-MEASURE
+RESOLVE EFFECTIVE CONFIG -> FOCUSED BASELINE -> CHARACTERIZATION SAFETY NET -> LOCAL REVERSIBLE REFACTOR -> FOCUSED TESTS -> RE-MEASURE
 ```
 
-1. Establish a focused passing baseline for the unit under change.
-2. Load the effective configuration from `gopher:config` for the relevant scope
+1. Resolve effective config from `gopher:config` for the relevant scope
    and targets.
-3. Apply the local, reversible refactor with idiomatic Go, preserving behavior.
-4. Run focused behavior tests for the changed unit.
-5. Re-measure the same way and report the change, tests, and any limitation.
+2. Establish a FOCUSED BASELINE that passes for the unit under change.
+3. Create or identify a passing characterization safety net before mutation;
+   it must pin the behavior the refactor preserves.
+4. Apply the local, reversible refactor with idiomatic Go, preserving behavior.
+5. Run focused behavior tests for the changed unit and keep them green through
+   any follow-up refactoring.
+6. Re-measure the same way and report the change, tests, and any limitation.
 
 ## Boundaries and routing
 
