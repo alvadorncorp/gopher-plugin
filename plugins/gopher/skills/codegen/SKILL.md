@@ -1,6 +1,6 @@
 ---
 name: codegen
-description: Inventories Go generators, records provenance, reproduces generation in a temporary location, and classifies checked-in output as fresh, stale, or nondeterministic before verifying the artifacts. Use for `go generate`, a file carrying a `DO NOT EDIT` header, or mocks, protobuf, sqlc, and stringer output: to check whether generated Go code is current and reproducible, to regenerate on request, or to adopt an ad hoc generator. Route generator implementation to `gopher:developer` and generated-contract changes to `gopher:architecture`.
+description: "Inventories Go generators, records provenance, reproduces generation in a temporary location, and classifies checked-in output as fresh, stale, or nondeterministic before verifying the artifacts. Use for `go generate`, a file carrying a `DO NOT EDIT` header, or mocks, protobuf, sqlc, and stringer output: to check whether generated Go code is current and reproducible, to regenerate on request, or to adopt an ad hoc generator. Route generator implementation to `gopher:developer` and generated-contract changes to `gopher:architecture`."
 ---
 
 # Go Code Generation

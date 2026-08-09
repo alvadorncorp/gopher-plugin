@@ -14,7 +14,6 @@ CLAUDE_PLUGIN = PLUGIN / ".claude-plugin/plugin.json"
 GROK_PLUGIN = PLUGIN / ".grok-plugin/plugin.json"
 KIMI_PLUGIN = PLUGIN / ".kimi-plugin/plugin.json"
 ROOT_KIMI_PLUGIN = ROOT / ".kimi-plugin/plugin.json"
-LAYOUT = ROOT / "tests/fixtures/expected-layout.json"
 
 
 def load(path: Path):
@@ -46,7 +45,6 @@ class BootstrapPackageTest(unittest.TestCase):
             self.assertEqual(codex_plugin[key], grok_plugin[key])
             self.assertEqual(codex_plugin[key], kimi_plugin[key])
         self.assertEqual("gopher", codex_plugin["name"])
-        self.assertEqual(load(LAYOUT)["plugin_version"], codex_plugin["version"])
         self.assertTrue((PLUGIN / "skills").is_dir())
         self.assertTrue((PLUGIN / "agents").is_dir())
         self.assertTrue((PLUGIN / "agents/codex").is_dir())

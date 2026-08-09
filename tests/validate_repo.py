@@ -348,13 +348,9 @@ def validate_repository() -> list[str]:
         errors.append("Grok marketplace name mismatch")
     if kimi_market.get("name") != expected["marketplace_name"]:
         errors.append("Kimi marketplace name mismatch")
-    # The release engine bumps only the plugin manifests, so the catalogs that do
-    # carry a version are pinned to the fixture here instead of drifting silently.
-    # The Codex catalog carries no version and is deliberately not checked.
-    for label, market in (("Claude", claude_market), ("Grok", grok_market), ("Kimi", kimi_market)):
-        entry = (market.get("plugins") or [{}])[0]
-        if entry.get("version") != expected["plugin_version"]:
-            errors.append(f"{label} marketplace version mismatch")
+    # Official host packaging validators own catalog/manifest version compatibility.
+    # This repository gate preserves identity, source, and cross-manifest parity
+    # without copying a release number into the structural layout fixture.
     for key in ("name", "version", "description", "author"):
         if codex_plugin.get(key) != claude_plugin.get(key):
             errors.append(f"plugin manifest parity mismatch: {key}")
@@ -364,8 +360,6 @@ def validate_repository() -> list[str]:
             errors.append(f"plugin manifest parity mismatch (kimi): {key}")
     if codex_plugin.get("name") != expected["plugin_name"]:
         errors.append("plugin name mismatch")
-    if codex_plugin.get("version") != expected["plugin_version"]:
-        errors.append("plugin version mismatch")
     grok_source = (grok_market.get("plugins") or [{}])[0].get("source")
     if not isinstance(grok_source, dict) or grok_source.get("path") != "./plugins/gopher":
         errors.append("Grok marketplace source path mismatch")
