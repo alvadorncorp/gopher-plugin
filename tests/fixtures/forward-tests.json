@@ -101,6 +101,10 @@
     {"id":"refactor-single-dimension-handoff","prompt":"Only measure and reduce cyclomatic complexity in this package; nothing else.","expected":{"selected_skill":"gopher:complexity"},"tags":["refactor","negative","complexity"]},
     {"id":"developer-from-slice","prompt":"Implement approved structure_decision slice 2 that stays inside one Go package with entry_condition and verification already green.","expected":{"selected_skill":"gopher:developer"},"tags":["developer","from_slice","development"]},
     {"id":"developer-multi-package-handback","prompt":"This local change requires editing two packages and moving an exported type between them. Implement it as a routine developer task.","expected":{"selected_skill":"gopher:architecture","authorization_gate":"approval-required"},"tags":["developer","negative","architecture"]},
-    {"id":"developer-fast-path-routing","prompt":"During development, mechanically rename a local unexported helper in one Go package with no behavior change under adaptive-tdd.","expected":{"selected_skill":"gopher:developer","change_class":"mechanical"},"tags":["developer","mechanical","development"]}
+    {"id":"developer-fast-path-routing","prompt":"During development, mechanically rename a local unexported helper in one Go package with no behavior change under adaptive-tdd.","expected":{"selected_skill":"gopher:developer","change_class":"mechanical"},"tags":["developer","mechanical","development"]},
+    {"id":"review-auto-heuristic","prompt":"Review this Go change with --mode auto after I finished implementing the local fix.","expected":{"selected_skill":"gopher:review","mode":"auto"},"tags":["review","auto","development"]},
+    {"id":"review-delta-mode","prompt":"Review only the risk surface of this small Go diff with --mode delta.","expected":{"selected_skill":"gopher:review","mode":"delta"},"tags":["review","delta","development"]},
+    {"id":"review-fix-queue","prompt":"Review this Go PR with --mode tests,security and return a fix_queue for owners without editing.","expected":{"selected_skill":"gopher:review","selected_lenses":["tests","security"]},"tags":["review","fix-queue"]},
+    {"id":"review-after-implement","prompt":"I just finished a local Go implementation; review it before I open the PR.","expected":{"selected_skill":"gopher:review"},"tags":["review","development","routing"]}
   ]
 }
