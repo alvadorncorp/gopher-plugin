@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Designs, reviews, and migrates Go packages, internal boundaries, dependency direction, public APIs, evidence-backed seams, and the module and workspace lifecycle from creation through split, merge, retirement, and release. Use for cross-package, module-topology, or public-contract work, including sequenced migrations. Route routine local implementation and language-agnostic application structure to their canonical peers.
+description: Designs, reviews, and migrates Go packages, internal boundaries, dependency direction, public APIs, evidence-backed seams, and the module and workspace lifecycle from creation through split, merge, retirement, and release. Use during planning for package layout, module split, public-API moves, migration sequencing, or "where should this live" questions; mode triage classifies local vs cross-package vs application-boundary ownership before design. Use for cross-package, module-topology, or public-contract work, including sequenced migrations. Hand local one-package implementation to `gopher:developer`, language-agnostic app boundaries alone to `gopher:application-architecture`, multidimensional cleanup orchestration to `gopher:refactor`, and multi-lens diff review to `gopher:review`.
 ---
 
 # Go Architecture
@@ -12,7 +12,7 @@ direction, public APIs, interface seams, migrations, and architecture tests.
 Primary owner: `gopher:architecture`.
 
 Receive conceptual application boundaries from `gopher:application-architecture`.
-Route local implementation to `gopher:developer`, runtime synchronization to
+Hand local implementation to `gopher:developer`, runtime synchronization to
 `gopher:concurrency`, performance cost and throughput to `gopher:performance`, and
 explicit security analysis to `gopher:security`.
 
@@ -32,13 +32,20 @@ with its own version line is `gopher:architecture`.
 
 | Mode | When | Stop condition |
 |---|---|---|
-| `design` | Packages, boundaries, seams, or public APIs are the open question. The default behavior of this skill | Every proposed boundary carries its evidence, its dependency direction, its public-contract effect, and an executable architecture gate |
+| `triage` | Ownership is unclear: local package work vs cross-package Go structure vs language-agnostic application boundaries. Prefer this first on planning prompts | Emits a handoff decision: stay on `gopher:architecture` (name next mode), hand off to `gopher:developer`, hand off to `gopher:application-architecture`, or `gopher:refactor` for multidimensional cleanup — with evidence and `authorization_gate` |
+| `design` | Packages, boundaries, seams, or public APIs are the open question. The default after triage selects architecture | Every proposed boundary carries its evidence, its dependency direction, its public-contract effect, and at least one executable architecture gate (test, `go list`/import rule, or project-adopted checker) |
 | `module-lifecycle` | A module is created, split, merged, or retired, or `go.work` membership, `replace` directives, or release grouping is the open question | Every affected module has a decided import path, version line, workspace membership, `replace` set, and release step, each verified by the commands that prove it |
 | `migration` | An agreed structural change reaches live code and needs sequencing | Every slice has met its entry condition, passed its verification, held its compatibility guarantee, and kept its rollback available |
 
 State the mode before proposing anything, and carry it in the report. A single
 request may traverse modes in order; each transition restates the evidence the
 next mode needs.
+`triage` is always read-only: it classifies ownership and names the next action
+without editing files, creating packages, or opening a migration. When triage
+selects architecture, name the next mode (`design`, `module-lifecycle`, or
+`migration`) and the evidence that mode needs. When triage selects another
+owner, emit `mode`, `authorization_gate`, `primary_owner`, and `handoff`, then
+stop.
 
 ## Policy gating
 
@@ -71,27 +78,52 @@ corrected. `UNSUPPORTED_VERSION` stays read-only.
 
 ## Workflow
 
-1. Name the mode, then detect module, workspace, Go version, packages, imports,
-   public consumers, tests, and accepted ADR/constraints. Resolve the
-   `[architecture]` policy and record `config_status`.
-2. State evidence, forces, and the no-refactor baseline.
-3. Map current and proposed dependencies; identify cycles and public-contract effects.
-4. Prefer concrete types and consumer-owned interfaces at demonstrated seams.
-5. In `module-lifecycle`, settle module membership, import paths, version lines,
+1. Name the mode. In `triage`, classify the request as local implementation
+   (`gopher:developer`), language-agnostic application boundaries
+   (`gopher:application-architecture`), multidimensional cleanup
+   (`gopher:refactor`), or Go package/module/public-contract work (continue
+   here). When the owner is not architecture, emit the output with `handoff`
+   and `authorization_gate`, and stop — later steps do not run.
+2. When the question is conceptual bounded-context or domain ownership rather
+   than Go packages, hand off to `gopher:application-architecture` before any
+   package design; resume here only with that skill's boundary decisions as
+   input.
+3. Detect module, workspace, Go version, packages, imports, public consumers,
+   tests, and accepted ADR/constraints. Resolve the `[architecture]` policy and
+   record `config_status`.
+4. State evidence, forces, and the no-refactor baseline. Classify supporting
+   claims as `observed`, `inferred`, or `unknown`. When an unknown blocks the
+   next mode step, stop at that gate and name the exact evidence or user/owner
+   decision required to continue.
+5. Map current and proposed dependencies; identify cycles and public-contract effects.
+6. Prefer concrete types and consumer-owned interfaces at demonstrated seams.
+7. In `module-lifecycle`, settle module membership, import paths, version lines,
    workspace use, the `replace` set, and release order using
    `references/modules-workspaces.md`, within the policy above.
-6. In `migration`, sequence the work into slices that each declare an entry
+8. In `migration`, sequence the work into slices that each declare an entry
    condition, a change, a verification, a compatibility guarantee, and a
    rollback, using `references/migrations.md`.
-7. Compare at most three structures or migration paths and reject alternatives.
-8. Define compatibility, rollback, architecture tests, and proportional verification.
-9. Obtain explicit approval for cross-package, public-contract, boundary, or
-   ADR-affecting edits; then execute incremental slices or hand implementation off.
+9. When more than one structure or migration path is outcome-relevant, compare
+   at most three candidates and record rejected alternatives with evidence;
+   when only one candidate meets the mode stop condition, record it against the
+   no-refactor baseline without inventing alternatives.
+10. Define compatibility, rollback, and verification that is the cheapest
+    observable proof of each declared gate and compatibility claim. In `design`
+    and `migration`, require at least one machine-checkable architecture gate
+    (see `references/architecture-tests.md`); a design with only diagrams and no
+    proposed executable rule is incomplete.
+11. Obtain explicit approval for cross-package, public-contract, boundary, or
+    ADR-affecting edits (`authorization_gate`: `none` when the change stays
+    inside already-approved scope, `approval-required` until granted, `blocked`
+    when policy or config forbids progress); then execute incremental slices or
+    hand implementation off via `structure_decision` (see
+    `references/structure-decision.md`). After handoff, the receiving peer
+    applies its own authorization gate.
 
 ## Output format
 
 ```yaml
-mode: design | module-lifecycle | migration
+mode: triage | design | module-lifecycle | migration
 config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
 problem_and_evidence:
 forces_and_constraints:
@@ -102,10 +134,23 @@ rejected_alternatives:
 public_contract_impact:
 migration_and_rollback:
 validation:
+structure_decision:
+  decision_id:
+  mode: design | module-lifecycle | migration
+  packages_touched: []
+  public_contract_delta: none | additive | breaking
+  architecture_tests_to_add: []
+  slices: []
+  authorization_gate: none | approval-required | blocked
+  notes:
 authorization_gate: none | approval-required | blocked
 primary_owner: gopher:architecture
 handoff: gopher:<skill> | null
 ```
+
+Omit `structure_decision` only for pure `triage` handoffs that carry no
+structural proposal; for every other successful architecture result, emit the
+card (`slices: []` when the decision is design-only).
 
 ## Quality checklist
 
@@ -113,8 +158,10 @@ handoff: gopher:<skill> | null
 - Keep interfaces at consumers and only for real seams.
 - Treat exported names, signatures, behavior, errors, and option semantics as contracts.
 - Use `internal` and modules for enforceable ownership, not aesthetic grouping.
-- Include incremental migration, rollback, and machine-checkable dependency rules.
-- Record approval status before structural edits.
+- Match migration, rollback, and machine-checkable dependency obligations to the
+  active mode stop condition; keep no-change when the baseline already satisfies it.
+- Report `authorization_gate` (`none` | `approval-required` | `blocked`) before
+  structural edits; leave specialist gates to the owning peer after handoff.
 - Report the active mode together with the effective `[architecture]` values that
   shaped the proposal.
 - Justify a second module by a durable version, release, ownership, or
@@ -131,3 +178,4 @@ handoff: gopher:<skill> | null
 - `references/migrations.md` — the slice protocol for sequenced migrations.
 - `references/architecture-tests.md` — deterministic dependency gates.
 - `references/pattern-mappings.md` — package/seam pattern adaptations.
+- `references/structure-decision.md` — Structure Decision Card for implementers and handoffs.

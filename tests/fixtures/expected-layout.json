@@ -35,7 +35,8 @@
       "references/modules-workspaces.md",
       "references/packages-internal.md",
       "references/pattern-mappings.md",
-      "references/public-api.md"
+      "references/public-api.md",
+      "references/structure-decision.md"
     ],
     "concurrency": [
       "references/channels-synchronization.md",
