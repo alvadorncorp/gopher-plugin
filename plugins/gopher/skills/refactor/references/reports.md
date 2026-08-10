@@ -28,3 +28,24 @@ of them with the evidence bundle below.
   was persisted.
 - The final read-only review verdict and its diff range are included in the
   report.
+
+## Terminal state PLAN_READY
+
+`PLAN_READY` is valid only in `plan` mode. Evidence must include the baseline
+attempt (pass/fail/not-run), selected dimensions, prioritized backlog, and
+proposed handoffs. It must not claim applied production edits.
+
+## refactor_plan backlog
+
+    refactor_plan:
+      status: PLAN_READY
+      items:
+        - id: R1
+          dimension: correctness | security | tests | complexity | concurrency | performance | modernization
+          owner: gopher:<skill>
+          effort: S | M | L
+          blocks: []
+          risk: correctness | security | none
+          summary: <one line>
+
+Order items by `references/prioritization.md`. Each item has exactly one owner.

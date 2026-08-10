@@ -95,6 +95,9 @@
     {"id":"architecture-triage-local","prompt":"Before coding, tell me if renaming a helper inside one Go package needs an architecture change.","expected":{"selected_skill":"gopher:architecture","mode":"triage","handoff":"gopher:developer"},"tags":["architecture","triage","planning"]},
     {"id":"architecture-plan-before-code","prompt":"Plan the package layout for this new Go billing feature before any implementation.","expected":{"selected_skill":"gopher:architecture"},"tags":["architecture","planning","routing"]},
     {"id":"architecture-structure-decision","prompt":"Design the Go package boundaries and emit a structure decision card with slices for implementers.","expected":{"selected_skill":"gopher:architecture","mode":"design"},"tags":["architecture","structure-decision"]},
-    {"id":"architecture-aa-handoff","prompt":"Choose language-agnostic bounded contexts for checkout before we talk about Go packages.","expected":{"selected_skill":"gopher:application-architecture"},"tags":["architecture","negative","application-architecture"]}
+    {"id":"architecture-aa-handoff","prompt":"Choose language-agnostic bounded contexts for checkout before we talk about Go packages.","expected":{"selected_skill":"gopher:application-architecture"},"tags":["architecture","negative","application-architecture"]},
+    {"id":"refactor-plan-only","prompt":"Inventory multidimensional Go debt across complexity and modernization and prioritize work, but do not change any code.","expected":{"selected_skill":"gopher:refactor","mode":"plan","status":"PLAN_READY"},"tags":["refactor","plan","planning"]},
+    {"id":"refactor-plan-ready-status","prompt":"Produce a PLAN_READY refactor backlog for tests and complexity without remediation.","expected":{"selected_skill":"gopher:refactor","status":"PLAN_READY"},"tags":["refactor","plan"]},
+    {"id":"refactor-single-dimension-handoff","prompt":"Only measure and reduce cyclomatic complexity in this package; nothing else.","expected":{"selected_skill":"gopher:complexity"},"tags":["refactor","negative","complexity"]}
   ]
 }
