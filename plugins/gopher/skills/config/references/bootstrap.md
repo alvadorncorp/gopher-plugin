@@ -34,6 +34,9 @@ Ask only what the user wants to change; accept the default for anything skipped:
 - Agents: `enabled`, the per-role model and effort policy,
   `reviewer_max_parallel`, `authorization`, and `policy_divergence`.
 - Developer: `idiom_policy` and `test_workflow` under `[developer]`.
+- Workflow: `planning_preflight`, `planning_require_structure_decision`,
+  `implementation_owner`, `post_implementation_review`,
+  `post_implementation_lenses`, and `max_auto_review_files` under `[workflow]`.
 
 Validate every supplied value against `references/schema.md` before preview.
 
@@ -60,12 +63,14 @@ Migration is the only path that changes `schema_version`, and it runs only here.
 
    | From | The migration adds |
    |---|---|
-   | `1` | the version bump to `schema_version = 4`, the tables `[doctor]`, `[fuzz]`, `[architecture]`, and `[agents]` at their documented defaults, the key `quality_lab_families = []` in `[test-quality]`, and any missing `[developer]` keys set to `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"` |
-   | `2` | the version bump to `schema_version = 4`, the table `[agents]` at its documented defaults, and any missing `[developer]` keys set to `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"` |
-   | `3` | the version bump to `schema_version = 4` and any missing `[developer]` keys set to `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"` |
+   | `1` | the version bump to `schema_version = 5`, the tables `[doctor]`, `[fuzz]`, `[architecture]`, and `[agents]` at their documented defaults, the key `quality_lab_families = []` in `[test-quality]`, any missing `[developer]` keys set to `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"`, and `[workflow]` at its documented defaults |
+   | `2` | the version bump to `schema_version = 5`, the table `[agents]` at its documented defaults, any missing `[developer]` keys set to `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"`, and `[workflow]` at its documented defaults |
+   | `3` | the version bump to `schema_version = 5`, any missing `[developer]` keys set to `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"`, and `[workflow]` at its documented defaults |
+   | `4` | the version bump to `schema_version = 5` and any missing `[workflow]` keys at their documented defaults |
 
 3. Preserve every value the user already set. Migration adds what the current
    schema introduces and changes nothing the existing file already states.
+   Migration runs only on confirmed bootstrap.
 4. Show the exact diff of the version bump and the added tables and keys.
 5. Require explicit confirmation. Declining leaves the file untouched and keeps
    the state `MIGRATION_AVAILABLE`; workflows continue on the older contract.

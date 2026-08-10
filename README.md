@@ -267,29 +267,45 @@ plugins/gopher/skills/config/templates/default.gopher-plugin.toml
 ```
 
 Use the `config` skill to bootstrap, validate, or explain the effective project
-configuration. The current schema version `4` adds the `[developer]` policy
-table:
+configuration. The current schema version `5` includes the `[developer]` policy
+table and the `[workflow]` session policy table:
 
 ```toml
 [developer]
 idiom_policy = "latest-compatible"
 test_workflow = "adaptive-tdd"
+
+[workflow]
+planning_preflight = ["architecture:triage"]
+planning_require_structure_decision = false
+implementation_owner = "developer"
+post_implementation_review = "off"
+post_implementation_lenses = "heuristic"
+max_auto_review_files = 20
 ```
 
 `idiom_policy` accepts `latest-compatible`, `project-aligned`, or
 `explicit-only`; `test_workflow` accepts `adaptive-tdd`, `strict-tdd`, or
 `test-after`. The defaults are `latest-compatible` and `adaptive-tdd`.
-Each key resolves independently in this order: an explicit current-session
-instruction, `.gopher-plugin.toml`, adopted project configuration and commands,
-then the Gopher default.
+Each developer key resolves independently in this order: an explicit
+current-session instruction, `.gopher-plugin.toml`, adopted project
+configuration and commands, then the Gopher default.
 
-Schema versions `1`, `2`, and `3` keep working as `MIGRATION_AVAILABLE`.
-Before migration, missing `[developer]` values use the defaults without writing
-them to the project. Only a confirmed `config --bootstrap` migration persists
-the schema-4 additions; it preserves existing values. The developer workflow
-uses these policies for local implementation and its focused test evidence. It
-does not perform broad modernization or rewrite unrelated code; those remain
-with the appropriate specialist skill.
+The `[workflow]` keys are session policy hints only. They do not install hooks,
+do not mutate the tree, and cannot widen packaged agent bindings.
+`post_implementation_review` accepts `off`, `recommend`, or `auto` (default
+`off`). Planning modes include `architecture` triage and `refactor` plan;
+development modes include `review` auto/delta after local implementation when
+the host session honors the policy.
+
+Schema versions `1`, `2`, `3`, and `4` keep working as `MIGRATION_AVAILABLE`.
+Before migration, missing `[developer]` and `[workflow]` values use the
+defaults without writing them to the project. Only a confirmed
+`config --bootstrap` migration persists the schema version `5` additions; it
+preserves existing values. The developer workflow uses these policies for local
+implementation and its focused test evidence. It does not perform broad
+modernization or rewrite unrelated code; those remain with the appropriate
+specialist skill.
 
 ## Development and validation
 

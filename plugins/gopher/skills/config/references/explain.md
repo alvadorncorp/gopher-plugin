@@ -24,7 +24,8 @@ detected `config_status`, one `effective_values` entry for every resolved
   `references/schema.md`, including validation and every workflow for
   `gopher.schema_version`, `gopher:complexity`, `gopher:test-quality`,
   `gopher:modernize`, `gopher:refactor`, `gopher:doctor`, `gopher:fuzz`,
-  `gopher:architecture`, the shared project scope, and `gopher:developer`.
+  `gopher:architecture`, the shared project scope, `gopher:developer`, and
+  session workflow policy under `[workflow]`.
   Preserve the packaged developer, architect, and reviewer agents, plus the
   direct `gopher:review` controller and Kimi review adapter wherever the schema
   names them.
@@ -33,7 +34,11 @@ Keep every effective key, including keys at their default and keys whose table
 is absent but whose default still applies. For versions `1`, `2`, and `3`
 without `[developer]`, report `idiom_policy = "latest-compatible"` and
 `test_workflow = "adaptive-tdd"` with source `default`; these effective values
-remain unpersisted until a confirmed `--bootstrap` migration.
+remain unpersisted until a confirmed `--bootstrap` migration. For versions
+`1`, `2`, `3`, and `4` without `[workflow]`, report every workflow key at its
+documented default with source `default`; those effective values remain
+unpersisted until a confirmed `--bootstrap` migration. Schema version `5` is
+current; versions `1`–`4` are migratable.
 
 Set the top-level `handoff` to a real receiving `gopher:<skill>` when the
 explanation identifies follow-up work; otherwise set it to `null`. A consuming
@@ -43,9 +48,10 @@ workflow is an ownership label, not an instruction to invoke that workflow.
 
 - Group values by canonical table (`gopher`, `project`, `complexity`,
   `test-quality`, `modernize`, `refactor`, `tools`, `doctor`, `fuzz`,
-  `architecture`, `agents`, `developer`).
+  `architecture`, `agents`, `developer`, `workflow`).
 - Mark any value that differs from its default, and name the source tier that
-  overrode it.
+  overrode it. List every effective workflow value and whether its source is
+  `file` or `default`.
 
 ## Resolution order and state handling
 
@@ -77,14 +83,21 @@ decision required to continue.
 When the state is `MIGRATION_AVAILABLE`, explain the effective values of the
 older contract as usual and add:
 
-- The `schema_version` found in the file and the supported version `4`.
+- The `schema_version` found in the file and the supported version `5`.
 - For that source version, use the matching migration row in
   `references/bootstrap.md` to name the version bump, every table or key the
   current schema adds, and the default each added value would take. For schema
-  4, name `[developer]` and its `idiom_policy = "latest-compatible"` and
-  `test_workflow = "adaptive-tdd"` defaults. Explain that `idiom_policy`
-  selects compatible idioms for `gopher:developer`, while `test_workflow`
-  selects its test and implementation sequencing.
+  versions that lack `[developer]`, name `[developer]` and its
+  `idiom_policy = "latest-compatible"` and `test_workflow = "adaptive-tdd"`
+  defaults. Explain that `idiom_policy` selects compatible idioms for
+  `gopher:developer`, while `test_workflow` selects its test and implementation
+  sequencing. For schema versions that lack `[workflow]` (including version
+  `4`), name `[workflow]` and its documented defaults
+  (`planning_preflight = ["architecture:triage"]`,
+  `planning_require_structure_decision = false`,
+  `implementation_owner = "developer"`, `post_implementation_review = "off"`,
+  `post_implementation_lenses = "heuristic"`, `max_auto_review_files = 20`).
+  Explain that workflow keys are session policy hints and do not install hooks.
 - The fact that every value the file already sets is preserved by migration.
 - The fact that `--explain` writes nothing. Migration happens only inside
   `--bootstrap`, with a shown diff and explicit confirmation.

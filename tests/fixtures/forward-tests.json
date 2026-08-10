@@ -105,6 +105,8 @@
     {"id":"review-auto-heuristic","prompt":"Review this Go change with --mode auto after I finished implementing the local fix.","expected":{"selected_skill":"gopher:review","mode":"auto"},"tags":["review","auto","development"]},
     {"id":"review-delta-mode","prompt":"Review only the risk surface of this small Go diff with --mode delta.","expected":{"selected_skill":"gopher:review","mode":"delta"},"tags":["review","delta","development"]},
     {"id":"review-fix-queue","prompt":"Review this Go PR with --mode tests,security and return a fix_queue for owners without editing.","expected":{"selected_skill":"gopher:review","selected_lenses":["tests","security"]},"tags":["review","fix-queue"]},
-    {"id":"review-after-implement","prompt":"I just finished a local Go implementation; review it before I open the PR.","expected":{"selected_skill":"gopher:review"},"tags":["review","development","routing"]}
+    {"id":"review-after-implement","prompt":"I just finished a local Go implementation; review it before I open the PR.","expected":{"selected_skill":"gopher:review"},"tags":["review","development","routing"]},
+    {"id":"workflow-post-review-off-default","prompt":"I finished a local Go fix under default Gopher workflow policy; do not auto-review unless I ask.","expected":{"selected_skill":"gopher:developer"},"tags":["workflow","developer","negative"]},
+    {"id":"workflow-planning-preflight-architecture","prompt":"We are planning a multi-package Go feature; start with ownership triage before coding.","expected":{"selected_skill":"gopher:architecture","mode":"triage"},"tags":["workflow","architecture","planning"]}
   ]
 }

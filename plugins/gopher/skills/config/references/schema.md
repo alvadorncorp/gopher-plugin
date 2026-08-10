@@ -2,9 +2,9 @@
 
 Every value lives inside a canonical table. Root-level loose keys and dotted
 keys (for example `complexity.cyclomatic_max = 15` at the root) are not
-canonical and fail validation. The twelve canonical tables are `gopher`,
+canonical and fail validation. The thirteen canonical tables are `gopher`,
 `project`, `complexity`, `test-quality`, `modernize`, `refactor`, `tools`,
-`doctor`, `fuzz`, `architecture`, `agents`, and `developer`.
+`doctor`, `fuzz`, `architecture`, `agents`, `developer`, and `workflow`.
 
 Defaults are configurable targets, not universal claims about Go code. A legacy
 project below a target does not automatically fail when the measured scope
@@ -14,7 +14,7 @@ maintains or improves its baseline.
 
 | Key | Type | Range / enum | Default | Consumed by |
 |---|---|---|---|---|
-| `schema_version` | integer | `1` \| `2` \| `3` (supported, migratable) \| `4` (current) | `4` | validation, every workflow |
+| `schema_version` | integer | `1` \| `2` \| `3` \| `4` (supported, migratable) \| `5` (current) | `5` | validation, every workflow |
 
 `schema_version` pins the contract. A newer value than this skill supports is
 `UNSUPPORTED_VERSION` and is treated read-only. An older but still supported
@@ -241,6 +241,27 @@ predates this table, but the classification follows the parsed document and not
 the schema version: rules 3 and 4 of `references/validation.md` are
 version-independent, so an older file that does declare `[agents]` is read like
 any other and its `enabled` and `policy_divergence` values take effect.
+
+## `[workflow]`
+
+| Key | Type | Range / enum | Default | Consumed by |
+|---|---|---|---|---|
+| `planning_preflight` | list of string | advisory skill hints such as `architecture:triage`, `refactor:plan` | `["architecture:triage"]` | session agents during planning prompts |
+| `planning_require_structure_decision` | boolean | `true` \| `false` | `false` | session agents before large multi-package implementation |
+| `implementation_owner` | string | `developer` | `developer` | session routing for local implementation |
+| `post_implementation_review` | string | `off` \| `recommend` \| `auto` | `off` | whether to suggest or auto-select `gopher:review` after green local implementation |
+| `post_implementation_lenses` | string | `heuristic` \| `full` \| comma-separated lens list | `heuristic` | lens selection when post review is `auto` or `recommend` |
+| `max_auto_review_files` | integer | `> 0` | `20` | upper bound on changed Go files for `auto` review without confirmation |
+
+These keys are **session policy hints**. They do not install hooks, do not mutate
+the tree, and cannot widen packaged agent bindings. `post_implementation_review
+= auto` authorizes `gopher:review --mode auto` behavior when the host session
+chooses to honor the policy; it never grants edit rights to review.
+
+Schema versions `1`, `2`, `3`, and `4` remain supported and migratable; until a
+confirmed `gopher:config --bootstrap` migration writes them, an absent
+`[workflow]` table resolves these keys to the defaults above without
+persisting them.
 
 ## Effective-value precedence
 

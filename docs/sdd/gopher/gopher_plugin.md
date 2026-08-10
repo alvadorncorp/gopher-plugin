@@ -5,7 +5,7 @@ context: gopher
 title: Package Go engineering workflows for Codex, Claude, and Grok
 status: Accepted
 tags: [go, codex, claude, grok, skills, marketplace]
-related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005, adr:gopher:006, adr:gopher:007, adr:gopher:008]
+related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005, adr:gopher:006, adr:gopher:007, adr:gopher:008, adr:gopher:009]
 date: 2026-07-14
 ---
 # SDD: Package Go engineering workflows for Codex, Claude, and Grok
@@ -28,11 +28,13 @@ Codex, Claude, and Grok receive native manifests while loading the same physical
 tree at `plugins/gopher/skills/`. Twenty peer skills have canonical ownership
 and a textual decision and handoff contract. A `.gopher-plugin.toml` project
 contract, owned by `gopher:config`, carries thresholds, tool policy, and
-refactoring safeguards for the quality workflows; it is at schema version `4`
-and reports a version-`1`, version-`2`, or version-`3` file as
+refactoring safeguards for the quality workflows; it is at schema version `5`
+and reports a version-`1`, version-`2`, version-`3`, or version-`4` file as
 `MIGRATION_AVAILABLE`. The `[developer]` policy carries idiom and test-workflow
 choices, resolved independently by session, file, adopted project policy, then
-default. Versions `1`–`3` remain `MIGRATION_AVAILABLE`. Three
+default. The `[workflow]` policy carries planning preflight hints and
+post-implementation review defaults as session policy only (no hooks).
+Versions `1`–`4` remain `MIGRATION_AVAILABLE`. Three
 packaged role agents wrap `gopher:developer`, `gopher:architecture`, and
 `gopher:review` with a fixed per-role binding.
 
@@ -136,6 +138,10 @@ the change while keeping modernization specialist-owned.
   schema version `4`, preserving opt-in migration for versions `1`–`3` —
   recorded in `adr:gopher:008`, as `adr:gopher:005` requires for any schema
   migration.
+- Add schema version `5` with the `[workflow]` session policy table and the
+  planning→implementation→review skill-mode loop, preserving opt-in migration
+  for versions `1`–`4` — recorded in `adr:gopher:009`, as `adr:gopher:005`
+  requires for any schema migration.
 
 ## Risks and Trade-offs
 
@@ -171,6 +177,10 @@ the change while keeping modernization specialist-owned.
 - Phase 8: adaptive developer policy, schema `4`, migration compatibility for
   versions `1`–`3`, and the developer evidence flow (`adr:gopher:008`) — the
   existing `0.5.1` release state.
+- Phase 9: planning and development skill loop with schema version `5`
+  `[workflow]` policy (`architecture:triage`, `refactor:plan`, developer
+  `from_slice`/fast paths, review `auto`/`delta`/`fix_queue`), opt-in
+  migration for versions `1`–`4`, and no hook runtime (`adr:gopher:009`).
 - After a real non-Go consumer exists: evaluate extracting `design-patterns`
   and `application-architecture` without changing handoff identifiers.
 - After every stable Go release and at least quarterly: review

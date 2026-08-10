@@ -13,7 +13,7 @@ EXPLAIN_DOC = ROOT / "plugins/gopher/skills/config/references/explain.md"
 
 CANONICAL_TABLES = (
     "gopher", "project", "complexity", "test-quality", "modernize", "refactor", "tools",
-    "doctor", "fuzz", "architecture", "agents", "developer",
+    "doctor", "fuzz", "architecture", "agents", "developer", "workflow",
 )
 
 AGENT_ROLES = ("developer", "architect", "reviewer")
@@ -23,6 +23,8 @@ AGENT_AUTHORIZATIONS = ("handback", "request-approval", "inherit-session")
 AGENT_DIVERGENCE_MODES = ("report", "block")
 DEVELOPER_IDIOM_POLICIES = ("latest-compatible", "project-aligned", "explicit-only")
 DEVELOPER_TEST_WORKFLOWS = ("adaptive-tdd", "strict-tdd", "test-after")
+WORKFLOW_POST_REVIEW = ("off", "recommend", "auto")
+WORKFLOW_POST_LENSES = ("heuristic", "full")
 
 QUALITY_LAB_FAMILIES = (
     "deterministic-concurrency", "integration", "contract", "hermetic", "flake",
@@ -39,7 +41,7 @@ def load_template():
 class ConfigContractTest(unittest.TestCase):
     def test_schema_version_and_canonical_tables(self):
         data = load_template()
-        self.assertEqual(4, data["gopher"]["schema_version"])
+        self.assertEqual(5, data["gopher"]["schema_version"])
         self.assertEqual(set(CANONICAL_TABLES), set(data.keys()))
 
     def test_no_root_loose_or_dotted_keys(self):
@@ -132,6 +134,48 @@ class ConfigContractTest(unittest.TestCase):
         for member in DEVELOPER_IDIOM_POLICIES + DEVELOPER_TEST_WORKFLOWS:
             self.assertIn(f"`{member}`", doc, f"schema.md omits developer enum member {member}")
 
+    def test_workflow_policy_defaults_types_and_enums(self):
+        workflow = load_template()["workflow"]
+        self.assertEqual(
+            {
+                "planning_preflight": ["architecture:triage"],
+                "planning_require_structure_decision": False,
+                "implementation_owner": "developer",
+                "post_implementation_review": "off",
+                "post_implementation_lenses": "heuristic",
+                "max_auto_review_files": 20,
+            },
+            workflow,
+        )
+        self.assertIsInstance(workflow["planning_preflight"], list)
+        for hint in workflow["planning_preflight"]:
+            self.assertIsInstance(hint, str)
+        self.assertIsInstance(workflow["planning_require_structure_decision"], bool)
+        self.assertIsInstance(workflow["implementation_owner"], str)
+        self.assertEqual("developer", workflow["implementation_owner"])
+        self.assertIsInstance(workflow["post_implementation_review"], str)
+        self.assertIn(workflow["post_implementation_review"], WORKFLOW_POST_REVIEW)
+        self.assertIsInstance(workflow["post_implementation_lenses"], str)
+        self.assertIn(workflow["post_implementation_lenses"], WORKFLOW_POST_LENSES)
+        self.assertIsInstance(workflow["max_auto_review_files"], int)
+        self.assertGreater(workflow["max_auto_review_files"], 0)
+
+    def test_workflow_enum_members_are_documented(self):
+        doc = SCHEMA_DOC.read_text(encoding="utf-8")
+        for member in WORKFLOW_POST_REVIEW + WORKFLOW_POST_LENSES + ("developer",):
+            self.assertIn(f"`{member}`", doc, f"schema.md omits workflow enum member {member}")
+        for key in (
+            "planning_preflight",
+            "planning_require_structure_decision",
+            "implementation_owner",
+            "post_implementation_review",
+            "post_implementation_lenses",
+            "max_auto_review_files",
+        ):
+            self.assertIn(f"`{key}`", doc, f"schema.md omits workflow key {key}")
+        self.assertIn("session policy hints", doc)
+        self.assertIn("do not install hooks", doc)
+
     def test_enum_values(self):
         data = load_template()
         self.assertEqual("advisory", data["complexity"]["mode"])
@@ -161,6 +205,7 @@ class ConfigContractTest(unittest.TestCase):
         for table, body in data.items():
             for key in body:
                 self.assertIn(key, doc, f"schema.md omits key {table}.{key}")
+        self.assertIn("thirteen canonical tables", doc)
 
     def test_validation_doc_documents_states(self):
         doc = VALIDATION_DOC.read_text(encoding="utf-8")
@@ -169,8 +214,8 @@ class ConfigContractTest(unittest.TestCase):
         ):
             self.assertIn(state, doc, f"validation.md omits state {state}")
 
-    def test_schema_v4_developer_policy_is_normative_across_config_workflow(self):
-        """Schema 4 must keep legacy contracts usable until a confirmed migration."""
+    def test_schema_v5_workflow_and_developer_policy_are_normative(self):
+        """Schema 5 must keep legacy contracts usable until a confirmed migration."""
         documents = {
             "SKILL.md": CONFIG_SKILL.read_text(encoding="utf-8"),
             "bootstrap.md": BOOTSTRAP_DOC.read_text(encoding="utf-8"),
@@ -183,20 +228,24 @@ class ConfigContractTest(unittest.TestCase):
                 self.assertIn("`test_workflow`", document)
 
         bootstrap = documents["bootstrap.md"]
-        for version in (1, 2, 3):
+        for version in (1, 2, 3, 4):
             with self.subTest(version=version):
                 self.assertIn(f"| `{version}` |", bootstrap)
-        self.assertIn("schema_version = 4", bootstrap)
+        self.assertIn("schema_version = 5", bootstrap)
         self.assertIn("[developer]", bootstrap)
+        self.assertIn("[workflow]", bootstrap)
         self.assertIn('idiom_policy = "latest-compatible"', bootstrap)
         self.assertIn('test_workflow = "adaptive-tdd"', bootstrap)
         self.assertIn("Preserve every value the user already set", bootstrap)
         self.assertIn("Declining leaves the file untouched", bootstrap)
+        self.assertIn("Migration runs only on confirmed bootstrap", bootstrap)
 
         validation = documents["validation.md"]
-        self.assertIn("`4` is `VALID`", validation)
-        self.assertIn("`1`, `2`, and `3` are `MIGRATION_AVAILABLE`", validation)
+        self.assertIn("`5` is `VALID`", validation)
+        self.assertIn("`1`, `2`, `3`, and `4` are `MIGRATION_AVAILABLE`", validation)
         self.assertIn("missing `[developer]` table", validation)
+        self.assertIn("missing `[workflow]` table", validation)
+        self.assertIn("`workflow`", validation)
 
         explain = documents["explain.md"]
         self.assertIn("`idiom_policy`", explain)
@@ -204,6 +253,14 @@ class ConfigContractTest(unittest.TestCase):
         self.assertIn("latest-compatible", explain)
         self.assertIn("adaptive-tdd", explain)
         self.assertIn("`--explain` writes nothing", explain)
+        self.assertIn("supported version `5`", explain)
+        self.assertIn("[workflow]", explain)
+        self.assertIn("post_implementation_review", explain)
+        self.assertIn("file` or `default", explain)
+
+        skill = documents["SKILL.md"]
+        self.assertIn("[workflow]", skill)
+        self.assertIn("session planning", skill)
 
 
 if __name__ == "__main__":

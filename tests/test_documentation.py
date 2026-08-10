@@ -8,16 +8,19 @@ ROOT = Path(__file__).resolve().parents[1]
 
 
 class DocumentationTest(unittest.TestCase):
-    def test_sdd_records_schema_four_developer_policy_and_evolution(self):
+    def test_sdd_records_schema_five_workflow_policy_and_evolution(self):
         text = (ROOT / "docs/sdd/gopher/gopher_plugin.md").read_text(encoding="utf-8")
         required = (
             "adr:gopher:008",
-            "schema version `4`",
-            "Versions `1`–`3` remain `MIGRATION_AVAILABLE`",
+            "adr:gopher:009",
+            "schema version `5`",
+            "Versions `1`–`4` remain `MIGRATION_AVAILABLE`",
             "gopher:developer",
             "adaptive-tdd",
             "migration",
             "Phase 8",
+            "Phase 9",
+            "[workflow]",
         )
         for value in required:
             self.assertTrue(value in text, f"SDD is missing {value!r}")
@@ -33,14 +36,17 @@ class DocumentationTest(unittest.TestCase):
             "Kimi Code does not load packaged plugin agents",
             "policy_status",
             "It may narrow an agent and it can never widen one.",
-            "schema version `4`",
+            "schema version `5`",
             "[developer]",
+            "[workflow]",
             "idiom_policy",
             "test_workflow",
+            "post_implementation_review",
             "latest-compatible",
             "adaptive-tdd",
             "MIGRATION_AVAILABLE",
             "config --bootstrap",
+            "ships no hooks",
         )
         for value in required:
             # assertIn would dump the whole README on failure; name the string instead.

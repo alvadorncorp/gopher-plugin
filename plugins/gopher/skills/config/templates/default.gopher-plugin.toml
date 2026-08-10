@@ -1,5 +1,5 @@
 [gopher]
-schema_version = 4
+schema_version = 5
 
 [project]
 module_roots = []
@@ -66,3 +66,11 @@ reviewer_effort = "shipped"
 reviewer_max_parallel = 7
 authorization = "handback"
 policy_divergence = "report"
+
+[workflow]
+planning_preflight = ["architecture:triage"]
+planning_require_structure_decision = false
+implementation_owner = "developer"
+post_implementation_review = "off"
+post_implementation_lenses = "heuristic"
+max_auto_review_files = 20

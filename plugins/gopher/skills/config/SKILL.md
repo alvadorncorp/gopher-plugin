@@ -33,6 +33,13 @@ the missing values to `idiom_policy = "latest-compatible"` and
 `references/validation.md`. Keep those effective defaults unpersisted until a
 confirmed `--bootstrap` migration writes them.
 
+The `[workflow]` table declares session planning and post-implementation policy
+hints. This skill validates, bootstraps, migrates, and explains those values;
+session agents consume them as policy, never as hooks or expanded agent rights.
+For a version `1`, `2`, `3`, or `4` file with no `[workflow]` table, resolve the
+missing keys to the defaults in `references/schema.md` without persisting them
+until a confirmed `--bootstrap` migration writes them.
+
 ## Modes
 
 - No mode: detect the project root, locate the file, report its path and
