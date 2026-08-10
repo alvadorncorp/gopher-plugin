@@ -14,7 +14,7 @@ the decision question. Outcomes are `KEEP_A`, `KEEP_B`, `MERGE`, or
 
 Final output sections: Scope and bundle identity; Selected lenses; Verification;
 Parallel window and policy; Per-lens reports; Consolidated findings;
-Adjudications; Verdict; Handoffs; Limitations/degradation.
+Adjudications; Verdict; Fix queue; Parent review; Handoffs; Limitations/degradation.
 
 `Parallel window and policy` carries two fields. `parallel_window` is `full` when
 every selected lens ran in one window and `bounded-by-policy` when the effective
@@ -23,3 +23,9 @@ thing as `degradation: sequential_no_parallel_support`, which belongs in
 `Limitations/degradation` and states only that the host could not run lenses
 together. `policy_status` is the value `references/controller.md` resolved, with
 its notes. Consolidate only after the union of every window has drained.
+
+## Fix queue emission
+
+Build `fix_queue` only from consolidated findings after adjudication. Sort by
+severity (critical, important, minor), then by `file_line` ascending. Preserve
+finding ids.

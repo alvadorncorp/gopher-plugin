@@ -12,7 +12,7 @@ class ForwardCorpusTest(unittest.TestCase):
 
     def test_corpus_schema_and_owner_coverage(self):
         self.assertEqual([], run_forward_tests.validate_corpus(self.payload))
-        self.assertEqual(91, len(self.cases))
+        self.assertEqual(105, len(self.cases))
         for harness, config in self.configs.items():
             self.assertEqual(harness, config["harness"])
             self.assertEqual("gopher@alvadorncorp", config["selector"])

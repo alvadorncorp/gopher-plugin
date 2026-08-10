@@ -6,6 +6,7 @@ Capture once before dispatch:
 
 ```yaml
 review_id:
+parent_review_id:
 intent_and_scope:
 invariants:
 base_and_diff_range:
@@ -18,6 +19,8 @@ existing_adrs_or_constraints:
 verification_commands:
 verification_results:
 decisions_taken:
+selection_reasons:
+scope: full | delta
 ```
 
 Use a concrete base SHA and head SHA. A changed head invalidates the bundle.
@@ -41,6 +44,15 @@ no peer report.
    possible result is collected.
 
 The controller prepares and consolidates; it does not act as an extra reviewer.
+
+## auto and delta
+
+- `auto` must write `selected_lenses` and `selection_reasons` into the bundle
+  before dispatch and must not prompt for confirmation.
+- `delta` uses the same bundle fields but adds `scope: delta` and instructs each
+  lens reviewer to prefer changed files, affected call sites, and public
+  contracts listed in the bundle over untouched packages.
+- Neither mode may edit files or invoke fix owners.
 
 ## Agent policy
 

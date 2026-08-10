@@ -129,7 +129,16 @@ class DeveloperContractTest(unittest.TestCase):
         for marker in ("attributable red signal", "assertion failure or compile failure", "never an unrelated failure", "passing characterization", "recorded test-first exception", "Block production edits", "Implement first, then add or update behavior tests", "same focused command must turn green", "explicit reason"):
             with self.subTest(marker=marker):
                 self.assertIn(marker, testing)
-        assert_order(skill, "ESTABLISH FOCUSED BASELINE", "CLASSIFY CHANGE", "COLLECT FIRST SIGNAL", "IMPLEMENT", "CONFIRM GREEN", "REFACTOR WHILE GREEN", "FINAL VALIDATION")
+        assert_order(
+            skill,
+            "**ESTABLISH FOCUSED BASELINE**",
+            "**CLASSIFY CHANGE**",
+            "**COLLECT FIRST SIGNAL**",
+            "**IMPLEMENT**",
+            "**CONFIRM GREEN**",
+            "**REFACTOR WHILE GREEN**",
+            "**FINAL VALIDATION**",
+        )
 
     def test_workflow_evidence_and_refactoring_safety_are_explicit(self):
         tooling = text(REFERENCES["tooling"])

@@ -1,6 +1,6 @@
 ---
 name: reviewer
-description: Runs a read-only multi-lens Go review through the gopher:review skill, fanning out one isolated reviewer per selected lens and returning the consolidated findings and verdict. Use to delegate a diff, a pull request, or a change review. Applies no fixes of any kind.
+description: Runs a read-only multi-lens Go review through the gopher:review skill, fanning out one isolated reviewer per selected lens and returning the consolidated findings, verdict, and fix_queue. Use during development after a local implementation completes, before opening a PR, or to delegate a diff/PR review. Supports --mode full, subsets, auto, and delta. Applies no fixes of any kind.
 disallowedTools: Edit, Write, NotebookEdit
 skills: ["gopher:review"]
 model: opus

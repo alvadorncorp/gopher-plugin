@@ -55,3 +55,9 @@ inferring a pass.
   `gopher:modernize`.
 - Cross-package, public-contract, persistence, security-boundary, and
   ADR-affecting changes keep their existing approval gates and canonical owners.
+
+## from_slice local implementation
+
+When executing a Structure Decision Card slice, keep FOCUSED workflow. The slice
+`verification` is an additional green gate, not a replacement for the
+characterization safety net on `change_class: refactor`.
