@@ -37,3 +37,10 @@ and any canonical handoff. A blocked prerequisite or required approval remains
 `BLOCKED`; a non-blocking unavailable optional gate is `COMPLETE_WITH_LIMITATIONS`
 with its limitation and handoff. Route config recovery to `gopher:config` and
 other ownership or scope decisions to the owner named in `SKILL.md`.
+
+## Mechanical fast path validation
+
+For `change_class: mechanical` on the adaptive/test-after fast path, final
+validation is the focused package test command already used for green plus
+`gofmt` on touched files. Do not expand to module-wide suites unless the
+project's adopted commands make the package test impossible in isolation.

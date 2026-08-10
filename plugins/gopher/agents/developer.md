@@ -1,6 +1,6 @@
 ---
 name: developer
-description: Implements a delegated local Go change in one package through the gopher:developer skill, with project-aware validation and an explicit handback when the change leaves the local reversible envelope. Use to delegate a bounded Go implementation, a focused test, or a local fix inside one package.
+description: Implements a delegated local Go change in one package through the gopher:developer skill, with project-aware validation and an explicit handback when the change leaves the local reversible envelope. Use to delegate a bounded Go implementation, a focused test, a local fix, or an approved structure_decision slice that stays inside one package.
 tools: Read, Grep, Glob, Edit, Write, Bash
 skills: ["gopher:developer"]
 model: sonnet
