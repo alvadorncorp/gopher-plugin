@@ -1,5 +1,14 @@
 # Evidence-based Signal Router
 
+## When to route
+
+Use this table only after evidence identifies a dominant supported signal. A
+keyword alone is not attribution. On a match, set `primary_owner` to exactly
+one table owner and status to `ATTRIBUTED`. When no row is supported by the
+evidence, keep status `UNKNOWN` and `primary_owner` null.
+
+## Owner table
+
 | Dominant supported signal | Primary owner |
 |---|---|
 | Local API, types, errors, modules, tooling, tests, or reversible implementation | `gopher:developer` |
@@ -25,19 +34,23 @@
 | An attributed defect at a Go/C boundary — pointer, ownership, lifetime, callback, thread affinity, or linking | `gopher:cgo` |
 | An input-driven defect in a parser, decoder, or state machine that a falsifiable invariant can expose | `gopher:fuzz` |
 
+## Boundary gates
+
 A crash or hang at a Go/C boundary that has not been attributed stays in
 `gopher:diagnose` until the evidence supports the boundary as the dominant
 signal. The presence of `import "C"` is a keyword, not attribution; route to
 `gopher:cgo` once a probe ties the observed failure to the boundary itself.
 
 `gopher:doctor` owns a signal only while the request is still a readiness check
-against an already-written rule. Once evidence attributes a cause, name the
-specialist that performs the remedy — `gopher:codegen` for a stale artifact,
-`gopher:config` for an invalid project contract, `gopher:architecture` for a
-module or workspace inconsistency, `gopher:modernize` for a toolchain or
-declared-version issue — and record the readiness rule in
-`recommended_next_step`.
+against an already-written rule. Once evidence attributes a cause, set
+`primary_owner` to the specialist that performs the remedy —
+`gopher:codegen` for a stale artifact, `gopher:config` for an invalid project
+contract, `gopher:architecture` for a module or workspace inconsistency,
+`gopher:modernize` for a toolchain or declared-version issue — and record the
+readiness rule in `recommended_next_step`.
+
+## One-owner rule
 
 Mixed symptoms still receive one owner: choose the domain whose risk and
-evidence explain the observed failure. Put secondary constraints in
-`recommended_next_step` without assigning multiple primary owners.
+evidence explain the observed failure. Assign exactly one primary owner; put
+secondary constraints in `recommended_next_step`.

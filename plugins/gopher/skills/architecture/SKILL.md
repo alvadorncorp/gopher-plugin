@@ -46,8 +46,8 @@ next mode needs.
 without editing files, creating packages, or opening a migration. When triage
 selects architecture, name the next mode (`design`, `module-lifecycle`, or
 `migration`) and the evidence that mode needs. When triage selects another
-owner, emit `mode`, `authorization_gate`, `primary_owner`, and `handoff`, then
-stop.
+owner, emit the triage handoff fields in Output format (including
+`authorization_gate`, `primary_owner`, and `handoff`), then stop.
 
 ## Policy gating
 
@@ -72,11 +72,12 @@ required` makes a tidy graph a completion condition for the slice, never an
 authorization to move a dependency version.
 
 Resolve the effective values through `gopher:config` and report the
-`config_status` that applies. `ABSENT` applies the defaults in this table.
-`VALID` and `MIGRATION_AVAILABLE` proceed on that contract's effective values,
-and migrating the schema belongs to `gopher:config --bootstrap`. `INVALID`
-allows design analysis and blocks every structural edit until the contract is
-corrected. `UNSUPPORTED_VERSION` stays read-only.
+`config_status` and effective `architecture_policy` values that apply.
+`ABSENT` applies the defaults in this table. `VALID` and `MIGRATION_AVAILABLE`
+proceed on that contract's effective values, and migrating the schema belongs to
+`gopher:config --bootstrap`. `INVALID` allows design analysis and blocks every
+structural edit until the contract is corrected. `UNSUPPORTED_VERSION` stays
+read-only.
 
 ## Workflow
 
@@ -85,12 +86,12 @@ corrected. `UNSUPPORTED_VERSION` stays read-only.
    `pattern.*` ID (`gopher:design-patterns`), language-agnostic application
    boundaries (`gopher:application-architecture`), multidimensional cleanup
    (`gopher:refactor`), or Go package/module/public-contract work (continue
-   here). When the owner is not architecture, emit the output with `handoff`
-   and `authorization_gate`, and stop — later steps do not run. Prefer
-   `gopher:design-patterns` when Strategy/Factory/Proxy/clone/snapshot/intern
-   forces are still undecided; keep façade and consumer-interface seam work
-   here only when the general pattern is already decided or the evidence is
-   already package-level ownership.
+   here). When the owner is not architecture, emit the triage handoff output
+   and stop — later steps remain unstarted. Prefer `gopher:design-patterns`
+   when Strategy/Factory/Proxy/clone/snapshot/intern forces are still
+   undecided; keep façade and consumer-interface seam work here only when the
+   general pattern is already decided or the evidence is already package-level
+   ownership.
 2. When the question is conceptual bounded-context or domain ownership rather
    than Go packages, hand off to `gopher:application-architecture` before any
    package design; resume here only with that skill's boundary decisions as
@@ -98,13 +99,14 @@ corrected. `UNSUPPORTED_VERSION` stays read-only.
    placement, resume in `design` with that ID in evidence.
 3. Detect module, workspace, Go version, packages, imports, public consumers,
    tests, and accepted ADR/constraints. Resolve the `[architecture]` policy and
-   record `config_status`.
+   record `config_status` plus the effective `architecture_policy` key values.
 4. State evidence, forces, and the no-refactor baseline. Classify supporting
    claims as `observed`, `inferred`, or `unknown`. When an unknown blocks the
    next mode step, stop at that gate and name the exact evidence or user/owner
    decision required to continue.
 5. Map current and proposed dependencies; identify cycles and public-contract effects.
-6. Prefer concrete types and consumer-owned interfaces at demonstrated seams.
+6. Prefer concrete types and consumer-owned interfaces at demonstrated seams
+   (`references/interfaces-seams.md` when seam placement is open).
 7. In `module-lifecycle`, settle module membership, import paths, version lines,
    workspace use, the `replace` set, and release order using
    `references/modules-workspaces.md`, within the policy above.
@@ -133,6 +135,11 @@ corrected. `UNSUPPORTED_VERSION` stays read-only.
 ```yaml
 mode: triage | design | module-lifecycle | migration
 config_status: ABSENT | VALID | MIGRATION_AVAILABLE | INVALID | UNSUPPORTED_VERSION
+architecture_policy:
+  workspace_mode: off | advisory | required
+  tidy_mode: off | advisory | required
+  release_mode: independent | grouped
+  replace_mode: forbid | local-only | allow
 problem_and_evidence:
 forces_and_constraints:
 baseline_without_pattern_or_refactor:
@@ -156,9 +163,19 @@ primary_owner: gopher:architecture
 handoff: gopher:<skill> | null
 ```
 
-Omit `structure_decision` only for pure `triage` handoffs that carry no
-structural proposal; for every other successful architecture result, emit the
-card (`slices: []` when the decision is design-only).
+Field rules:
+
+- Pure `triage` handoffs to another owner emit at least `mode`, `config_status`,
+  `architecture_policy`, `problem_and_evidence`, `authorization_gate`,
+  `primary_owner`, and `handoff`. Omit proposal-only fields that do not apply
+  (`candidates_and_liabilities`, `decision`, `rejected_alternatives`,
+  `public_contract_impact`, `migration_and_rollback`, `validation`,
+  `structure_decision`).
+- For every other successful architecture result, emit `structure_decision`
+  (`slices: []` when the decision is design-only). When the card is present, its
+  `authorization_gate` matches the top-level `authorization_gate`.
+- Report effective `architecture_policy` values (table defaults when
+  `config_status` is `ABSENT`).
 
 ## Quality checklist
 
@@ -171,7 +188,7 @@ card (`slices: []` when the decision is design-only).
 - Report `authorization_gate` (`none` | `approval-required` | `blocked`) before
   structural edits; leave specialist gates to the owning peer after handoff.
 - Report the active mode together with the effective `[architecture]` values that
-  shaped the proposal.
+  shaped the proposal (`architecture_policy` in the output).
 - Justify a second module by a durable version, release, ownership, or
   consumption boundary, and name the `go` commands that carry the change.
 - Give every migration slice an entry condition, a verification command, a
@@ -179,11 +196,18 @@ card (`slices: []` when the decision is design-only).
 
 ## References
 
-- `references/packages-internal.md` — package cohesion and `internal` boundaries.
-- `references/interfaces-seams.md` — concrete types and consumer-owned seams.
-- `references/modules-workspaces.md` — the module lifecycle, `go.work`, `replace`, and release grouping.
-- `references/public-api.md` — compatibility and public contracts.
-- `references/migrations.md` — the slice protocol for sequenced migrations.
-- `references/architecture-tests.md` — deterministic dependency gates.
-- `references/pattern-mappings.md` — package/seam pattern adaptations.
-- `references/structure-decision.md` — Structure Decision Card for implementers and handoffs.
+- `references/packages-internal.md` — WHEN package cohesion or `internal`
+  placement is open.
+- `references/interfaces-seams.md` — WHEN seam or consumer-owned interface
+  placement is open.
+- `references/modules-workspaces.md` — WHEN mode is `module-lifecycle` or
+  membership, `replace`, or release grouping is open.
+- `references/public-api.md` — WHEN exported contract compatibility is open.
+- `references/migrations.md` — WHEN mode is `migration` or slice sequencing is
+  open.
+- `references/architecture-tests.md` — WHEN defining or verifying executable
+  dependency gates in `design` or `migration`.
+- `references/pattern-mappings.md` — WHEN adapting a decided `pattern.*` to
+  package or seam placement.
+- `references/structure-decision.md` — WHEN emitting or consuming a Structure
+  Decision Card for implementers and handoffs.

@@ -1,12 +1,20 @@
 # Catalog Diagnostics and Canonical Index
 
+Load when the problem family is unclear, the request names an anti-pattern
+candidate, or an ID must be checked against the canonical catalog.
+
 ## Card schema
+
+| Disposition | Operational duty |
+|---|---|
+| full | Compare with the full card fields and the owning family reference. |
+| diagnostic | Treat as selectable only after the evidence gates below and the family card pass; otherwise keep the direct baseline or `no-pattern`. |
+| boundary | Name the concept and route mechanics to the listed owner; do not invent local mechanics here. |
+| deferred | Not selectable in v1; the catalog currently has none. |
 
 Every full card supplies: ID and aliases, problem, forces, direct baseline,
 signals, counter-signals, mechanics, liabilities, useful combinations, and
-validation questions. Diagnostic cards need evidence before selection.
-Boundary cards select a concept while routing mechanics to the named owner.
-The catalog currently has no deferred cards.
+validation questions.
 
 ## Canonical v1 index
 
@@ -50,25 +58,50 @@ The catalog currently has no deferred cards.
 | pattern.object-pool | boundary | gopher:performance |
 
 Counts are normative: 23 full, 10 diagnostic, 0 deferred, and 3 boundary
-candidates (36 total). No popularity ranking is implied.
+candidates (36 total). No popularity ranking is implied. Use only IDs listed
+above.
 
-## Diagnostic rules
+## Selection and diagnostic gates
+
+### Baseline
 
 - Return `no-pattern` when the direct baseline satisfies all forces.
-- Require two active product families before recommending Abstract Factory.
-- Require process-wide identity rather than convenience for Singleton.
-- Require two independent variation axes for Bridge.
-- Require distinct access/lazy/remote/lifecycle semantics for Proxy.
-- Keep Service Locator, reflection-heavy injection, and global Registry as
-  diagnostics unless a real runtime plugin ecosystem is demonstrated.
-- For Prototype, require a documented shallow/deep aliasing and ownership
-  contract; reject clone-for-convenience and prototype registries.
-- For Flyweight, require measured memory value plus safe identity and lifetime
+
+### Diagnostic disposition gates
+
+Select a diagnostic ID only when its evidence holds; otherwise keep the baseline
+or `no-pattern`.
+
+- `pattern.abstract-factory`: two active product families that vary together.
+- `pattern.singleton`: process-wide identity is a verified invariant, not a
+  convenience.
+- `pattern.bridge`: two independent variation axes that must compose.
+- `pattern.proxy`: distinct access, lazy, remote, or lifecycle semantics versus
+  the target.
+- `pattern.service-locator`, reflection-heavy injection, and global
+  `pattern.registry`: keep diagnostic unless a real runtime plugin ecosystem is
+  demonstrated.
+- `pattern.template-method`, `pattern.mediator`, `pattern.generic-option`, and
+  `pattern.generic-result`: apply the family card's diagnostic-only validation;
+  select only when composition or native forms cannot express the force.
+
+### Full-card high-risk gates
+
+These IDs are full cards and still require the named proof before selection.
+
+- `pattern.prototype`: documented shallow/deep aliasing and ownership contract
+  for clone-from-instance; prefer assignment, value copy, or a one-off explicit
+  copy when that contract is absent (not clone-for-convenience or a prototype
+  registry).
+- `pattern.flyweight`: measured memory value plus safe identity and lifetime
   semantics; otherwise allocate normally (interning is not object pooling).
-- For Memento, require an explicit snapshot/restore contract with cost and
-  aliasing rules; otherwise use an explicit copy or domain value.
-- For Interpreter, require a real grammar, AST, semantics, and consumers;
-  reject accidental languages over a closed set of direct operations.
+- `pattern.memento`: explicit snapshot/restore contract with cost and aliasing
+  rules; otherwise use an explicit copy or domain value.
+- `pattern.interpreter`: real grammar, AST, semantics, and consumers; keep a
+  closed set of direct operations when no general language is present.
+
+### Boundary handoffs
+
 - Route cancellation, pipelines, and fan-out/fan-in mechanics to
-  `gopher:concurrency`; route pooling to `gopher:performance` and require
-  measurement before pooling.
+  `gopher:concurrency`.
+- Route pooling to `gopher:performance` and require measurement before pooling.

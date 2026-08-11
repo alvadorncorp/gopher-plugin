@@ -55,79 +55,73 @@ Keep unloaded references out of context until a row above requires them.
 
 ## Workflow
 
-1. **CLASSIFY CONFIG** using `references/project-detection.md`. `INVALID` and
-   `UNSUPPORTED_VERSION` permit read-only diagnosis only, block production
-   edits, and hand recovery to `gopher:config`. Record the config status and
-   validation evidence.
+1. **CLASSIFY CONFIG AND DETECT PROJECT** using
+   `references/project-detection.md`. Record in one pass:
+   - `config_status` and validation evidence
+   - declared Go version, project commands, and conventions
+   - `INVALID` and `UNSUPPORTED_VERSION` permit read-only diagnosis only, block
+     production edits, and hand recovery to `gopher:config`
 2. **RESOLVE IDIOM POLICY** and **RESOLVE TEST WORKFLOW** independently using
    `session | file | adopted | default`; use `latest-compatible` and
    `adaptive-tdd` when their values are absent or migratable. Record each
    resolved value and source. Keep effective defaults session-scoped and persist
    them only through the `gopher:config` bootstrap flow.
-3. Detect the declared Go version, project commands, and conventions using
-   `references/project-detection.md`, and record the detected values.
-4. **ESTABLISH FOCUSED BASELINE** with the narrowest adopted command that
+3. **ESTABLISH FOCUSED BASELINE** with the narrowest adopted command that
    exercises the affected package or behavior; record its exact command, exit
    status, and observation before classifying a change or editing production
    behavior.
-5. **CLASSIFY CHANGE** as behavior, bug-fix, refactor, mechanical, or test-only;
-   restate its behavior, affected local API,
-   error semantics, and compatibility constraints.
-5a. **PATTERN FORCE GATE.** If the open question is which code/module pattern to
+4. **CLASSIFY CHANGE** as behavior, bug-fix, refactor, mechanical, or test-only;
+   restate its behavior, affected local API, error semantics, and compatibility
+   constraints.
+5. **PATTERN FORCE GATE.** If the open question is which code/module pattern to
    select (compare X vs Y, justify Singleton/locator, clone vs copy, unmeasured
    intern, accidental language) and the request supplies neither a `pattern.*`
    ID nor an already-decided local Go shape to implement, stop without editing,
-   set `handoff: gopher:design-patterns` and
-   `status: COMPLETE_WITH_LIMITATIONS` or `BLOCKED` as appropriate, and leave
-   production code unchanged. Stay here when the user asks to implement a named
-   local shape (for example Functional Options plus tests), when a `pattern.*`
-   mapping is already supplied or returned from design-patterns, or when the
-   change is mechanical inside one package.
-
-## Change-class fast path
-
-After **CLASSIFY CHANGE**, select the FAST PATH:
+   set `handoff: gopher:design-patterns`, apply **Terminal status** (below), and
+   leave production code unchanged. Stay here when the user asks to implement a
+   named local shape (for example Functional Options plus tests), when a
+   `pattern.*` mapping is already supplied or returned from design-patterns, or
+   when the change is mechanical inside one package.
+6. **SELECT FAST PATH** after CLASSIFY CHANGE (still run steps 1–2 and package
+   envelope detection before any production edit):
 
 | change_class | Path |
 |---|---|
-| `mechanical` with `adaptive-tdd` or `test-after` | FOCUSED BASELINE → record first_signal `exception` → IMPLEMENT → `gofmt` + focused package test → FINAL VALIDATION (package only). Skip red-green ceremony. |
-| `mechanical` with `strict-tdd` | unchanged: blocked without session override |
-| `test-only` | no production edits; add/strengthen tests; CONFIRM GREEN on focused command |
+| `mechanical` with `adaptive-tdd` or `test-after` | FOCUSED BASELINE → record first_signal `exception` → IMPLEMENT → `gofmt` + focused package test → FINAL VALIDATION (package only). Omit red-green ceremony. |
+| `mechanical` with `strict-tdd` | Production edits blocked unless the session supplies an explicit override: a user or session instruction that permits this mechanical production edit under `strict-tdd`. Record the override text in `first_signal.reason` (and `limitations` if residual). Without that override, leave production code unchanged and set `status: BLOCKED`. |
+| `test-only` | Production files stay unchanged; add or strengthen tests; CONFIRM GREEN on focused command |
 | `behavior` / `bug-fix` | full workflow (first signal → implement → green → refactor → final validation) |
 | `refactor` | characterization path in `references/refactoring.md` |
 
-Fast path still runs CLASSIFY CONFIG, policy resolution, and multi-package
-detection before any production edit.
-
-6. Load `references/testing.md` and **COLLECT FIRST SIGNAL** required by the
+7. Load `references/testing.md` and **COLLECT FIRST SIGNAL** required by the
    resolved `test_workflow`; record that signal before editing production
    behavior. On the mechanical adaptive/test-after path, the first signal is the
    recorded `exception` and red-green ceremony is omitted.
-7. Inspect callers, tests, and nearby conventions before editing.
-8. Prefer direct code, concrete types, functions, and useful zero values.
-9. When the request, project, `from_slice` card, or a prior
-   `gopher:design-patterns` handoff supplies a `pattern.*` mapping, load
-   `references/pattern-mappings.md` and
-   accept, adapt, or veto it with Go-specific evidence.
-10. For a local reversible refactor, load `references/refactoring.md` and follow
+8. Inspect callers, tests, and nearby conventions before editing.
+9. Prefer direct code, concrete types, functions, and useful zero values.
+10. When the request, project, `from_slice` card, or a prior
+    `gopher:design-patterns` handoff supplies a `pattern.*` mapping, load
+    `references/pattern-mappings.md` and
+    accept, adapt, or veto it with Go-specific evidence.
+11. For a local reversible refactor, load `references/refactoring.md` and follow
     its FOCUSED workflow; hand multidimensional or repository-wide work to
     `gopher:refactor`.
-11. **DETECT PACKAGE ENVELOPE.** If the planned edit set spans more than one
+12. **DETECT PACKAGE ENVELOPE.** If the planned edit set spans more than one
     package import path, or requires an exported API move across packages, stop
     without editing, set `authorization_gate: approval-required` when the change
     is cross-package or public-contract structural work, and
     `handoff: gopher:architecture` (or `gopher:refactor` when multidimensional).
     Record the package list in `limitations`.
-12. **IMPLEMENT** the smallest cohesive change that satisfies the requested
+13. **IMPLEMENT** the smallest cohesive change that satisfies the requested
     behavior, with tests for changed observable behavior.
-13. **CONFIRM GREEN** with the same focused command and record its evidence,
+14. **CONFIRM GREEN** with the same focused command and record its evidence,
     then **REFACTOR WHILE GREEN**.
-14. Run **FINAL VALIDATION** with the affected-risk ladder in
+15. Run **FINAL VALIDATION** with the affected-risk ladder in
     `references/tooling.md` and existing project commands. On the mechanical
     adaptive/test-after fast path, use the package-only ladder in
     `references/tooling.md` (focused package test + `gofmt`).
-15. Complete **Micro-review** (below), then report files, behavior, validation,
-    limitations, `micro_review`, and any handoff.
+16. Complete **Micro-review** (below), then report files, behavior, validation,
+    limitations, `micro_review`, and any handoff. Apply **Terminal status**.
 
 For each workflow gate, classify supporting claims as `observed`, `inferred`, or
 `unknown`. If an unknown blocks the next gate, stop at that gate and record the
@@ -222,6 +216,23 @@ Evidence entries record the exact command, exit status, and concise observation.
 When a stage is skipped or not applicable, record an explicit reason rather than
 omitting the entry. Set `slice_id` when executing `from_slice`; otherwise `null`.
 
+### Terminal status
+
+Select exactly one status using these rules (aligned with
+`references/tooling.md`):
+
+| status | When |
+|---|---|
+| `COMPLETE` | Requested in-scope outcome is done; no residual limitations or required handoffs. |
+| `COMPLETE_WITH_LIMITATIONS` | In-scope work finished, and every residual is non-blocking (optional tool gap, recommended follow-up, or a routing-only deliverable). Name each residue in `limitations`. |
+| `BLOCKED` | A required gate prevents the requested production progress: unmet `from_slice` entry condition; `INVALID` / `UNSUPPORTED_VERSION` config for edits; **PATTERN FORCE GATE** when implementation was requested; multi-package / exported API move awaiting approval or architecture ownership; `mechanical` + `strict-tdd` without session override; or `unknown` evidence that blocks the next gate. Set `handoff` when another skill owns the unresolved decision. |
+
+**PATTERN FORCE GATE status:** use `BLOCKED` when the request required a
+production edit that cannot proceed without a pattern decision; use
+`COMPLETE_WITH_LIMITATIONS` when the session only needed ownership or routing
+and the design-patterns handoff is the delivered outcome. Always leave production
+code unchanged and set `handoff: gopher:design-patterns`.
+
 ## Authorization
 
 Proceed with explicitly requested local and reversible changes inside one
@@ -258,6 +269,7 @@ with that evidence in place of editing.
   session/workflow policy asks for multi-lens review.
 - Report `authorization_gate` (`none` | `approval-required` | `blocked`) with any
   handoff.
+- Set `status` per **Terminal status**; name every residue that prevents `COMPLETE`.
 
 ## References
 
