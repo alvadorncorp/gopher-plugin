@@ -59,7 +59,7 @@ packaged role agents wrap `gopher:developer`, `gopher:architecture`, and
 
 | Skill | Canonical ownership |
 |---|---|
-| `design-patterns` | language-agnostic code/module forces and patterns |
+| `design-patterns` | language-agnostic code/module forces and patterns (23 full, 10 diagnostic, 0 deferred, 3 boundary; reverse handoff from developer/architecture when `pattern.*` is open) |
 | `application-architecture` | language-agnostic internal application boundaries |
 | `developer` | local Go implementation, APIs, errors, tests, and tooling |
 | `architecture` | Go packages, modules, dependencies, and public contracts |

@@ -67,7 +67,7 @@ relative path into a peer.
 
 | Skill | Primary ownership |
 |---|---|
-| `design-patterns` | Language-agnostic code/module pattern diagnosis and selection |
+| `design-patterns` | Language-agnostic code/module pattern diagnosis and selection; peers reverse-hand off open pattern forces |
 | `application-architecture` | Language-agnostic internal application boundaries |
 | `developer` | Config-aware, local and reversible Go implementation with adaptive test-first evidence; hands broad modernization and specialist work to their canonical owners |
 | `architecture` | Go packages, modules/workspaces, dependency direction, seams, and public APIs |
