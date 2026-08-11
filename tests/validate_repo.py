@@ -439,7 +439,7 @@ def validate_repository() -> list[str]:
     )}
     if len(catalog_ids) != 36 or len(set(catalog_ids)) != 36:
         errors.append("catalog must contain 36 unique pattern IDs")
-    if dispositions != {"full": 19, "diagnostic": 10, "deferred": 4, "boundary": 3}:
+    if dispositions != {"full": 23, "diagnostic": 10, "deferred": 0, "boundary": 3}:
         errors.append(f"catalog disposition mismatch: {dispositions}")
 
     mapped_general = []

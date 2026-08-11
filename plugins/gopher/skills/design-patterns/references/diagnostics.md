@@ -5,8 +5,8 @@
 Every full card supplies: ID and aliases, problem, forces, direct baseline,
 signals, counter-signals, mechanics, liabilities, useful combinations, and
 validation questions. Diagnostic cards need evidence before selection.
-Deferred cards require a concrete use case and new review before promotion.
 Boundary cards select a concept while routing mechanics to the named owner.
+The catalog currently has no deferred cards.
 
 ## Canonical v1 index
 
@@ -41,15 +41,15 @@ Boundary cards select a concept while routing mechanics to the named owner.
 | pattern.generic-result | diagnostic | values-errors |
 | pattern.service-locator | diagnostic | composition |
 | pattern.registry | diagnostic | composition |
-| pattern.prototype | deferred | construction |
-| pattern.flyweight | deferred | state-traversal |
-| pattern.memento | deferred | state-traversal |
-| pattern.interpreter | deferred | state-traversal |
+| pattern.prototype | full | construction |
+| pattern.flyweight | full | state-traversal |
+| pattern.memento | full | state-traversal |
+| pattern.interpreter | full | state-traversal |
 | pattern.context-cancellation | boundary | gopher:concurrency |
 | pattern.pipeline | boundary | gopher:concurrency |
 | pattern.object-pool | boundary | gopher:performance |
 
-Counts are normative: 19 full, 10 diagnostic, 4 deferred, and 3 boundary
+Counts are normative: 23 full, 10 diagnostic, 0 deferred, and 3 boundary
 candidates (36 total). No popularity ranking is implied.
 
 ## Diagnostic rules
@@ -61,6 +61,14 @@ candidates (36 total). No popularity ranking is implied.
 - Require distinct access/lazy/remote/lifecycle semantics for Proxy.
 - Keep Service Locator, reflection-heavy injection, and global Registry as
   diagnostics unless a real runtime plugin ecosystem is demonstrated.
+- For Prototype, require a documented shallow/deep aliasing and ownership
+  contract; reject clone-for-convenience and prototype registries.
+- For Flyweight, require measured memory value plus safe identity and lifetime
+  semantics; otherwise allocate normally (interning is not object pooling).
+- For Memento, require an explicit snapshot/restore contract with cost and
+  aliasing rules; otherwise use an explicit copy or domain value.
+- For Interpreter, require a real grammar, AST, semantics, and consumers;
+  reject accidental languages over a closed set of direct operations.
 - Route cancellation, pipelines, and fan-out/fan-in mechanics to
   `gopher:concurrency`; route pooling to `gopher:performance` and require
   measurement before pooling.

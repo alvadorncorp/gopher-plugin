@@ -15,7 +15,7 @@ class RepositoryContractTest(unittest.TestCase):
         }
         self.assertEqual(36, len(rows))
         self.assertEqual(
-            {"full": 19, "diagnostic": 10, "deferred": 4, "boundary": 3},
+            {"full": 23, "diagnostic": 10, "deferred": 0, "boundary": 3},
             counts,
         )
 

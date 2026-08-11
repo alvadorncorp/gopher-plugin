@@ -11,7 +11,7 @@ literal, or explicit constructor is the baseline for every construction choice.
 | `pattern.configuration-options` | Many independent optional dimensions, strong defaults, private configuration behavior, and credible evolution. | A constructor or configuration object is smaller and more inspectable. | Ordering, duplicates, non-idempotency, late validation, captured mutable state, namespace growth. | Specify ordering, duplicate, nil, validation, and compatibility semantics. |
 | `pattern.abstract-factory` | Several real product families vary together. | Concrete constructors cover one family or speculative variants. | Type explosion and hidden coupling. | Demonstrate two active families and family-wide invariants. |
 | `pattern.singleton` | Process-wide identity is a verified invariant. | Explicit dependency wiring and scoped lifetime. | Global state, test interference, lifecycle ambiguity. | Prove unique identity is required rather than convenient. |
-| `pattern.prototype` | Cloning must preserve a documented aliasing contract. | Assignment or explicit copy is sufficient. | Shallow/deep copy ambiguity. | Deferred in v1; gather real clone and ownership evidence. |
+| `pattern.prototype` | A new instance must be derived from an existing one and preserve a documented shallow/deep aliasing and ownership contract. | Assignment, value copy, or a one-off explicit copy is enough. | Hidden shared mutability, incomplete deep copies, prototype registries, clone-for-convenience. | Document which fields are shared vs copied; call sites remain clear; invalid aliasing is unrepresentable or tested. |
 
 ## Selection sequence
 
@@ -19,4 +19,5 @@ literal, or explicit constructor is the baseline for every construction choice.
 2. Choose a configuration object for declarative or serializable data.
 3. Choose a builder only for incremental construction state.
 4. Choose configuration options only after specifying option interactions.
-5. Keep Abstract Factory and Singleton diagnostic until their invariants are demonstrated.
+5. Choose prototype only when clone-from-instance is required and aliasing is documented.
+6. Keep Abstract Factory and Singleton diagnostic until their invariants are demonstrated.
