@@ -7,6 +7,9 @@
 | Goroutine lifetime, channel, synchronization, context, race, deadlock, goroutine leak, or backpressure | `gopher:concurrency` |
 | Algorithmic or asymptotic cost, allocation, GC, memory growth, cache behavior, parsing, I/O amplification, benchmark, profile, latency, or throughput | `gopher:performance` |
 | Explicit pattern forces and selection/rejection | `gopher:design-patterns` |
+| Speculative interface or abstraction without a demonstrated consumer seam, framed as design choice rather than a crash | `gopher:design-patterns` |
+| Global access, service locator, or registry convenience without process-wide identity or plugin-ecosystem evidence | `gopher:design-patterns` |
+| Clone, snapshot/undo, interning/canonicalization, or expression/AST-eval design without an implementation request | `gopher:design-patterns` |
 | Language-agnostic internal application boundary or dependency direction | `gopher:application-architecture` |
 | Threat, trust boundary, exploit path, vulnerable dependency/symbol, or security control | `gopher:security` |
 | Diff/PR review intent rather than diagnosis | `gopher:review` |

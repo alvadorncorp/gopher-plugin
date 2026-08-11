@@ -1,6 +1,6 @@
 ---
 name: developer
-description: Implements and maintains idiomatic Go code, including local APIs, types, errors, values, local module edits, tooling, tests, fixes, and reversible refactors. Use during development when adding or changing a function, type, or local API, wrapping or classifying an error, choosing a constructor or option shape, writing focused tests, fixing a bug inside one package, or implementing an approved structure_decision slice that stays local. Prefer after a structure decision exists for cross-cutting features. Hand cross-package architecture to gopher:architecture, security audits to gopher:security, specialized concurrency or performance investigations to gopher:concurrency and gopher:performance; hand generated-output lifecycle to gopher:codegen, fuzz target and campaign design to gopher:fuzz, Go/C boundary design or audit to gopher:cgo, multidimensional cleanup to gopher:refactor, and multi-lens diff review to gopher:review.
+description: Implements and maintains idiomatic Go code, including local APIs, types, errors, values, local module edits, tooling, tests, fixes, and reversible refactors. Use during development when adding or changing a function, type, or local API, wrapping or classifying an error, choosing a constructor or option shape, writing focused tests, fixing a bug inside one package, or implementing an approved structure_decision slice that stays local. Prefer after a structure decision exists for cross-cutting features. When the open question is which code/module pattern to use and no pattern.* ID is supplied, hand off to gopher:design-patterns first; stay here to implement a named local Go shape or an accepted pattern mapping. Hand cross-package architecture to gopher:architecture, security audits to gopher:security, specialized concurrency or performance investigations to gopher:concurrency and gopher:performance; hand generated-output lifecycle to gopher:codegen, fuzz target and campaign design to gopher:fuzz, Go/C boundary design or audit to gopher:cgo, multidimensional cleanup to gopher:refactor, and multi-lens diff review to gopher:review.
 ---
 
 # Go Developer
@@ -14,6 +14,7 @@ resolve missing project values through `references/project-detection.md`.
 
 | Question | Owner |
 |---|---|
+| Open code/module pattern selection without a supplied `pattern.*` ID | `gopher:design-patterns` |
 | Cross-package dependency, module lifecycle, or public-contract work | `gopher:architecture` |
 | Goroutine, synchronization, or cancellation work | `gopher:concurrency` |
 | Cost, allocation, or throughput work | `gopher:performance` |
@@ -46,7 +47,8 @@ Load only the references required by the current change:
 | Errors / values / public local API | `api-errors-values.md` |
 | Idiom policy disputes | `idioms.md` |
 | Local reversible refactor | `refactoring.md` |
-| pattern.* mapping supplied | `pattern-mappings.md` |
+| `pattern.*` supplied or returned from `gopher:design-patterns` | `pattern-mappings.md` |
+| Clone, snapshot, intern, or AST-eval construction | `pattern-mappings.md` (or hand off if no `pattern.*`) |
 | `from_slice` input present | `refactoring.md` plus the architecture Structure Decision Card fields from the request |
 
 Keep unloaded references out of context until a row above requires them.
@@ -71,6 +73,16 @@ Keep unloaded references out of context until a row above requires them.
 5. **CLASSIFY CHANGE** as behavior, bug-fix, refactor, mechanical, or test-only;
    restate its behavior, affected local API,
    error semantics, and compatibility constraints.
+5a. **PATTERN FORCE GATE.** If the open question is which code/module pattern to
+   select (compare X vs Y, justify Singleton/locator, clone vs copy, unmeasured
+   intern, accidental language) and the request supplies neither a `pattern.*`
+   ID nor an already-decided local Go shape to implement, stop without editing,
+   set `handoff: gopher:design-patterns` and
+   `status: COMPLETE_WITH_LIMITATIONS` or `BLOCKED` as appropriate, and leave
+   production code unchanged. Stay here when the user asks to implement a named
+   local shape (for example Functional Options plus tests), when a `pattern.*`
+   mapping is already supplied or returned from design-patterns, or when the
+   change is mechanical inside one package.
 
 ## Change-class fast path
 
@@ -93,7 +105,8 @@ detection before any production edit.
    recorded `exception` and red-green ceremony is omitted.
 7. Inspect callers, tests, and nearby conventions before editing.
 8. Prefer direct code, concrete types, functions, and useful zero values.
-9. When the request or project supplies a `pattern.*` mapping, load
+9. When the request, project, `from_slice` card, or a prior
+   `gopher:design-patterns` handoff supplies a `pattern.*` mapping, load
    `references/pattern-mappings.md` and
    accept, adapt, or veto it with Go-specific evidence.
 10. For a local reversible refactor, load `references/refactoring.md` and follow
@@ -236,6 +249,8 @@ with that evidence in place of editing.
 - Test observable behavior with independent expected values.
 - Run `gofmt` plus the smallest relevant adopted test/static gates (package-only
   on the mechanical adaptive/test-after fast path).
+- Apply **PATTERN FORCE GATE**: open pattern selection without `pattern.*` hands
+  off to `gopher:design-patterns`; implement named local Go shapes here.
 - Stop at **DETECT PACKAGE ENVELOPE** and hand multi-package or exported API moves
   to `gopher:architecture` (or `gopher:refactor` when multidimensional).
 - On `from_slice`, meet entry conditions and slice verification before COMPLETE.

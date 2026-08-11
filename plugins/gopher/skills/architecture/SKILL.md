@@ -1,6 +1,6 @@
 ---
 name: architecture
-description: Designs, reviews, and migrates Go packages, internal boundaries, dependency direction, public APIs, evidence-backed seams, and the module and workspace lifecycle from creation through split, merge, retirement, and release. Use during planning for package layout, module split, public-API moves, migration sequencing, or "where should this live" questions; mode triage classifies local vs cross-package vs application-boundary ownership before design. Use for cross-package, module-topology, or public-contract work, including sequenced migrations. Hand local one-package implementation to `gopher:developer`, language-agnostic app boundaries alone to `gopher:application-architecture`, multidimensional cleanup orchestration to `gopher:refactor`, and multi-lens diff review to `gopher:review`.
+description: Designs, reviews, and migrates Go packages, internal boundaries, dependency direction, public APIs, evidence-backed seams, and the module and workspace lifecycle from creation through split, merge, retirement, and release. Use during planning for package layout, module split, public-API moves, migration sequencing, or "where should this live" questions; mode triage classifies local vs cross-package vs application-boundary ownership before design. Use for cross-package, module-topology, or public-contract work, including sequenced migrations. Hand open code/module pattern selection without a pattern.* ID to `gopher:design-patterns`, local one-package implementation to `gopher:developer`, language-agnostic app boundaries alone to `gopher:application-architecture`, multidimensional cleanup orchestration to `gopher:refactor`, and multi-lens diff review to `gopher:review`.
 ---
 
 # Go Architecture
@@ -12,9 +12,11 @@ direction, public APIs, interface seams, migrations, and architecture tests.
 Primary owner: `gopher:architecture`.
 
 Receive conceptual application boundaries from `gopher:application-architecture`.
-Hand local implementation to `gopher:developer`, runtime synchronization to
-`gopher:concurrency`, performance cost and throughput to `gopher:performance`, and
-explicit security analysis to `gopher:security`.
+Hand open code/module pattern forces without a `pattern.*` ID to
+`gopher:design-patterns`, then resume package placement after that selection when
+needed. Hand local implementation to `gopher:developer`, runtime synchronization
+to `gopher:concurrency`, performance cost and throughput to `gopher:performance`,
+and explicit security analysis to `gopher:security`.
 
 Receive public-API and module-topology modernization from `gopher:modernize`;
 contract-changing modernization remains owned here.
@@ -32,7 +34,7 @@ with its own version line is `gopher:architecture`.
 
 | Mode | When | Stop condition |
 |---|---|---|
-| `triage` | Ownership is unclear: local package work vs cross-package Go structure vs language-agnostic application boundaries. Prefer this first on planning prompts | Emits a handoff decision: stay on `gopher:architecture` (name next mode), hand off to `gopher:developer`, hand off to `gopher:application-architecture`, or `gopher:refactor` for multidimensional cleanup — with evidence and `authorization_gate` |
+| `triage` | Ownership is unclear: local package work vs cross-package Go structure vs language-agnostic application boundaries vs open code/module pattern forces. Prefer this first on planning prompts | Emits a handoff decision: stay on `gopher:architecture` (name next mode), hand off to `gopher:developer`, hand off to `gopher:design-patterns`, hand off to `gopher:application-architecture`, or `gopher:refactor` for multidimensional cleanup — with evidence and `authorization_gate` |
 | `design` | Packages, boundaries, seams, or public APIs are the open question. The default after triage selects architecture | Every proposed boundary carries its evidence, its dependency direction, its public-contract effect, and at least one executable architecture gate (test, `go list`/import rule, or project-adopted checker) |
 | `module-lifecycle` | A module is created, split, merged, or retired, or `go.work` membership, `replace` directives, or release grouping is the open question | Every affected module has a decided import path, version line, workspace membership, `replace` set, and release step, each verified by the commands that prove it |
 | `migration` | An agreed structural change reaches live code and needs sequencing | Every slice has met its entry condition, passed its verification, held its compatibility guarantee, and kept its rollback available |
@@ -79,15 +81,21 @@ corrected. `UNSUPPORTED_VERSION` stays read-only.
 ## Workflow
 
 1. Name the mode. In `triage`, classify the request as local implementation
-   (`gopher:developer`), language-agnostic application boundaries
-   (`gopher:application-architecture`), multidimensional cleanup
+   (`gopher:developer`), open code/module pattern selection without a
+   `pattern.*` ID (`gopher:design-patterns`), language-agnostic application
+   boundaries (`gopher:application-architecture`), multidimensional cleanup
    (`gopher:refactor`), or Go package/module/public-contract work (continue
    here). When the owner is not architecture, emit the output with `handoff`
-   and `authorization_gate`, and stop — later steps do not run.
+   and `authorization_gate`, and stop — later steps do not run. Prefer
+   `gopher:design-patterns` when Strategy/Factory/Proxy/clone/snapshot/intern
+   forces are still undecided; keep façade and consumer-interface seam work
+   here only when the general pattern is already decided or the evidence is
+   already package-level ownership.
 2. When the question is conceptual bounded-context or domain ownership rather
    than Go packages, hand off to `gopher:application-architecture` before any
    package design; resume here only with that skill's boundary decisions as
-   input.
+   input. When design-patterns returns a `pattern.*` that needs package
+   placement, resume in `design` with that ID in evidence.
 3. Detect module, workspace, Go version, packages, imports, public consumers,
    tests, and accepted ADR/constraints. Resolve the `[architecture]` policy and
    record `config_status`.

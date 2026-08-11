@@ -1,5 +1,9 @@
 # Go Construction and Options
 
+When construction forces are still open (which pattern, not which Go shape) and
+no `pattern.*` ID is supplied, hand off to `gopher:design-patterns` before
+choosing among the steps below.
+
 ## Decision order
 
 1. Useful zero value or literal.
