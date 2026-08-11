@@ -1,6 +1,6 @@
 ---
 name: design-patterns
-description: Diagnoses forces and selects, combines, rejects, or names no code/module pattern from a language-agnostic catalog. Use when users ask to choose, compare, or review a design pattern. Route Go implementation, application architecture, concurrency, and performance mechanics to their canonical peers.
+description: Diagnoses forces and selects, combines, rejects, or names no-pattern from a language-agnostic code/module catalog (pattern.*). Use when choosing or comparing Factory vs constructor/NewT, Strategy vs function, Builder vs config, Decorator/chain, Optional/Result vs native returns, Singleton/locator/registry suspicion, clone vs copy, snapshot/undo, interning/canonicalization, or expression/AST eval—including "should I use X", "X vs Y", or "is this pattern needed". Prefer no-pattern when direct code satisfies the forces. Hand Go implementation of a chosen shape to gopher:developer, package/public-contract work to gopher:architecture, app modular boundaries to gopher:application-architecture, goroutine/pipeline mechanics to gopher:concurrency, and measured pooling to gopher:performance. Stay here when peers hand off open pattern forces without a pattern.* ID; leave when the request is implement a named local Go API already decided.
 ---
 
 # Design Patterns
@@ -13,8 +13,10 @@ not a pattern name. Keep the catalog language-agnostic and use stable
 
 Primary owner: `gopher:design-patterns`.
 
-Route internal application boundaries to `gopher:application-architecture`, Go
-implementation to `gopher:developer`, Go package/public-contract decisions to
+Receive reverse handoffs from `gopher:developer` and `gopher:architecture` when
+pattern forces are open and no `pattern.*` ID is supplied. Route internal
+application boundaries to `gopher:application-architecture`, Go implementation
+to `gopher:developer`, Go package/public-contract decisions to
 `gopher:architecture`, concurrency mechanics to `gopher:concurrency`, and
 performance mechanics to `gopher:performance`.
 
@@ -78,6 +80,6 @@ leading candidates, return the direct baseline plus the missing evidence.
 - `references/construction.md` — object/configuration creation decisions.
 - `references/composition.md` — seams, wrappers, composition, and dispatch.
 - `references/behavior.md` — commands, events, and coordination.
-- `references/state-traversal.md` — iteration, state, traversal, and deferred cards.
+- `references/state-traversal.md` — iteration, state, traversal, snapshot, intern, and eval.
 - `references/values-errors.md` — optional and fallible value protocols.
 - `references/diagnostics.md` — canonical index, dispositions, and card schema.

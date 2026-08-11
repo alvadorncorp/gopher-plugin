@@ -1,4 +1,4 @@
 interface:
   display_name: "Design Patterns"
   short_description: "Select patterns from evidence and forces"
-  default_prompt: "Use $design-patterns to compare patterns for this design and include the direct baseline."
+  default_prompt: "Use $design-patterns for this design. State forces, the direct baseline without a pattern, at most three candidates with liabilities and counter-signals, then decide selected|rejected|combined|no-pattern and hand off with a pattern.* ID (or none) to one language owner."
