@@ -37,7 +37,7 @@ type = "plugin"
 path = ".kimi-plugin/plugin.json"
 
 [[groups.default.targets]]
-type = "npm"
+type = "node"
 path = "package.json"
 
 [groups.current]
