@@ -5,7 +5,7 @@
 </p>
 
 Gopher packages evidence-driven Go engineering workflows as one installable
-plugin for Codex, Claude Code, Grok Build, and Kimi Code. Its goal is to help
+plugin for Codex, Claude Code, Grok Build, Kimi Code, and OpenCode. Its goal is to help
 an agent diagnose before it prescribes, choose idiomatic Go designs, make small
 reversible changes, review code through explicit risk lenses, and coordinate
 larger refactors with documented evidence.
@@ -18,7 +18,9 @@ exposes it through native marketplace manifests for each host. Codex reads the
 manifest. Grok Build reads `.grok-plugin/marketplace.json` and the plugin's
 `.grok-plugin/plugin.json` manifest. Kimi Code reads
 `.kimi-plugin/marketplace.json` and the plugin's `.kimi-plugin/plugin.json`
-manifest. All four hosts load the same `skills/` tree.
+manifest. OpenCode installs the npm package `@alvadorncorp/gopher`, whose config
+hook registers the same `skills/` tree and three native role agents. All five
+hosts load the same physical skill tree.
 
 ## What Gopher provides
 
@@ -38,9 +40,9 @@ Go repositories:
 - Coordinate repository-wide refactors with baselines, sequencing, handoffs,
   and evidence.
 
-The installable plugin package intentionally ships no hooks, MCP servers, apps,
-LSP servers, or runtime visual assets. It does ship three packaged role agents,
-described below.
+The installable package intentionally ships no user-triggered hooks, MCP servers,
+apps, LSP servers, or runtime visual assets. The OpenCode adapter uses only a
+startup config hook to register the shared skills and native role agents.
 
 ## Package layout
 
@@ -53,9 +55,12 @@ described below.
 - Claude Code manifest: `plugins/gopher/.claude-plugin/plugin.json`
 - Grok Build manifest: `plugins/gopher/.grok-plugin/plugin.json`
 - Kimi Code manifest: `plugins/gopher/.kimi-plugin/plugin.json`
+- OpenCode package: `package.json`
+- OpenCode adapter: `plugins/gopher/opencode/plugin.js`
 - Shared skills: `plugins/gopher/skills/`
 - Packaged agents (Claude Code, Grok Build): `plugins/gopher/agents/`
 - Packaged agents (Codex): `plugins/gopher/agents/codex/`
+- Packaged agents (OpenCode): `plugins/gopher/agents/opencode/`
 - Structural and forward tests: `tests/`
 - Architecture notes: `docs/`
 
@@ -96,11 +101,11 @@ the skill keeps the workflow, the evidence discipline, and the output. The agent
 add no ownership row and no orchestrator, so each one's primary owner stays the
 skill it wraps.
 
-| Agent | Skill | Markdown binding | Codex binding | Declared edit envelope |
-|---|---|---|---|---|
-| `developer` | `gopher:developer` | `sonnet`, effort `medium` | sandbox `workspace-write` | local and reversible, inside one package |
-| `architect` | `gopher:architecture` | `opus`, effort `high` | sandbox `read-only` | existing files only, under an explicit approval; never creates a file |
-| `reviewer` | `gopher:review` | `opus`, effort `high` | sandbox `read-only` | none |
+| Agent | Skill | Markdown binding | Codex binding | OpenCode binding | Declared edit envelope |
+|---|---|---|---|---|---|
+| `developer` | `gopher:developer` | `sonnet`, effort `medium` | sandbox `workspace-write` | `gopher-developer` subagent | local and reversible, inside one package |
+| `architect` | `gopher:architecture` | `opus`, effort `high` | sandbox `read-only` | `gopher-architect` subagent, `edit: deny` | existing files only, under an explicit approval; never creates a file |
+| `reviewer` | `gopher:review` | `opus`, effort `high` | sandbox `read-only` | `gopher-reviewer` primary agent, `edit: deny` | none |
 
 The markdown dialect binds the model, the reasoning effort, and the tool set. The
 Codex agent dialect accepts `name`, `description`, `sandbox_mode`, and
@@ -114,6 +119,10 @@ than on the host.
 
 Claude Code and Grok Build load `plugins/gopher/agents/*.md`, and Codex loads
 `plugins/gopher/agents/codex/*.toml`.
+OpenCode loads the native agent definitions through the package config hook. All
+three OpenCode roles inherit the session model and variant; `gopher-reviewer` is
+a primary agent so it can dispatch read-only built-in `explore` children without
+changing the global subagent-depth setting.
 Kimi Code does not load packaged plugin agents, so the Kimi review and refactor
 adapters restate the constraint envelope inline as instruction text with no
 binding behind it at all: the review adapter dispatches through the runtime
@@ -235,13 +244,41 @@ To confirm Kimi Code can see the plugin:
 /plugins info gopher
 ```
 
+## Install in OpenCode
+
+Install the published package for the current project:
+
+```bash
+opencode plugin @alvadorncorp/gopher
+```
+
+For local development from this repository root, install the local package into
+the current project instead:
+
+```bash
+opencode plugin "$(pwd)"
+```
+
+Add `--global` to either command to install it in the user configuration. Quit
+and restart OpenCode after installation or an update because plugins and skills
+are loaded at startup. Verify the installed package configuration with:
+
+```bash
+opencode debug config
+```
+
+Then start an OpenCode session and select `gopher-reviewer` when you need an
+explicit read-only multi-lens review.
+
 ## Use Gopher
 
 After installation, ask naturally for Go engineering help or select a bundled
 skill explicitly. Codex can route from the prompt or from an installed plugin
 skill. Claude Code and Grok Build expose plugin skills as namespaced commands
 such as `/gopher:review --mode full`. Kimi Code routes from the prompt or from
-explicit skill invocation such as `/skill:review`.
+explicit skill invocation such as `/skill:review`. OpenCode exposes the skills
+by their canonical names, such as `review`; it does not apply a `gopher:`
+namespace, so users must avoid duplicate skill names in their OpenCode setup.
 
 Examples:
 
@@ -317,14 +354,15 @@ python3 -m unittest discover -s tests -p 'test_*.py'
 python3 "${CODEX_HOME:-$HOME/.codex}/skills/.system/plugin-creator/scripts/validate_plugin.py" plugins/gopher
 claude plugin validate . --strict
 grok plugin validate plugins/gopher
+node --check plugins/gopher/opencode/plugin.js
 python3 tests/run_forward_tests.py --validate-only
 ```
 
 Live forward tests require authenticated local harnesses and installed Codex,
-Claude Code, Grok Build, and/or Kimi Code plugin snapshots:
+Claude Code, Grok Build, Kimi Code, and/or OpenCode plugin snapshots:
 
 ```bash
-python3 tests/run_forward_tests.py --harness codex --harness claude --harness grok --harness kimi
+python3 tests/run_forward_tests.py --harness codex --harness claude --harness grok --harness kimi --harness opencode
 ```
 
 Review official, version-sensitive Go references after every stable Go release

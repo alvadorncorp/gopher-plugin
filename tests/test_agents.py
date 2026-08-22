@@ -15,6 +15,7 @@ KIMI_ADAPTERS = {
     "review": ROOT / "plugins/gopher/skills/review/references/harnesses/kimi.md",
     "refactor": ROOT / "plugins/gopher/skills/refactor/references/harnesses/kimi.md",
 }
+OPENCODE_AGENTS = AGENTS / "opencode"
 
 
 def codex_agent(role: str) -> dict:
@@ -91,6 +92,15 @@ class PackagedAgentTest(unittest.TestCase):
         refactor = KIMI_ADAPTERS["refactor"].read_text(encoding="utf-8")
         self.assertIn("agents.reviewer_max_parallel", review)
         self.assertIn("agents.authorization", refactor)
+
+    def test_opencode_agents_are_thin_native_wrappers(self):
+        for role, agent_id in SPEC["opencode_agent_ids"].items():
+            path = OPENCODE_AGENTS / f"{role}.md"
+            metadata = validate_repo.parse_frontmatter(path)
+            body = validate_repo.agent_body(path)
+            self.assertEqual(agent_id, metadata["name"])
+            self.assertIn("declared policy may narrow this agent and it can never widen it", body)
+            self.assertLessEqual(validate_repo.normalized_size(body), validate_repo.AGENT_BODY_MAX_CHARS)
 
     def test_policy_status_values_are_declared_wherever_the_contract_is_stated(self):
         """`policy_status` is a reporting contract, so every document that states

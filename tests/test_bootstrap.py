@@ -14,6 +14,7 @@ CLAUDE_PLUGIN = PLUGIN / ".claude-plugin/plugin.json"
 GROK_PLUGIN = PLUGIN / ".grok-plugin/plugin.json"
 KIMI_PLUGIN = PLUGIN / ".kimi-plugin/plugin.json"
 ROOT_KIMI_PLUGIN = ROOT / ".kimi-plugin/plugin.json"
+OPENCODE_PACKAGE = ROOT / "package.json"
 
 
 def load(path: Path):
@@ -55,6 +56,14 @@ class BootstrapPackageTest(unittest.TestCase):
             self.assertNotIn(forbidden, manifest)
         for forbidden_path in (".app.json", ".mcp.json", ".lsp.json", "hooks", "assets"):
             self.assertFalse((PLUGIN / forbidden_path).exists())
+
+    def test_opencode_package_matches_the_shared_plugin_identity(self):
+        package = load(OPENCODE_PACKAGE)
+        codex = load(CODEX_PLUGIN)
+        self.assertEqual("@alvadorncorp/gopher", package["name"])
+        self.assertEqual(codex["version"], package["version"])
+        self.assertEqual(codex["description"], package["description"])
+        self.assertEqual("plugins/gopher/opencode/plugin.js", package["main"])
 
     def test_kimi_manifests_declare_no_packaged_agents(self):
         """Kimi Code discards packaged plugin agents, so declaring them would

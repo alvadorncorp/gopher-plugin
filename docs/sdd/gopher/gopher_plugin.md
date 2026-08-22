@@ -2,13 +2,13 @@
 type: sdd
 id: sdd:gopher:gopher_plugin
 context: gopher
-title: Package Go engineering workflows for Codex, Claude, and Grok
+title: Package Go engineering workflows for Codex, Claude, Grok, Kimi, and OpenCode
 status: Accepted
-tags: [go, codex, claude, grok, skills, marketplace]
-related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005, adr:gopher:006, adr:gopher:007, adr:gopher:008, adr:gopher:009]
+tags: [go, codex, claude, grok, kimi, opencode, skills, marketplace]
+related: [adr:gopher:001, adr:gopher:002, adr:gopher:003, adr:gopher:004, adr:gopher:005, adr:gopher:006, adr:gopher:007, adr:gopher:008, adr:gopher:009, adr:gopher:010]
 date: 2026-07-14
 ---
-# SDD: Package Go engineering workflows for Codex, Claude, and Grok
+# SDD: Package Go engineering workflows for Codex, Claude, Grok, Kimi, and OpenCode
 
 ## Context and Drivers
 
@@ -23,9 +23,10 @@ and `adr:gopher:001`, with the third host recorded in `adr:gopher:003`.
 
 ## Solution Overview
 
-Publish marketplace `alvadorncorp` with plugin `gopher` version `0.5.1`.
-Codex, Claude, and Grok receive native manifests while loading the same physical
-tree at `plugins/gopher/skills/`. Twenty peer skills have canonical ownership
+Publish marketplace `alvadorncorp` with plugin `gopher` version `0.7.0` and npm
+package `@alvadorncorp/gopher`. Codex, Claude, Grok, and Kimi receive native
+manifests, while OpenCode receives a package config hook; all load the same
+physical tree at `plugins/gopher/skills/`. Twenty peer skills have canonical ownership
 and a textual decision and handoff contract. A `.gopher-plugin.toml` project
 contract, owned by `gopher:config`, carries thresholds, tool policy, and
 refactoring safeguards for the quality workflows; it is at schema version `5`
@@ -40,17 +41,20 @@ packaged role agents wrap `gopher:developer`, `gopher:architecture`, and
 
 ## Architecture
 
-- **Components:** Codex/Claude/Grok marketplaces; plugin manifests; twenty
+- **Components:** Codex/Claude/Grok/Kimi marketplaces; native manifests; the
+  OpenCode npm package and config hook; twenty
   skills (`design-patterns`, `application-architecture`, `developer`,
   `architecture`, `concurrency`, `performance`, `diagnose`, `security`,
   `review`, `config`, `complexity`, `test-quality`, `modernize`, `refactor`,
   `doctor`, `resilience`, `observability`, `codegen`, `cgo`, `fuzz`);
   references; three packaged role agents (`developer`, `architect`, `reviewer`)
-  in Claude/Grok markdown and Codex TOML form; validators; cross-harness corpus.
+  in Claude/Grok markdown, Codex TOML, and OpenCode native forms; validators;
+  cross-harness corpus.
 - **Data:** versioned Markdown, YAML, and JSON only. No database, production
   state, generated copies, or symlinks.
 - **Integrations:** official `plugin-creator` and `skill-creator` scripts,
-  native Codex/Claude/Grok validators, and local CLIs for forward tests.
+  native Codex/Claude/Grok validators, OpenCode config/plugin discovery, and
+  local CLIs for forward tests.
 - **End-to-end flows:** intent → primary owner → specialized workflow →
   proportional validation → handoff; unexplained symptom → `diagnose` → evidence →
   owner; diff → `review` → explicit lenses → consolidation → verdict.
@@ -86,6 +90,8 @@ the host reads it at load time. The `[agents]` table of the project contract is 
 declared policy that narrows an agent and never widens one. Kimi Code discards
 packaged agents, so its review and refactor adapters reproduce the same
 constraint envelope inline.
+OpenCode loads three native role agents from its package config hook; its skills
+retain unprefixed canonical names, so users must avoid name collisions.
 
 Explicitly requested local and reversible changes may proceed. Cross-package,
 public-contract, boundary, persistence, security-boundary, or ADR-affecting
@@ -142,6 +148,8 @@ the change while keeping modernization specialist-owned.
   planning→implementation→review skill-mode loop, preserving opt-in migration
   for versions `1`–`4` — recorded in `adr:gopher:009`, as `adr:gopher:005`
   requires for any schema migration.
+- Add OpenCode npm packaging, native role agents, and `task` adapters while
+  retaining one physical skill tree — recorded in `adr:gopher:010`.
 
 ## Risks and Trade-offs
 
@@ -154,6 +162,8 @@ the change while keeping modernization specialist-owned.
   `agents.policy-declared` readiness rule.
 - Kimi discards packaged agents → the constraint envelope duplicated inline in
   both Kimi adapters, with its presence enforced by test.
+- OpenCode does not namespace configured skills → document collisions and retain
+  canonical names rather than introducing wrapper copies.
 
 ## Evolution Plan
 
@@ -176,11 +186,14 @@ the change while keeping modernization specialist-owned.
   every versioned marketplace catalog.
 - Phase 8: adaptive developer policy, schema `4`, migration compatibility for
   versions `1`–`3`, and the developer evidence flow (`adr:gopher:008`) — the
-  existing `0.5.1` release state.
+  existing `0.7.0` release state.
 - Phase 9: planning and development skill loop with schema version `5`
   `[workflow]` policy (`architecture:triage`, `refactor:plan`, developer
   `from_slice`/fast paths, review `auto`/`delta`/`fix_queue`), opt-in
   migration for versions `1`–`4`, and no hook runtime (`adr:gopher:009`).
+- Phase 10: OpenCode npm package, config hook, three native role agents,
+  `review`/`refactor` task adapters, and shared forward-test runner
+  (`adr:gopher:010`).
 - After a real non-Go consumer exists: evaluate extracting `design-patterns`
   and `application-architecture` without changing handoff identifiers.
 - After every stable Go release and at least quarterly: review

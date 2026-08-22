@@ -15,7 +15,8 @@ class ForwardCorpusTest(unittest.TestCase):
         self.assertEqual(107, len(self.cases))
         for harness, config in self.configs.items():
             self.assertEqual(harness, config["harness"])
-            self.assertEqual("gopher@alvadorncorp", config["selector"])
+            selector = "@alvadorncorp/gopher" if harness == "opencode" else "gopher@alvadorncorp"
+            self.assertEqual(selector, config["selector"])
             self.assertTrue(config["requires_local_install"])
             self.assertEqual(f"python3 tests/run_forward_tests.py --harness {harness}", config["runner"])
 

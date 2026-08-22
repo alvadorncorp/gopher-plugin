@@ -12,6 +12,7 @@ notes_paths = [
   ".claude-plugin/marketplace.json",
   ".grok-plugin/marketplace.json",
   ".kimi-plugin/marketplace.json",
+  "package.json",
   "README.md",
   "tests",
 ]
@@ -35,6 +36,10 @@ path = "plugins/gopher/.kimi-plugin/plugin.json"
 type = "plugin"
 path = ".kimi-plugin/plugin.json"
 
+[[groups.default.targets]]
+type = "npm"
+path = "package.json"
+
 [groups.current]
 source = "tag"
 tag = "v{version}"
@@ -44,6 +49,7 @@ notes_paths = [
   ".claude-plugin/marketplace.json",
   ".grok-plugin/marketplace.json",
   ".kimi-plugin",
+  "package.json",
   "README.md",
   "tests",
 ]

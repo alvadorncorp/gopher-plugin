@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import fnmatch
 import json
+import os
 import subprocess
 import sys
 import tempfile
@@ -13,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests/fixtures/forward-tests.json"
 SCHEMA_PATH = ROOT / "tests/fixtures/response-schema.json"
 LAYOUT_PATH = ROOT / "tests/fixtures/expected-layout.json"
-HARNESSES = ("codex", "claude", "grok", "kimi")
+HARNESSES = ("codex", "claude", "grok", "kimi", "opencode")
 
 
 def load_json(path: Path):
@@ -214,8 +215,57 @@ def run_kimi(case, timeout):
     raise RuntimeError("Kimi returned no structured object")
 
 
+def run_opencode(case, timeout):
+    schema = json.dumps(load_json(SCHEMA_PATH), separators=(",", ":"))
+    prompt = (
+        wrapped_prompt(case)
+        + "\n\nSkill identifiers must always use the canonical `gopher:` prefix"
+        " (for example `gopher:architecture`, never a bare `architecture`)."
+        " `authorization_gate` must be exactly one of `none`,"
+        " `approval-required`, or `blocked`."
+        "\n\nResponse JSON schema:\n" + schema
+    )
+    config = {
+        "plugin": [ROOT.as_uri()],
+        "permission": {
+            "edit": "deny",
+            "bash": "deny",
+            "task": "deny",
+            "webfetch": "deny",
+            "websearch": "deny",
+        },
+    }
+    env = {
+        **os.environ,
+        "OPENCODE_CONFIG_CONTENT": json.dumps(config),
+        "OPENCODE_DISABLE_EXTERNAL_SKILLS": "1",
+        "OPENCODE_DISABLE_CLAUDE_CODE_SKILLS": "1",
+    }
+    command = ["opencode", "run", "--dir", str(ROOT), "--format", "json", "--auto", prompt]
+    completed = subprocess.run(command, text=True, capture_output=True, timeout=timeout, env=env)
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or completed.stdout.strip())
+    candidates = []
+    for line in completed.stdout.splitlines():
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") != "text":
+            continue
+        part = event.get("part")
+        if isinstance(part, dict) and isinstance(part.get("text"), str):
+            candidates.append(part["text"])
+    for candidate in reversed(candidates):
+        try:
+            return _coerce_structured(candidate)
+        except (RuntimeError, json.JSONDecodeError):
+            continue
+    raise RuntimeError("OpenCode returned no structured object")
+
+
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex, Claude, Grok, and Kimi")
+    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex, Claude, Grok, Kimi, and OpenCode")
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--harness", action="append", choices=HARNESSES)
     parser.add_argument("--case", default="*")
@@ -241,9 +291,9 @@ def main():
         return 1
     harnesses = args.harness or list(HARNESSES)
     if args.validate_only:
-        print(f"Validated {len(payload['cases'])} forward-test cases for codex, claude, grok, and kimi.")
+        print(f"Validated {len(payload['cases'])} forward-test cases for codex, claude, grok, kimi, and opencode.")
         return 0
-    runners = {"codex": run_codex, "claude": run_claude, "grok": run_grok, "kimi": run_kimi}
+    runners = {"codex": run_codex, "claude": run_claude, "grok": run_grok, "kimi": run_kimi, "opencode": run_opencode}
     results = []
     failed = False
     for harness in harnesses:

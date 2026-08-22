@@ -11,6 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 PLUGIN = ROOT / "plugins/gopher"
 SKILLS = PLUGIN / "skills"
 AGENTS = PLUGIN / "agents"
+OPENCODE_AGENTS = AGENTS / "opencode"
 FIXTURE = ROOT / "tests/fixtures/expected-layout.json"
 
 CODEX_AGENT_KEYS = {"name", "description", "sandbox_mode", "developer_instructions"}
@@ -242,6 +243,53 @@ def validate_agents(expected) -> list[str]:
     return errors
 
 
+def validate_opencode_package(expected) -> list[str]:
+    errors: list[str] = []
+    package_path = ROOT / "package.json"
+    if not package_path.is_file():
+        return ["missing OpenCode package.json"]
+    package = load_json(package_path)
+    if package.get("name") != "@alvadorncorp/gopher":
+        errors.append("OpenCode package name mismatch")
+    if package.get("main") != "plugins/gopher/opencode/plugin.js":
+        errors.append("OpenCode package main mismatch")
+    if package.get("engines", {}).get("opencode") != ">=1.18.15":
+        errors.append("OpenCode package engine mismatch")
+    if package.get("version") != load_json(PLUGIN / ".codex-plugin/plugin.json").get("version"):
+        errors.append("OpenCode package version mismatch")
+    entry = PLUGIN / "opencode/plugin.js"
+    if not entry.is_file():
+        errors.append("missing OpenCode plugin entry")
+    spec = expected.get("agents", {})
+    expected_agents = spec.get("opencode")
+    ids = spec.get("opencode_agent_ids")
+    actual_agents = sorted(path.name for path in OPENCODE_AGENTS.glob("*.md")) if OPENCODE_AGENTS.is_dir() else []
+    if actual_agents != expected_agents:
+        errors.append(f"OpenCode agent mismatch: expected={expected_agents} actual={actual_agents}")
+    if not isinstance(ids, dict):
+        return errors + ["layout fixture declares no OpenCode agent ids"]
+    for role, agent_id in sorted(ids.items()):
+        path = OPENCODE_AGENTS / f"{role}.md"
+        if not path.is_file():
+            continue
+        try:
+            metadata = parse_frontmatter(path)
+        except ValueError as exc:
+            errors.append(f"agents/opencode/{role}.md: {exc}")
+            continue
+        if metadata.get("name") != agent_id:
+            errors.append(f"agents/opencode/{role}.md: name must be {agent_id}")
+        if not metadata.get("description"):
+            errors.append(f"agents/opencode/{role}.md: missing description")
+        body = agent_body(path)
+        skill = {"architect": "architecture", "developer": "developer", "reviewer": "review"}[role]
+        if f"`{skill}` skill" not in body:
+            errors.append(f"agents/opencode/{role}.md: body must load {skill}")
+        if "declared policy may narrow this agent and it can never widen it" not in body:
+            errors.append(f"agents/opencode/{role}.md: missing policy contract")
+    return errors
+
+
 def validate_doctor_catalog() -> list[str]:
     """The rule count and the three profile counts are written out in prose in
     two files. Derive them from the tables so a moved row fails here first."""
@@ -462,6 +510,7 @@ def validate_repository() -> list[str]:
         errors.append(f"review harness mismatch: {harnesses}")
 
     errors.extend(validate_agents(expected))
+    errors.extend(validate_opencode_package(expected))
     errors.extend(validate_doctor_catalog())
 
     return errors
@@ -481,7 +530,7 @@ def main() -> int:
     print(
         f"Repository validation passed ({skill_count} skills, "
         f"{reference_total} references, {agent_count} agents, "
-        f"4 manifests, 4 marketplaces)."
+        f"4 manifests, 4 marketplaces, and 1 OpenCode package)."
     )
     return 0
 

@@ -1,0 +1,35 @@
+{
+  "name": "@alvadorncorp/gopher",
+  "version": "0.7.0",
+  "description": "Evidence-driven Go engineering workflows for design, implementation, diagnosis, security, and multi-lens review.",
+  "license": "MIT",
+  "author": {
+    "name": "Igor Sant'Ana @ Alvadorn Corp"
+  },
+  "type": "module",
+  "main": "plugins/gopher/opencode/plugin.js",
+  "exports": {
+    ".": "./plugins/gopher/opencode/plugin.js"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "plugins/gopher/opencode/",
+    "plugins/gopher/agents/opencode/",
+    "plugins/gopher/skills/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "opencode": ">=1.18.15"
+  },
+  "keywords": [
+    "go",
+    "golang",
+    "opencode",
+    "architecture",
+    "security",
+    "code-review"
+  ]
+}

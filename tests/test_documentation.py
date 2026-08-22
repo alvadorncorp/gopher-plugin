@@ -25,12 +25,14 @@ class DocumentationTest(unittest.TestCase):
         for value in required:
             self.assertTrue(value in text, f"SDD is missing {value!r}")
 
-    def test_readme_documents_identity_skills_and_both_install_flows(self):
+    def test_readme_documents_identity_skills_and_install_flows(self):
         text = (ROOT / "README.md").read_text(encoding="utf-8")
         required = (
             "# Gopher Plugin", "## Skills and ownership", "## Install locally in Codex",
             "## Install locally in Claude Code", "## Install locally in Grok Build",
             "## Install locally in Kimi Code", "gopher@alvadorncorp", "--mode full",
+            "## Install in OpenCode", "@alvadorncorp/gopher", "gopher-reviewer",
+            "does not apply a `gopher:`\nnamespace",
             "All repository documentation is written in English.",
             "## Agents", "plugins/gopher/agents/",
             "Kimi Code does not load packaged plugin agents",
@@ -46,7 +48,7 @@ class DocumentationTest(unittest.TestCase):
             "adaptive-tdd",
             "MIGRATION_AVAILABLE",
             "config --bootstrap",
-            "ships no hooks",
+            "ships no user-triggered hooks",
         )
         for value in required:
             # assertIn would dump the whole README on failure; name the string instead.
