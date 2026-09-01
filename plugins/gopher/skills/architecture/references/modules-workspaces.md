@@ -166,15 +166,22 @@ Under `workspace_mode`:
 
 Under `tidy_mode`, `off` leaves the requirement set as found, `advisory` proposes
 `go mod tidy` and shows its effect with `go mod tidy -diff`, and `required` makes
-a tidy module graph part of the slice: the slice is complete when `go mod tidy`
-is a no-op for every touched module.
+a tidy module graph part of the slice: the slice is complete when re-running
+`go mod tidy` leaves every touched module unchanged, so one tidy that writes
+inside the slice is part of the slice rather than a failure of it.
 
-The first tidy after a module reaches `go 1.27` is not a no-op even when the
+The first tidy after a module declares `go 1.27` writes even when the
 requirement set is unchanged: from that version `go mod tidy` merges duplicate
-`require` blocks, leaving at most one direct and one indirect block. A module
-declaring `go 1.26` keeps its blocks as written, so the reformat lands exactly
-once, on the slice that raises the directive. Separate it from the dependency
-change it would otherwise be read as.
+`require` blocks, leaving at most one direct and one indirect block and
+preserving existing comment blocks. A module declaring `go 1.26` keeps its
+blocks as written, so the reformat lands exactly once, on the slice that raises
+the directive.
+
+That reformat adds and drops no requirement and moves no selected version, so it
+stays inside the slice and needs neither a separate slice nor its own approval.
+Give it its own entry in the slice `change:` field with the `require` block count
+before and after, so a reviewer reading the `go.mod` diff does not classify it as
+a dependency change.
 
 ## `replace` directives and `replace_mode`
 
@@ -222,4 +229,4 @@ and how to respond if a tag is published in error — a new version plus a
 
 Official sources: <https://go.dev/ref/mod>,
 <https://go.dev/doc/tutorial/workspaces>, <https://go.dev/blog/v2-go-modules>.
-Last verified: 2026-08-05.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

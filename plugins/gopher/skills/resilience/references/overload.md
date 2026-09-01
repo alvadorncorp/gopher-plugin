@@ -94,10 +94,11 @@ effect, and the signal that shows which tier is active. A degraded tier that
 has never been exercised is a proposed control, not a proven one, and it stays
 in the residual-risk list until an exercise or a real incident proves it.
 
-## Server limits the toolchain supplies
+## Controls the toolchain moved in Go 1.27
 
 Some admission limits are toolchain defaults rather than project code, so a Go
-upgrade moves them without a diff. On Go 1.27:
+upgrade moves them without a diff. The guard is the toolchain that builds the
+binary; below it, the previous defaults apply and none of these knobs exist.
 
 - `http.Server.MaxHeaderValueCount` bounds how many header values the server
   parses, defaulting to `DefaultMaxHeaderValueCount` (500). It sits beside
@@ -112,10 +113,17 @@ upgrade moves them without a diff. On Go 1.27:
   client priority is now the default, which means a client can influence the
   order in which a loaded server serves its streams. Decide whether that is
   acceptable for a multi-tenant surface rather than inheriting it.
-- Closing an HTTP/1 `Response.Body` now reads it to completion asynchronously up
-  to a conservative limit, so the defensive `io.Copy(io.Discard, resp.Body)`
-  before `Close` is no longer needed to keep a connection reusable. Keep an
-  explicit drain only where the bound matters and say which bound.
+- On the client side, closing an HTTP/1 `Response.Body` now reads it to
+  completion asynchronously up to a conservative limit, so the defensive
+  `io.Copy(io.Discard, resp.Body)` before `Close` is no longer needed to keep a
+  connection reusable. Keep an explicit drain only where a response can exceed
+  what the runtime drains and connection reuse is load-bearing, and state the
+  size bound the drain protects.
+
+Each of the three is a control the project inherited rather than chose. A
+default left in place after this review is a proven control only if its value
+was checked against measured traffic; otherwise report it as a proposed control
+or as residual risk, on the same terms as a degraded tier.
 
 Sources: <https://pkg.go.dev/golang.org/x/time/rate>,
 <https://pkg.go.dev/net/http#MaxBytesReader>,

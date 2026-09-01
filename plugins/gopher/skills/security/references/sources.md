@@ -14,7 +14,10 @@
 | Post-quantum signatures (ML-DSA) | <https://pkg.go.dev/crypto/mldsa> | 2026-08-31 |
 | FIPS 140-3 module status | <https://go.dev/doc/security/fips140> | 2026-08-31 |
 | JSON v2 defaults and options | <https://pkg.go.dev/encoding/json/v2> | 2026-08-31 |
+| Go 1.27 release notes | <https://go.dev/doc/go1.27> | 2026-08-31 |
 
-Re-verify version-sensitive guidance after every stable Go release and at least
-quarterly; `references/go-risk-catalog.md` carries the controls that moved in
-the most recent one. Add third-party sources only when the project adopts the related tool.
+Confirm every version-sensitive detail against the Go toolchain the target
+project declares; these pages track the current release. Re-verify after every
+stable Go release and at least quarterly; `references/go-risk-catalog.md`
+carries the controls that moved in the release it names. Add third-party
+sources only when the project adopts the related tool.

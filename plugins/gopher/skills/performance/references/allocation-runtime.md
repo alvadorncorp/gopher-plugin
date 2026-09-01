@@ -30,16 +30,17 @@ Sources: <https://go.dev/doc/gc-guide#Optimization_guide>,
 
 ## What the toolchain already does for small allocations
 
-From Go 1.27 the compiler emits size-specialized allocation routines. Small
-allocations — under 80 bytes — cost up to 30% less, allocation-heavy programs
-move about 1%, and binaries grow by roughly 60 KB. The gain arrives without a
-code change, so on a Go 1.27 project it is already in the baseline: an
-allocation-shaving change is measured against the new numbers, not credited with
-them.
+A Go 1.27 toolchain emits size-specialized allocation routines, so small
+allocations get cheaper with no code change
+(`references/version-sensitive.md` holds the magnitudes). On a Go 1.27 build the
+gain is already in the baseline: an allocation-shaving change is measured
+against the new numbers, not credited with them. The guard is the toolchain that
+builds the binary, not the declared version.
 
-`GOEXPERIMENT=nosizespecializedmalloc` restores the previous path. It exists to
-bisect a suspected regression and is expected to be removed in Go 1.28, so it is
-never a setting to ship (`references/version-sensitive.md`).
+`GOEXPERIMENT=nosizespecializedmalloc` restores the previous path. An experiment
+knob is a bisection tool, not a shipping configuration, which is the durable
+reason not to ship it; that it is also forecast for removal in Go 1.28 is a
+dated expectation, not a guarantee (`references/version-sensitive.md`).
 
 ## Large value copies in range loops
 

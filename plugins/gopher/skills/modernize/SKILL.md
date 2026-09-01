@@ -41,7 +41,9 @@ DETECT DECLARED VERSION -> RESOLVE TARGET -> COMPATIBILITY BASELINE -> ANALYZE -
 ## Workflow
 
 1. Detect the declared Go and toolchain versions, module and workspace
-   structure, and adopted commands (`references/project-contract.md`).
+   structure, adopted commands, and any `godebug` lines in `go.mod` or
+   `//go:debug` comments in source (`references/project-contract.md`,
+   `references/modules-toolchain.md`).
 2. Resolve the target from `modernize.target_go`; keep `declared` non-upgrading.
 3. Establish a compatibility baseline: a passing build and test run under the
    current versions.
@@ -74,7 +76,7 @@ DETECT DECLARED VERSION -> RESOLVE TARGET -> COMPATIBILITY BASELINE -> ANALYZE -
 - Analyzer names are a versioned surface: derive the roster from
   `go tool fix help` on the active toolchain, never from release notes or
   package documentation, and revalidate any pinned analyzer name on a toolchain
-  upgrade — a withdrawn name fails the invocation.
+  upgrade — a withdrawn name fails the invocation (`references/tooling.md`).
 - Removed `GODEBUG` settings pinned in `go.mod` or `//go:debug` block a
   toolchain upgrade from Go 1.27 onward; audit them before recommending the
   bump (`references/modules-toolchain.md`).

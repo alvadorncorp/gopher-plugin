@@ -31,3 +31,5 @@ declared versions in the target project before relying on a detail here.
   three — and a pinned command naming a withdrawn analyzer fails outright.
 - Keep the resolved target version and every tool version recorded with the
   result so a reviewer can reproduce the modernization exactly.
+
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

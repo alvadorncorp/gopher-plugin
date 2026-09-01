@@ -41,11 +41,13 @@ boundary card maps in `gopher:performance`. Diagnostic-only catalog IDs
 mapping—veto or return to `gopher:design-patterns` rather than inventing an ID.
 Identity interning (`go.canonical-intern`) is not object pooling.
 
-Generic methods, available from Go 1.27, widen what a mapping can reach without
-changing which mapping applies. A transformation over a generic container may
-now be a method on that container rather than a free function taking it, which
-most often affects `go.traversal` and `go.function-strategy`. Two limits bound
-it: an interface method cannot declare type parameters, and a generic method
-cannot implement an interface method — so any shape that must satisfy an
-interface keeps the free-function form. Below the declared-version guard the
-choice does not exist and the baseline is unchanged.
+Generic methods, available from Go 1.27, change how a mapping is realized, not
+which mapping applies. Wherever a row's baseline is a free function over a
+generic container, that function may now be a method on the container instead;
+`go.traversal` and `go.function-strategy` are the common cases, and any row with
+that baseline shape reads the same way. One limit bounds it: a generic method
+cannot implement an interface method, so a shape that must satisfy an interface
+keeps the free-function form. Choosing the method form is not by itself an
+`adapted` disposition; set `accepted`, `adapted`, or `vetoed` from the row's own
+selection rule. Below the declared-version guard the choice does not exist and
+the baseline is unchanged.

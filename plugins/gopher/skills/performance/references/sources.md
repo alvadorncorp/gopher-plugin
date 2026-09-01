@@ -13,6 +13,7 @@ here.
 - `net/http/pprof`: <https://pkg.go.dev/net/http/pprof>
 - `runtime/trace`: <https://pkg.go.dev/runtime/trace>
 - `go tool trace`: <https://go.dev/cmd/trace/>
+- `goroutineleak` profile: <https://pkg.go.dev/runtime/pprof#Profile>
 - Execution traces: <https://go.dev/blog/execution-traces-2024>
 
 ## Runtime, GC, and compiler
@@ -25,7 +26,6 @@ here.
 - Green Tea GC: <https://go.dev/blog/greenteagc>
 - Go 1.26 runtime notes: <https://go.dev/doc/go1.26#runtime>
 - Go 1.27 release notes: <https://go.dev/doc/go1.27>
-- `goroutineleak` profile: <https://pkg.go.dev/runtime/pprof#Profile>
 
 ## Language and standard library
 
@@ -55,7 +55,11 @@ here.
   correct one release earlier.
 - Record the Go version, toolchain, flags, and machine state with every
   measurement so a later reviewer can reproduce it.
-- When an official source deprecates or renames a knob, update the guard and
-  restate the baseline before comparing.
+- When a source reports that a knob was deprecated, renamed, or removed, confirm
+  it against the toolchain in hand before updating the guard — an unknown
+  `GOEXPERIMENT` name errors, an accepted one echoes back, and `go help` and
+  `go tool <cmd> -h` report the flags that release actually registers. A removal
+  a release note forecasts is not a removal (`adr:gopher:011`). Restate the
+  baseline once the guard changes.
 
-Last verified: 2026-08-31.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

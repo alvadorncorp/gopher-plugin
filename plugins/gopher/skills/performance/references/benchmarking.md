@@ -14,7 +14,10 @@
 5. Predeclare the sample count before running. Interleave baseline and candidate
    runs; do not rerun until a difference appears.
 6. Compare with `benchstat` when the project has already adopted it. Current
-   guidance is at least 10 and ideally 20 runs per configuration.
+   guidance is at least 10 and ideally 20 runs per configuration. When it is not
+   adopted, report the per-run distribution and state that no statistical
+   comparison was made; installing a tool needs the authorization gate in
+   `SKILL.md`.
 
 ## Capture commands
 
@@ -46,12 +49,10 @@ static analysis of the algorithm.
 - A microbenchmark does not establish end-to-end value.
 - A single run is weak evidence; thermal state, battery mode, and host load move
   the numbers.
-- A baseline does not survive a toolchain change. Go 1.27 alone made small
-  allocations cheaper by default, moved `encoding/json` v1 onto the v2
-  implementation, and changed both the speed and the encoded output of
-  `compress/flate` — so a size or ratio assertion captured on Go 1.26 is not
-  comparable across the upgrade. Recapture the baseline on the new toolchain
-  before attributing any delta to a code change.
+- Recapture the baseline on the new toolchain before attributing any delta to a
+  code change: time, allocation, and size baselines all cross a toolchain change
+  unreliably. Go 1.27 alone moved all three
+  (`references/version-sensitive.md`).
 - An optimization claim without a stable baseline stays a hypothesis.
 
 Sources: <https://pkg.go.dev/testing#B>,

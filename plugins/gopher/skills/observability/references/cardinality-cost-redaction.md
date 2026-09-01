@@ -79,6 +79,15 @@ request rather than a guarantee. Redact at the emission site, and add a second
 layer in the pipeline. Verify redaction with a test that asserts the absence of
 the forbidden field, since an assertion on presence never catches a leak.
 
+A profile label has a second egress path from Go 1.27. Modules declaring
+`go 1.27` carry `runtime/pprof` goroutine labels into runtime tracebacks and
+`debug=2` stack dumps, including the traceback an unrecovered panic prints into
+ordinary application logs — a different retention regime and a different
+jurisdiction question than the telemetry backend. The absence assertion above
+covers that surface too. When a label the project needs cannot lose the forbidden
+field, `tracebacklabels=0` is the recorded alternative
+(`references/profiles-runtime.md`).
+
 Structured attributes with typed values also reduce the injection surface,
 because a value is carried as data rather than concatenated into a message a
 downstream parser will re-split.
@@ -91,4 +100,4 @@ This skill states what each endpoint reveals, its cost, and applies the
 redaction `gopher:security` rules on; `gopher:security` decides the exposure and
 the controls.
 
-Last verified: 2026-08-05.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

@@ -31,12 +31,14 @@ already-available tool and never installs one.
   ("By default all analyzers are run"). `go tool fix help <name>` documents one
   analyzer, its flags, and a before/after example.
 
+### Pinned analyzer names
+
 Analyzer names are version-matched to the toolchain, and a per-analyzer flag
-naming an analyzer that release does not register fails the invocation. Go 1.27
-removed `-fmtappendf` and renamed `-waitgroup` to `-waitgroupgo`
-(`references/language-apis.md`), so an explicit `[tools].modernize` command, a
-build target, or a CI step that pins analyzer names is revalidated against
-`go tool fix help` on every toolchain upgrade.
+naming an analyzer that release does not register fails the invocation rather
+than degrading. Three places pin them: an explicit `[tools].modernize` command,
+a build target, and a CI step. Revalidate all three against `go tool fix help`
+on every toolchain upgrade; `references/language-apis.md` owns which names each
+release added, removed, and renamed.
 
 ## Skipped fixes
 
@@ -72,3 +74,5 @@ per `references/migration.md`.
 - An unavailable `auto` tool is a limitation. Analysis still reports the
   modernizations it can identify by inspection and marks the rest as
   unverified.
+
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

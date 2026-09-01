@@ -28,6 +28,10 @@ staying inside the declared version and adopted commands.
 
 ## Removed GODEBUG settings are an upgrade gate
 
+This gate applies when the resolved target is Go 1.27 or later, or when the
+report recommends that bump; under `target_go = "declared"` on an older target
+there is nothing to audit.
+
 From Go 1.27 the `go` command reads removed `GODEBUG` settings — `godebug`
 lines in `go.mod` and `//go:debug` comments in source — and accepts them only
 at their final default value. An old value fails the build rather than being
@@ -44,7 +48,9 @@ Go 1.27. The settings removed in that release are `asynctimerchan`,
 `x509keypairleaf`. Each pin encodes a behavior the project deliberately held
 back; removing the pin restores the current default, which is a behavior change
 to verify against the compatibility baseline, and for the TLS and x509 settings
-a security posture change owned by `gopher:security`.
+a security posture change owned by `gopher:security`. A pin at an old value is a
+blocking finding for the bump, not a modernization; name the setting and the
+`go.mod` line.
 
 ## Dependencies
 
@@ -59,3 +65,5 @@ a security posture change owned by `gopher:security`.
   with `encoding/json/jsontext`. Retiring a dependency for a standard-library
   equivalent is a preview-first change like any other, and it is only in scope
   when the declared version provides the package.
+
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

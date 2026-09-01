@@ -16,7 +16,9 @@ toolchain does not expose. Every one of those would have entered a skill as a
 confident, wrong guard.
 
 Record the toolchain the verification ran against on the `Last verified:` line
-of every file touched.
+of each touched reference file that carries one. When part of a file rests on
+release-note documentation instead, say so on that line rather than letting the
+stamp cover it.
 
 ## Where version knowledge lives
 
@@ -130,8 +132,11 @@ python3 -m unittest discover -s tests
 
 ## Recording the result
 
-- Bump `Last verified:` on every file touched, naming the toolchain when the
-  verification ran against one.
+- Bump `Last verified:` on every touched file that carries the line, naming the
+  toolchain when the verification ran against one. The line is a reference-file
+  convention, not a universal one: most reference files and no `SKILL.md` carry
+  it. Add it to a reference file that gained a version-gated claim; do not add it
+  to a `SKILL.md`.
 - Add the release-notes URL to the `sources.md` of each skill that gained a
   fact from it.
 - Write a forecast as a forecast. A removal is recorded only once the toolchain

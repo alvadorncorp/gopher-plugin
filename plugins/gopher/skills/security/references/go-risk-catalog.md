@@ -21,8 +21,10 @@ specific path, precondition, control analysis, and impact.
 
 ## Controls that moved in Go 1.27
 
-A toolchain upgrade changes controls without a code change. Each entry below is
-a question to re-ask, not a finding.
+A toolchain upgrade changes controls without a code change. Re-ask an entry when
+the project builds with Go 1.27 or is preparing to, and only for a family already
+in scope for the mapped data flow; each entry is a question to re-ask, not a
+finding.
 
 | Change | Family | What to re-ask |
 |---|---|---|
@@ -35,7 +37,8 @@ a question to re-ask, not a finding.
 | `http.Server.MaxHeaderValueCount` with `DefaultMaxHeaderValueCount = 500` | Resource exhaustion | Is the default appropriate for this service, and does a legitimate client send more values than it allows? |
 | `encoding/json/v2` rejects invalid UTF-8 and duplicate object names by default, where v1 replaced and allowed them | Inputs, parsing, serialization | Does anything relax that with `jsontext.AllowInvalidUTF8` or the duplicate-name option, reopening a parser-confusion gap between the project and a peer parser? |
 
-The duplicate-name and invalid-UTF-8 defaults are a real hardening, not a
-formality: two parsers disagreeing about which duplicate wins, or one silently
-substituting the replacement character, is how an authorization decision and the
-data it authorized come apart.
+Duplicate names and invalid UTF-8 are the parser-differential case: when the
+project and a peer parser disagree on which duplicate wins, the authorization
+decision and the data it authorized come apart.
+
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

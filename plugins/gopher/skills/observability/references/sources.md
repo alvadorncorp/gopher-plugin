@@ -74,6 +74,10 @@ a metric that halves.
   that was correct one release earlier can be absent in the version in use.
 - Re-run runtime-metric discovery after every Go upgrade, since names can be
   added, renamed, or removed between releases.
+- Re-read the `GODEBUG` history after every Go upgrade for defaults that changed,
+  confirming each against the toolchain in hand. Go 1.27 flipped
+  `tracebacklabels` on, which moved goroutine labels into tracebacks
+  (`references/profiles-runtime.md`).
 - Re-check instrumentation modules after each release for superseded entry
   points, since middleware and interceptor forms are replaced over time.
 - Re-read the alerting and coverage review in `references/dashboards-alerts.md`

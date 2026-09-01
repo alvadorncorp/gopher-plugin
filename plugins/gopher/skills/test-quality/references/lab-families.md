@@ -97,8 +97,8 @@ build and to run, not wall-clock alone: `low`, `medium`, `high`, `highest`.
 - **Tooling**: `go test -race`; goroutine-leak detection through an adopted
   leak-check helper or through the bubble-exit check that `testing/synctest`
   performs when a bubble's goroutines outlive its root; `runtime/pprof`
-  goroutine dumps for an inventory when no helper is adopted. On Go 1.27 and
-  newer the `goroutineleak` profile names goroutines the collector proves cannot
+  goroutine dumps for an inventory when no helper is adopted. When a Go 1.27
+  toolchain builds the tests, the `goroutineleak` profile names goroutines the collector proves cannot
   be unblocked, which is a stronger inventory than a count delta because it
   excludes goroutines that are merely still running.
 - **Proves**: no race was detected on the schedules actually executed, and no
@@ -115,16 +115,15 @@ build and to run, not wall-clock alone: `low`, `medium`, `high`, `highest`.
 - **Tooling**: `testing` with `testdata/`, an explicit `-update` flag, and a
   normalizer for volatile fields such as timestamps and IDs.
 - **Proves**: the output is byte-identical to the reviewed artifact.
-- **Does not prove**: that the artifact is correct. An artifact regenerated
-  without review makes the code its own oracle, which the selection ladder
-  rejects.
-- **Toolchain sensitivity**: a golden artifact can encode toolchain behavior
-  rather than project behavior. Go 1.27 changed the encoded output of
-  `compress/flate` and the error strings of `encoding/json` v1, so a compressed
-  golden file or an asserted JSON error message can go red on a toolchain bump
-  with no code change. Diagnose a golden failure that appears alongside a
-  toolchain upgrade against the upgrade first; regenerating without that check
-  is how a real regression gets absorbed into the artifact.
+- **Does not prove**: that the artifact is correct, or that a difference came
+  from the code. An artifact regenerated without review makes the code its own
+  oracle, which the selection ladder rejects. A golden artifact can also encode
+  toolchain behavior: Go 1.27 changed the encoded output of `compress/flate` and
+  the error strings of `encoding/json` v1, so a compressed golden file or an
+  asserted JSON error message can go red on a toolchain bump with no code
+  change. When a golden test fails, compare the run's recorded toolchain version
+  with the baseline's before regenerating; regenerating without that check is how
+  a real regression gets absorbed into the artifact.
 
 ## `property`
 
@@ -207,7 +206,11 @@ the guard stated, not offered with a caveat.
 | `testing/synctest` as a stable API, with `synctest.Test` and `synctest.Wait` | Go 1.25 | on Go 1.24 the experiment gate and the older entry point apply; earlier, neither exists |
 | `synctest.Sleep`, which advances the synthetic clock and waits in one call | Go 1.27 | pair `time.Sleep` with an explicit `synctest.Wait` |
 | `httptest.NewTestServer(t, handler)`, an in-memory server with automatic cleanup | Go 1.27 | `httptest.NewServer` with an explicit `defer Close`, over a real loopback socket |
-| `goroutineleak` profile for the `race-leak` inventory | Go 1.27 | an adopted leak-check helper, the `synctest` bubble-exit check, or a goroutine-count delta |
+| `goroutineleak` profile for the `race-leak` inventory | Go 1.27 **toolchain**, whatever the module declares | an adopted leak-check helper, the `synctest` bubble-exit check, or a goroutine-count delta |
+
+Every row above is gated by the declared version except the `goroutineleak` one,
+which the building toolchain decides. A fallback that names a `synctest` bubble
+is itself gated by the `synctest` rows above.
 
 `go test -race` needs a supported platform and a working cgo or race-enabled
 toolchain; when the target platform does not support it, that is a stated
@@ -223,8 +226,6 @@ run rather than reaching it:
 FAIL	example.com/stdver [build failed]
 ```
 
-A technique proposed above the project's guard therefore costs a red suite, not
-a caveat.
 
 Sources: <https://pkg.go.dev/testing>, <https://pkg.go.dev/testing/synctest>,
 <https://pkg.go.dev/testing/quick>, <https://pkg.go.dev/testing/iotest>,

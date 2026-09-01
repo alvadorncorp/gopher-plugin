@@ -16,8 +16,9 @@ one reviewable increment at a time.
 ## The `go fix` modernizer suite
 
 The `modernize` analyzers ship inside the Go toolchain and run through `go fix`
-(`references/tooling.md`). Use them only when the active toolchain is Go 1.26
-or newer and compatible with the declared version.
+(`references/tooling.md`). Two separate guards apply: the active toolchain must
+be Go 1.26 or newer for the modernizer to exist at all, and each analyzer's own
+floor must be met by the project's declared version for its rewrite to compile.
 
 Every registered analyzer runs by default — `go tool fix help` states it
 outright — so a bare `go fix ./...` is the whole suite, not a curated subset.
@@ -55,9 +56,13 @@ On a Go 1.27 toolchain the roster is:
 The floor column is the *declared* version the rewritten code needs, distinct
 from the Go 1.26 floor on the active toolchain that makes the modernizer
 available at all. It comes from `go tool fix help <analyzer>`, which states the
-version each rewrite targets, and from the API the rewrite introduces. `embedlit` is the one whose output only compiles on Go 1.27,
-so under `target_go = "declared"` it is out of scope for any project declaring
-less.
+version each rewrite targets, and from the API the rewrite introduces.
+
+Under `target_go = "declared"`, an analyzer whose floor exceeds the resolved
+target is out of scope: its rewrite would not compile. Report it as an
+out-of-scope modernization with the floor stated rather than proposing it. A
+project declaring Go 1.21 therefore has nine of the twenty-six out of scope, and
+`embedlit` is out of scope for every project below Go 1.27.
 
 `appendclipped`, `bloop` and `slicesdelete` are documented in the upstream
 `x/tools` `modernize` pass but are **not** registered in the in-toolchain
@@ -95,7 +100,9 @@ analyzer must be revalidated on every toolchain upgrade.
 Derive the roster from `go tool fix help` on the toolchain actually in hand.
 Release notes and the `x/tools` package documentation describe a different,
 larger set and disagree with the shipped `go fix` on which analyzers exist and
-which run by default.
+which run by default. When the roster in hand differs from the table above,
+report the difference as a limitation so this file can be refreshed
+(`docs/go-release-upgrade.md`).
 
 ## Boundaries
 
@@ -103,3 +110,5 @@ which run by default.
   is handed to `gopher:architecture`.
 - Keep every rewrite behavior-preserving; a modernization that changes observable
   behavior is a code change for `gopher:developer`, not a modernization.
+
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

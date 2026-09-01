@@ -16,9 +16,9 @@ never installs one.
 `frame` (`=== RUN`, `--- FAIL:`), `error` (a `t.Error`/`t.Fatal` message),
 `error-continue` (its continuation lines), and blank for everything else.
 
-It is optional and absent on older toolchains, so a harness that classifies test
-output keys off it when present and falls back to line parsing otherwise. Never
-require the field: a project on Go 1.26 emits none.
+Treat the field as optional when reading `go test -json` output: key off it when
+it is present and fall back to line parsing otherwise, because a project on Go
+1.26 emits none.
 
 ## Mutation
 

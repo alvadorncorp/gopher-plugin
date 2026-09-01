@@ -45,7 +45,7 @@ Load only the references required by the current change:
 | Any change | `project-detection.md`, then `testing.md` + `tooling.md` as the workflow needs them |
 | Construction / options | `construction-options.md` |
 | Errors / values / public local API | `api-errors-values.md` |
-| Idiom policy disputes | `idioms.md` |
+| Idiom policy disputes, or selecting a shape under `latest-compatible` | `idioms.md` |
 | Local reversible refactor | `refactoring.md` |
 | `pattern.*` supplied or returned from `gopher:design-patterns` | `pattern-mappings.md` |
 | Clone, snapshot, intern, or AST-eval construction | `pattern-mappings.md` (or hand off if no `pattern.*`) |

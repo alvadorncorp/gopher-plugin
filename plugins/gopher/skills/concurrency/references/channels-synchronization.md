@@ -10,10 +10,10 @@
   declared version is Go 1.25 or newer: it cannot lose a `Done` on an early
   return, and the `waitgroupgo` modernizer rewrites the old form mechanically.
 - Run the race detector for affected paths; a clean run covers only executed schedules.
-- Channels from the `time` package are unbuffered; from Go 1.27 there is no
+- Channels from the `time` package are unbuffered; a Go 1.27 toolchain offers no
   GODEBUG that changes this (`references/goroutine-lifetime.md`).
 
 Sources: <https://go.dev/ref/mem>, <https://go.dev/doc/articles/race_detector>,
 <https://pkg.go.dev/sync>, <https://pkg.go.dev/sync/atomic>,
 <https://pkg.go.dev/sync#WaitGroup.Go>.
-Last verified: 2026-08-31.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

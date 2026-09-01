@@ -13,6 +13,7 @@ benchmark that established magnitude.
 | Which lock is contended? | `mutex` |
 | Where does the code block? | `block` |
 | How many goroutines exist right now? | `goroutine` (point-in-time handoff evidence for `gopher:concurrency`) |
+| Which goroutines can never be unblocked? | `goroutineleak`, on a Go 1.27 toolchain (handoff evidence for `gopher:concurrency`) |
 
 ## Capture from a benchmark
 
@@ -68,14 +69,15 @@ viewer from another host takes an explicit unspecified address:
 
 ```bash
 go tool trace -http=:6060 trace.out        # localhost only, from Go 1.27
-go tool trace -http=0.0.0.0:6060 trace.out # reachable off-box, and an exposure decision
+go tool trace -http=0.0.0.0:6060 trace.out # reachable off-box; a `gopher:security` decision
 ```
 
 ## Leaked goroutines
 
-From Go 1.27 the `goroutineleak` profile is generally available in
-`runtime/pprof` and at `/debug/pprof/goroutineleak`, reporting stack traces of
-goroutines the garbage collector proves cannot be unblocked. It answers "which
+A Go 1.27 toolchain provides the `goroutineleak` profile in `runtime/pprof` and
+at `/debug/pprof/goroutineleak`, reporting stack traces of goroutines the garbage
+collector proves cannot be unblocked. The guard is the building toolchain, not
+the declared version: a module declaring `go 1.24` built with Go 1.27 has it. It answers "which
 goroutines are stuck", not "why they are stuck", and the diagnosis belongs to
 `gopher:concurrency`. Its exposure is a decision owned by `gopher:security` like
 any other pprof endpoint.

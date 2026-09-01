@@ -34,22 +34,21 @@ maps its errors into exactly one.
 | Terminal | The effect will never apply: HTTP 400, a validation failure, `context.Canceled` from the caller | Fail fast and report |
 | Ambiguous | The outcome is unknown: timeout, connection reset mid-response, `context.DeadlineExceeded` on a write | Retry only when the operation is idempotent; otherwise reconcile |
 
-Use `errors.Is` and `errors.As` over string matching, and wrap with `%w` so the
-class survives the call chain. `net.Error` and the `context` sentinel errors
-carry most of the signal a Go client needs.
+Use `errors.Is` and `errors.As` over string matching, matching sentinels before
+inspecting concrete types, and wrap with `%w` so the class survives the call
+chain. `net.Error` and the `context` sentinel errors carry most of the signal a
+Go client needs.
 
 ## A wrapped error can stop being wrapped
 
-An error taxonomy is written against the errors a release actually produces. Go
-1.27 changed one: `net.UnixConn` read methods return `io.EOF` directly instead of
-wrapping it in a `*net.OpError`. Classification that reached for `*net.OpError`
-first, or that type-switched before `errors.Is(err, io.EOF)`, silently
-reclassifies a normal end-of-stream as a transport failure — and a transport
-failure is usually retryable in the taxonomy above, so the cost is a retry loop
-on a closed connection.
-
-Match sentinels with `errors.Is` before inspecting concrete types, and re-check
-the taxonomy against the release notes on every toolchain upgrade.
+A taxonomy is written against the errors a release actually produces, so a
+toolchain upgrade can silently remap a class. Go 1.27 did: `net.UnixConn` read
+methods return `io.EOF` directly instead of wrapping it in a `*net.OpError`.
+Classification that reached for `*net.OpError` first lands a normal
+end-of-stream in Retryable, or in Ambiguous against an idempotent read — either
+way it retries, so the cost is a retry loop against a connection that has
+already ended. Re-verify the sentinels a class depends on against the toolchain
+in hand on every upgrade; `references/sources.md` holds the cadence.
 
 ## Idempotency
 
@@ -137,4 +136,4 @@ failure keeps its blast radius.
 
 Sources: <https://pkg.go.dev/context>, <https://pkg.go.dev/net/http#Server>,
 <https://pkg.go.dev/errors>.
-Last verified: 2026-08-31.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

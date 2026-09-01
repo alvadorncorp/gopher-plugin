@@ -106,25 +106,38 @@ decision.
 ## macOS deployment target
 
 From Go 1.27 the linker takes `-macos` and `-macsdk` to set the OS and SDK
-versions recorded in the Mach-O `LC_BUILD_VERSION` load command, defaulting to
-the oldest supported macOS (13.0.0) and a recent SDK (26.2.0):
+versions recorded in the Mach-O `LC_BUILD_VERSION` load command. `go tool link
+-h` confirms both flags but prints no defaults; the Go 1.27 release notes give
+them as the oldest supported macOS (13.0.0) and the toolchain's SDK (26.2.0),
+which is release-note documentation rather than a toolchain observation.
 
 ```bash
 go build -ldflags '-macos=14.0.0 -macsdk=26.2.0' ./...
 ```
 
+Passing `-macsdk` explicitly pins the recorded SDK so a later toolchain upgrade
+does not move it under a fixed deployment claim.
+
 This matters for a cgo target because `LC_BUILD_VERSION` is what the dynamic
-loader and the C toolchain use to decide availability. A binary linking a
-system framework whose symbol is newer than the recorded OS version is a
-deployment-time failure on an older host, not a build-time one, so a darwin row
-in the matrix below records the OS and SDK versions it was built against and the
-oldest host it is claimed to run on.
+loader and the C toolchain use to decide availability. A binary linking a system
+framework whose symbol is newer than the recorded OS version fails at deployment
+time on an older host, not at build time.
+
+Every darwin row in the matrix below therefore records its deployment target:
+the OS and SDK versions it was built against and the oldest macOS version it is
+claimed to run on, each in the `major.minor.patch` form the linker takes. Read
+the recorded pair back out of the produced binary with the Mach-O inspection
+tool the project already uses; a value contradicting the claimed oldest host is
+a build-matrix finding, and reading it back is also the only way to observe the
+defaults. Below Go 1.27 the values are whatever the toolchain records and are
+not selectable per build, so record the observed defaults and report a required
+deployment target the toolchain cannot set as a limitation.
 
 ## Matrix table
 
 Fill one row per shipped target. This table is the deliverable of the
 `build-matrix` mode.
 
-| `GOOS`/`GOARCH` | `CGO_ENABLED` | `CC` | Link mode | Libraries | Verified |
-|---|---|---|---|---|---|
-| | | | internal / external / static | | yes / unavailable |
+| `GOOS`/`GOARCH` | `CGO_ENABLED` | `CC` | Link mode | Libraries | Deployment target | Verified |
+|---|---|---|---|---|---|---|
+| | | | internal / external / static | | darwin: OS / SDK / oldest host | yes / unavailable |

@@ -47,6 +47,8 @@ detail here.
 ## Fault injection for control tests
 
 - `net/http/httptest`: <https://pkg.go.dev/net/http/httptest>
+- `net/http` server limits: <https://pkg.go.dev/net/http#Server>
+- Go 1.27 release notes: <https://go.dev/doc/go1.27>
 - `http.RoundTripper`: <https://pkg.go.dev/net/http#RoundTripper>
 - `net.Pipe`: <https://pkg.go.dev/net#Pipe>
 - `testing/synctest`: <https://pkg.go.dev/testing/synctest>
@@ -66,4 +68,4 @@ detail here.
 - Re-verify the declared objectives with the project on each assessment; an
   objective that has changed invalidates the alerting derived from it.
 
-Last verified: 2026-08-05.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

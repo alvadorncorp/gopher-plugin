@@ -19,6 +19,8 @@ unrelated rewrites to that skill. When a required input remains unknown after
 project detection, report the missing evidence and pause idiom selection until
 compatibility or adoption is evidenced.
 
+## Baseline idioms
+
 - Prefer useful zero values, literals, and explicit constructors.
 - Start with concrete types; introduce an interface at the consumer only when
   real variability, a test/process boundary, or compatibility seam exists.
@@ -32,12 +34,15 @@ compatibility or adoption is evidenced.
 - Use `defer` when lifetime is clear and its cost is appropriate for the path.
 - Prefer `wg.Go` over `wg.Add(1)` / `go` / `defer wg.Done()` from Go 1.25.
 
-## Shapes that Go 1.27 makes available
+## Declared-version-gated shapes
 
-Each entry is capped by the declared version like every other idiom: on a
-project declaring less, the shape is rejected with the guard stated, and the
-compiler enforces it — `go test` fails the build on a standard-library symbol
-newer than the declared version.
+Each entry selects a shape for new or directly changed code; converting existing
+occurrences is `gopher:modernize` work. Every entry is capped by the declared
+version like any other idiom: on a project declaring less, the shape is rejected
+with the guard stated. For the standard-library entries the compiler enforces
+the cap, so `go test` fails the build rather than reaching review.
+
+The shapes below arrived in Go 1.27.
 
 - **Generic methods.** A method may declare its own type parameters, so a
   transformation over a generic container no longer has to be a free function
@@ -47,10 +52,10 @@ newer than the declared version.
   still needs the free-function form.
 - **Promoted field names in composite literals.** A key may be any valid field
   selector, so an embedded field initializes without a nested literal:
-  `T{X: 1}` where `X` is promoted from an embedded `U`. The `embedlit`
-  modernizer rewrites the old form mechanically.
-- **Generalized function type inference**, which now applies wherever a generic
-  function is assigned to a variable or converted to a matching function type.
+  `T{X: 1}` where `X` is promoted from an embedded `U`.
+- **Generalized function type inference**: omit explicit type arguments where a
+  generic function is assigned to a variable or converted to a matching function
+  type.
 - `strings.CutLast` and `bytes.CutLast`, for splitting on the last separator
   instead of `LastIndex` plus manual slicing.
 - `hash/maphash.Hasher` and `ComparableHasher`, for a hash and equality contract

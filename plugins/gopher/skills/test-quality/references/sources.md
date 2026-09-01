@@ -11,6 +11,8 @@ installed in the target project before relying on a detail here.
   https://pkg.go.dev/cmd/cover
 - Gremlins mutation testing for Go: https://github.com/go-gremlins/gremlins
 
+- `go test -json` event stream: <https://pkg.go.dev/cmd/test2json>
+
 ## Review cadence
 
 - Re-check the coverage workflow and flags when the project upgrades the Go
