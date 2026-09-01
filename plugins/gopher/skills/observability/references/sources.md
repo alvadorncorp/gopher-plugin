@@ -34,6 +34,7 @@ a metric that halves.
 - `runtime/metrics`: <https://pkg.go.dev/runtime/metrics>
 - `runtime/pprof`: <https://pkg.go.dev/runtime/pprof>
 - `net/http/pprof`: <https://pkg.go.dev/net/http/pprof>
+- `GODEBUG` history, including `tracebacklabels`: <https://go.dev/doc/godebug>
 - `expvar`: <https://pkg.go.dev/expvar>
 - Go diagnostics overview: <https://go.dev/doc/diagnostics>
 
@@ -80,4 +81,4 @@ a metric that halves.
 - Record the resolved versions with every recommendation so a later reviewer can
   tell whether the advice still applies.
 
-Last verified: 2026-08-05.
+Last verified: 2026-08-31.

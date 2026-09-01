@@ -9,6 +9,17 @@ never installs one.
 - Always available through the Go toolchain: `go test -coverprofile` and
   `go tool cover`. No discovery is needed; record the Go version used.
 
+## Machine-readable test output
+
+`go test -json` is always available and needs no discovery. From Go 1.27 an
+`"Action":"output"` event may carry an `OutputType` field distinguishing
+`frame` (`=== RUN`, `--- FAIL:`), `error` (a `t.Error`/`t.Fatal` message),
+`error-continue` (its continuation lines), and blank for everything else.
+
+It is optional and absent on older toolchains, so a harness that classifies test
+output keys off it when present and falls back to line parsing otherwise. Never
+require the field: a project on Go 1.26 emits none.
+
 ## Mutation
 
 1. An explicit command in `[tools].mutation` (used verbatim).

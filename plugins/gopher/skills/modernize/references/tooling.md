@@ -27,8 +27,16 @@ already-available tool and never installs one.
   `-<analyzer>=false` runs every analyzer except that one. Use this to isolate
   one increment (`references/migration.md`) or to split a high-volume analyzer
   out of a review pass (`references/language-apis.md`).
-- `go tool fix help` — lists every registered analyzer, default-enabled or not.
-  `go tool fix help <name>` documents one analyzer and its flags.
+- `go tool fix help` — lists every registered analyzer and states the default
+  ("By default all analyzers are run"). `go tool fix help <name>` documents one
+  analyzer, its flags, and a before/after example.
+
+Analyzer names are version-matched to the toolchain, and a per-analyzer flag
+naming an analyzer that release does not register fails the invocation. Go 1.27
+removed `-fmtappendf` and renamed `-waitgroup` to `-waitgroupgo`
+(`references/language-apis.md`), so an explicit `[tools].modernize` command, a
+build target, or a CI step that pins analyzer names is revalidated against
+`go tool fix help` on every toolchain upgrade.
 
 ## Skipped fixes
 

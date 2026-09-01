@@ -38,6 +38,19 @@ Use `errors.Is` and `errors.As` over string matching, and wrap with `%w` so the
 class survives the call chain. `net.Error` and the `context` sentinel errors
 carry most of the signal a Go client needs.
 
+## A wrapped error can stop being wrapped
+
+An error taxonomy is written against the errors a release actually produces. Go
+1.27 changed one: `net.UnixConn` read methods return `io.EOF` directly instead of
+wrapping it in a `*net.OpError`. Classification that reached for `*net.OpError`
+first, or that type-switched before `errors.Is(err, io.EOF)`, silently
+reclassifies a normal end-of-stream as a transport failure — and a transport
+failure is usually retryable in the taxonomy above, so the cost is a retry loop
+on a closed connection.
+
+Match sentinels with `errors.Is` before inspecting concrete types, and re-check
+the taxonomy against the release notes on every toolchain upgrade.
+
 ## Idempotency
 
 A retry is safe when the operation is idempotent or carries an idempotency key.
@@ -124,4 +137,4 @@ failure keeps its blast radius.
 
 Sources: <https://pkg.go.dev/context>, <https://pkg.go.dev/net/http#Server>,
 <https://pkg.go.dev/errors>.
-Last verified: 2026-08-05.
+Last verified: 2026-08-31.

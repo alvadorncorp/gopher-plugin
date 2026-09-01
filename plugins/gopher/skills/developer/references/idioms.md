@@ -30,6 +30,39 @@ compatibility or adoption is evidenced.
 - Make resource ownership and `Close` responsibility explicit.
 - Keep package APIs cohesive and names meaningful at the call site.
 - Use `defer` when lifetime is clear and its cost is appropriate for the path.
+- Prefer `wg.Go` over `wg.Add(1)` / `go` / `defer wg.Done()` from Go 1.25.
 
-Official source: <https://go.dev/wiki/CodeReviewComments>.
-Last verified: 2026-07-14.
+## Shapes that Go 1.27 makes available
+
+Each entry is capped by the declared version like every other idiom: on a
+project declaring less, the shape is rejected with the guard stated, and the
+compiler enforces it — `go test` fails the build on a standard-library symbol
+newer than the declared version.
+
+- **Generic methods.** A method may declare its own type parameters, so a
+  transformation over a generic container no longer has to be a free function
+  taking the container. Two limits are part of the rule, not footnotes: an
+  interface method cannot declare type parameters, and a generic method cannot
+  implement an interface method. A shape that needs to satisfy an interface
+  still needs the free-function form.
+- **Promoted field names in composite literals.** A key may be any valid field
+  selector, so an embedded field initializes without a nested literal:
+  `T{X: 1}` where `X` is promoted from an embedded `U`. The `embedlit`
+  modernizer rewrites the old form mechanically.
+- **Generalized function type inference**, which now applies wherever a generic
+  function is assigned to a variable or converted to a matching function type.
+- `strings.CutLast` and `bytes.CutLast`, for splitting on the last separator
+  instead of `LastIndex` plus manual slicing.
+- `hash/maphash.Hasher` and `ComparableHasher`, for a hash and equality contract
+  a data structure can take as a parameter.
+- `net/url.URL.Clone` and `url.Values.Clone`, replacing hand-written deep copies.
+- `database/sql.ConvertAssign` and `driver.RowsColumnScanner`, for a driver that
+  needs `Rows.Scan` conversions or a direct scan into the caller's destination.
+- `math/big.Int.Divide`, for quotient and remainder under an explicit rounding
+  mode rather than a correction after the fact.
+- The standard-library `uuid` package (RFC 9562), which can retire a third-party
+  dependency. Retiring the dependency itself is `gopher:modernize` work.
+
+Official sources: <https://go.dev/wiki/CodeReviewComments>,
+<https://go.dev/doc/go1.27>.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

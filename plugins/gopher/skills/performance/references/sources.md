@@ -24,6 +24,8 @@ here.
 - Compiler diagnostics: <https://go.dev/src/cmd/compile/README>
 - Green Tea GC: <https://go.dev/blog/greenteagc>
 - Go 1.26 runtime notes: <https://go.dev/doc/go1.26#runtime>
+- Go 1.27 release notes: <https://go.dev/doc/go1.27>
+- `goroutineleak` profile: <https://pkg.go.dev/runtime/pprof#Profile>
 
 ## Language and standard library
 
@@ -56,4 +58,4 @@ here.
 - When an official source deprecates or renames a knob, update the guard and
   restate the baseline before comparing.
 
-Last verified: 2026-07-28.
+Last verified: 2026-08-31.

@@ -103,6 +103,23 @@ State the exact requirement, for example the compiler triple, the library
 version, and the sysroot, so the target becomes buildable by a deliberate
 decision.
 
+## macOS deployment target
+
+From Go 1.27 the linker takes `-macos` and `-macsdk` to set the OS and SDK
+versions recorded in the Mach-O `LC_BUILD_VERSION` load command, defaulting to
+the oldest supported macOS (13.0.0) and a recent SDK (26.2.0):
+
+```bash
+go build -ldflags '-macos=14.0.0 -macsdk=26.2.0' ./...
+```
+
+This matters for a cgo target because `LC_BUILD_VERSION` is what the dynamic
+loader and the C toolchain use to decide availability. A binary linking a
+system framework whose symbol is newer than the recorded OS version is a
+deployment-time failure on an older host, not a build-time one, so a darwin row
+in the matrix below records the OS and SDK versions it was built against and the
+oldest host it is claimed to run on.
+
 ## Matrix table
 
 Fill one row per shipped target. This table is the deliverable of the

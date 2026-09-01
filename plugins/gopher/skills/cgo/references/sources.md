@@ -48,6 +48,7 @@ version from the project before proposing a mechanism.
 | `GOEXPERIMENT=cgocheck2` | Go 1.21 | The stronger check is selected with `GODEBUG=cgocheck=2` instead |
 | `runtime.Pinner` | Go 1.21 | Copy into C memory or use a handle; pinning is unavailable |
 | `runtime.AddCleanup` | Go 1.24 | `runtime.SetFinalizer` remains the backstop, with its hazards |
+| Linker `-macos` and `-macsdk` for the Mach-O `LC_BUILD_VERSION` | Go 1.27 | The recorded OS and SDK versions are whatever the toolchain defaults to, and are not selectable per build |
 
 ## Review cadence
 
@@ -62,4 +63,4 @@ version from the project before proposing a mechanism.
 - Re-check the build matrix whenever a target, a compiler, or a linked library
   version changes, because each of those changes the ABI the boundary assumes.
 
-Last verified: 2026-08-05.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

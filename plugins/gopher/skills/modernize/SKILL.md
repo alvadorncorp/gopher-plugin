@@ -71,6 +71,13 @@ DETECT DECLARED VERSION -> RESOLVE TARGET -> COMPATIBILITY BASELINE -> ANALYZE -
   comments, and any change that touches a contract.
 - An active toolchain below Go 1.26 makes the `go fix` modernizer unavailable;
   report it as a limitation rather than substituting the legacy `go fix` tool.
+- Analyzer names are a versioned surface: derive the roster from
+  `go tool fix help` on the active toolchain, never from release notes or
+  package documentation, and revalidate any pinned analyzer name on a toolchain
+  upgrade — a withdrawn name fails the invocation.
+- Removed `GODEBUG` settings pinned in `go.mod` or `//go:debug` block a
+  toolchain upgrade from Go 1.27 onward; audit them before recommending the
+  bump (`references/modules-toolchain.md`).
 - A partial apply (some fixes applied, some remain) is
   `COMPLETE_WITH_LIMITATIONS`, never a silent `COMPLETE`; name the residue.
 

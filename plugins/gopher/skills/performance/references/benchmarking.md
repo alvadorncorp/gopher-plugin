@@ -46,9 +46,16 @@ static analysis of the algorithm.
 - A microbenchmark does not establish end-to-end value.
 - A single run is weak evidence; thermal state, battery mode, and host load move
   the numbers.
+- A baseline does not survive a toolchain change. Go 1.27 alone made small
+  allocations cheaper by default, moved `encoding/json` v1 onto the v2
+  implementation, and changed both the speed and the encoded output of
+  `compress/flate` — so a size or ratio assertion captured on Go 1.26 is not
+  comparable across the upgrade. Recapture the baseline on the new toolchain
+  before attributing any delta to a code change.
 - An optimization claim without a stable baseline stays a hypothesis.
 
 Sources: <https://pkg.go.dev/testing#B>,
 <https://pkg.go.dev/testing#B.ReportAllocs>,
-<https://pkg.go.dev/golang.org/x/perf/cmd/benchstat>.
-Last verified: 2026-07-28.
+<https://pkg.go.dev/golang.org/x/perf/cmd/benchstat>,
+<https://go.dev/doc/go1.27>.
+Last verified: 2026-08-31.

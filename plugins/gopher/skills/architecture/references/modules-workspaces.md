@@ -169,6 +169,13 @@ Under `tidy_mode`, `off` leaves the requirement set as found, `advisory` propose
 a tidy module graph part of the slice: the slice is complete when `go mod tidy`
 is a no-op for every touched module.
 
+The first tidy after a module reaches `go 1.27` is not a no-op even when the
+requirement set is unchanged: from that version `go mod tidy` merges duplicate
+`require` blocks, leaving at most one direct and one indirect block. A module
+declaring `go 1.26` keeps its blocks as written, so the reformat lands exactly
+once, on the slice that raises the directive. Separate it from the dependency
+change it would otherwise be read as.
+
 ## `replace` directives and `replace_mode`
 
 A `replace` directive in a published module applies to builds of that module

@@ -63,6 +63,30 @@ keep captures bounded and aligned to the incident. A project on Go 1.25 or newer
 may use `runtime/trace.FlightRecorder` for an intermittent symptom; an older
 declared version needs a bounded direct capture.
 
+From Go 1.27, `-http` with only a port listens on localhost alone. Reaching the
+viewer from another host takes an explicit unspecified address:
+
+```bash
+go tool trace -http=:6060 trace.out        # localhost only, from Go 1.27
+go tool trace -http=0.0.0.0:6060 trace.out # reachable off-box, and an exposure decision
+```
+
+## Leaked goroutines
+
+From Go 1.27 the `goroutineleak` profile is generally available in
+`runtime/pprof` and at `/debug/pprof/goroutineleak`, reporting stack traces of
+goroutines the garbage collector proves cannot be unblocked. It answers "which
+goroutines are stuck", not "why they are stuck", and the diagnosis belongs to
+`gopher:concurrency`. Its exposure is a decision owned by `gopher:security` like
+any other pprof endpoint.
+
+## Symbols do not survive a toolchain upgrade
+
+Go 1.27 generates simpler, inlining-independent names for function literals and
+may share code between instances of one literal. Closure frames therefore do not
+line up between a Go 1.26 profile and a Go 1.27 profile. Compare profiles across
+a toolchain change only after recapturing the baseline.
+
 ## Limits to report
 
 - Profiles are sampled or point-in-time views, not exact event counts.
@@ -73,5 +97,6 @@ declared version needs a bounded direct capture.
 Sources: <https://pkg.go.dev/runtime/pprof>, <https://pkg.go.dev/net/http/pprof>,
 <https://pkg.go.dev/runtime/trace>, <https://go.dev/cmd/trace/>,
 <https://go.dev/doc/diagnostics>,
-<https://go.dev/blog/execution-traces-2024>.
-Last verified: 2026-07-28.
+<https://go.dev/blog/execution-traces-2024>,
+<https://go.dev/doc/go1.27>.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

@@ -10,6 +10,11 @@
 | Cryptographic randomness | <https://pkg.go.dev/crypto/rand> | 2026-07-14 |
 | Filesystem paths | <https://pkg.go.dev/path/filepath> | 2026-07-14 |
 | HTTP client/server | <https://pkg.go.dev/net/http> | 2026-07-14 |
+| `GODEBUG` history and removals | <https://go.dev/doc/godebug> | 2026-08-31 |
+| Post-quantum signatures (ML-DSA) | <https://pkg.go.dev/crypto/mldsa> | 2026-08-31 |
+| FIPS 140-3 module status | <https://go.dev/doc/security/fips140> | 2026-08-31 |
+| JSON v2 defaults and options | <https://pkg.go.dev/encoding/json/v2> | 2026-08-31 |
 
 Re-verify version-sensitive guidance after every stable Go release and at least
-quarterly. Add third-party sources only when the project adopts the related tool.
+quarterly; `references/go-risk-catalog.md` carries the controls that moved in
+the most recent one. Add third-party sources only when the project adopts the related tool.

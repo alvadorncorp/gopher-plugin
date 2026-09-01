@@ -94,7 +94,31 @@ effect, and the signal that shows which tier is active. A degraded tier that
 has never been exercised is a proposed control, not a proven one, and it stays
 in the residual-risk list until an exercise or a real incident proves it.
 
+## Server limits the toolchain supplies
+
+Some admission limits are toolchain defaults rather than project code, so a Go
+upgrade moves them without a diff. On Go 1.27:
+
+- `http.Server.MaxHeaderValueCount` bounds how many header values the server
+  parses, defaulting to `DefaultMaxHeaderValueCount` (500). It sits beside
+  `MaxHeaderBytes` and closes a different gap: many small headers rather than a
+  few large ones. Counting is asymmetric — comma-separated values on one line
+  count once, the same values sent as separate lines count individually — so a
+  legitimate client that repeats a header can hit the limit where an equivalent
+  request would not. Raise it from measured client behavior, not from a guess.
+- `http.Server.DisableClientPriority` turns off RFC 9218 client priority
+  signals, restoring round-robin service. It takes effect only on HTTP/2 and
+  only when no custom write scheduler is set; otherwise it is a no-op. Honoring
+  client priority is now the default, which means a client can influence the
+  order in which a loaded server serves its streams. Decide whether that is
+  acceptable for a multi-tenant surface rather than inheriting it.
+- Closing an HTTP/1 `Response.Body` now reads it to completion asynchronously up
+  to a conservative limit, so the defensive `io.Copy(io.Discard, resp.Body)`
+  before `Close` is no longer needed to keep a connection reusable. Keep an
+  explicit drain only where the bound matters and say which bound.
+
 Sources: <https://pkg.go.dev/golang.org/x/time/rate>,
 <https://pkg.go.dev/net/http#MaxBytesReader>,
-<https://pkg.go.dev/golang.org/x/sync/semaphore>.
-Last verified: 2026-08-05.
+<https://pkg.go.dev/golang.org/x/sync/semaphore>,
+<https://pkg.go.dev/net/http#Server>.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

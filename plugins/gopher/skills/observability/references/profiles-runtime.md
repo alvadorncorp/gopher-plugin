@@ -19,6 +19,34 @@ Mutex and block profiles stay inert until their sampling rates are enabled, so
 "the endpoint is exposed" and "the profile has data" are separate states. Enable
 a rate deliberately, since both add per-event cost on contended paths.
 
+From Go 1.27 a sixth kind is generally available: `goroutineleak`, served at
+`/debug/pprof/goroutineleak`, reporting stacks of goroutines the collector
+proves can never be unblocked. It is computed during garbage collection rather
+than sampled, so it carries no steady-state cost, and its content is the same
+class of internal detail as a goroutine dump. Interpreting one is
+`gopher:concurrency` work; deciding who may fetch it is not.
+
+## Goroutine labels reach tracebacks from Go 1.27
+
+The `tracebacklabels` GODEBUG arrived in Go 1.26 defaulting to off. Go 1.27
+changes the default to on, so `runtime/pprof` goroutine labels appear in the
+goroutine status header of runtime tracebacks and of `debug=2` stack dumps —
+including the traceback printed by an unrecovered panic, which usually lands in
+ordinary application logs.
+
+This widens the blast radius of a label. A label chosen for profile
+dimensionality now also becomes crash-log content, so a label carrying a tenant
+id, an account identifier, or a request attribute changes what an incident log
+contains. Go documents `tracebacklabels=0` as an opt-out expected to be kept
+indefinitely for exactly this case.
+
+Two consequences for signal design:
+
+- Label keys and values fall under the redaction rules in
+  `references/cardinality-cost-redaction.md`, not only the cardinality rules.
+- A project that cannot redact its labels sets `tracebacklabels=0` deliberately
+  and records why, rather than discovering the exposure from a log.
+
 A continuous-profiling pipeline is a signal like any other: it needs a contract
 in `references/signal-contracts.md`, a named consumer, a retention period, and a
 cost line. A profiler running because it was easy to enable is cost without a
@@ -84,4 +112,4 @@ observability work. Choosing the value is not.
 Deliver the captured artifact together with the workload, Go version, capture
 window, and sampling rate, so the receiving skill can reproduce the measurement.
 
-Last verified: 2026-08-05.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.

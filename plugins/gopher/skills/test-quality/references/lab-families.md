@@ -97,7 +97,10 @@ build and to run, not wall-clock alone: `low`, `medium`, `high`, `highest`.
 - **Tooling**: `go test -race`; goroutine-leak detection through an adopted
   leak-check helper or through the bubble-exit check that `testing/synctest`
   performs when a bubble's goroutines outlive its root; `runtime/pprof`
-  goroutine dumps for an inventory when no helper is adopted.
+  goroutine dumps for an inventory when no helper is adopted. On Go 1.27 and
+  newer the `goroutineleak` profile names goroutines the collector proves cannot
+  be unblocked, which is a stronger inventory than a count delta because it
+  excludes goroutines that are merely still running.
 - **Proves**: no race was detected on the schedules actually executed, and no
   goroutine was outstanding at the checked point.
 - **Does not prove**: race freedom in general. The detector reports only what the
@@ -115,6 +118,13 @@ build and to run, not wall-clock alone: `low`, `medium`, `high`, `highest`.
 - **Does not prove**: that the artifact is correct. An artifact regenerated
   without review makes the code its own oracle, which the selection ladder
   rejects.
+- **Toolchain sensitivity**: a golden artifact can encode toolchain behavior
+  rather than project behavior. Go 1.27 changed the encoded output of
+  `compress/flate` and the error strings of `encoding/json` v1, so a compressed
+  golden file or an asserted JSON error message can go red on a toolchain bump
+  with no code change. Diagnose a golden failure that appears alongside a
+  toolchain upgrade against the upgrade first; regenerating without that check
+  is how a real regression gets absorbed into the artifact.
 
 ## `property`
 
@@ -195,13 +205,30 @@ the guard stated, not offered with a caveat.
 | `go test -shuffle` | Go 1.17 | ordering variation needs an external harness |
 | `testing/synctest` behind `GOEXPERIMENT=synctest`, with `synctest.Run` | Go 1.24 | no bubble; `deterministic-concurrency` runs on an injected clock |
 | `testing/synctest` as a stable API, with `synctest.Test` and `synctest.Wait` | Go 1.25 | on Go 1.24 the experiment gate and the older entry point apply; earlier, neither exists |
+| `synctest.Sleep`, which advances the synthetic clock and waits in one call | Go 1.27 | pair `time.Sleep` with an explicit `synctest.Wait` |
+| `httptest.NewTestServer(t, handler)`, an in-memory server with automatic cleanup | Go 1.27 | `httptest.NewServer` with an explicit `defer Close`, over a real loopback socket |
+| `goroutineleak` profile for the `race-leak` inventory | Go 1.27 | an adopted leak-check helper, the `synctest` bubble-exit check, or a goroutine-count delta |
 
 `go test -race` needs a supported platform and a working cgo or race-enabled
 toolchain; when the target platform does not support it, that is a stated
 limitation on the `race-leak` family rather than a silent skip.
 
+The guard is enforced by the toolchain, not only by review. `stdversion` is part
+of the high-confidence vet subset `go test` runs before building the test
+binary, so a standard-library symbol newer than the declared version fails the
+run rather than reaching it:
+
+```text
+./s.go:5:46: strings.CutLast requires go1.27 or later (module is go1.25)
+FAIL	example.com/stdver [build failed]
+```
+
+A technique proposed above the project's guard therefore costs a red suite, not
+a caveat.
+
 Sources: <https://pkg.go.dev/testing>, <https://pkg.go.dev/testing/synctest>,
 <https://pkg.go.dev/testing/quick>, <https://pkg.go.dev/testing/iotest>,
 <https://pkg.go.dev/testing/fstest>, <https://pkg.go.dev/net/http/httptest>,
-<https://go.dev/doc/articles/race_detector>.
-Last verified: 2026-08-05.
+<https://go.dev/doc/articles/race_detector>,
+<https://go.dev/doc/go1.27>.
+Last verified: 2026-08-31 against a local go1.27.0 toolchain.
