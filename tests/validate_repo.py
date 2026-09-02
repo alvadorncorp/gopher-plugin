@@ -382,6 +382,7 @@ def validate_repository() -> list[str]:
     codex_market = load_json(ROOT / ".agents/plugins/marketplace.json")
     claude_market = load_json(ROOT / ".claude-plugin/marketplace.json")
     grok_market = load_json(ROOT / ".grok-plugin/marketplace.json")
+    omp_market = load_json(ROOT / ".omp-plugin/marketplace.json")
     kimi_market = load_json(ROOT / ".kimi-plugin/marketplace.json")
     codex_plugin = load_json(PLUGIN / ".codex-plugin/plugin.json")
     claude_plugin = load_json(PLUGIN / ".claude-plugin/plugin.json")
@@ -396,6 +397,8 @@ def validate_repository() -> list[str]:
         errors.append("Grok marketplace name mismatch")
     if kimi_market.get("name") != expected["marketplace_name"]:
         errors.append("Kimi marketplace name mismatch")
+    if omp_market.get("name") != expected["marketplace_name"]:
+        errors.append("omp marketplace name mismatch")
     # Official host packaging validators own catalog/manifest version compatibility.
     # This repository gate preserves identity, source, and cross-manifest parity
     # without copying a release number into the structural layout fixture.
@@ -414,6 +417,9 @@ def validate_repository() -> list[str]:
     kimi_source = (kimi_market.get("plugins") or [{}])[0].get("source")
     if kimi_source != "./plugins/gopher":
         errors.append("Kimi marketplace source path mismatch")
+    omp_source = (omp_market.get("plugins") or [{}])[0].get("source")
+    if omp_source != "./plugins/gopher":
+        errors.append("omp marketplace source path mismatch")
 
     actual_skills = {path.name for path in SKILLS.iterdir() if path.is_dir()}
     expected_skills = set(expected["skills"])
@@ -530,7 +536,7 @@ def main() -> int:
     print(
         f"Repository validation passed ({skill_count} skills, "
         f"{reference_total} references, {agent_count} agents, "
-        f"4 manifests, 4 marketplaces, and 1 OpenCode package)."
+        f"4 manifests, 5 marketplaces, and 1 OpenCode package)."
     )
     return 0
 

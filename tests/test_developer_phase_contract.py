@@ -14,7 +14,7 @@ class DeveloperPhaseContractTest(unittest.TestCase):
             "structure_decision",
             "Micro-review",
             "DETECT PACKAGE ENVELOPE",
-            "Change-class fast path",
+            "SELECT FAST PATH",
             "Progressive reference loading",
             "slice_id:",
             "micro_review:",

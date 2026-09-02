@@ -163,4 +163,4 @@ with prioritized items (`references/reports.md`).
 - `references/prioritization.md` — the six-step priority order.
 - `references/handoffs.md` — recording and following specialist handoffs.
 - `references/reports.md` — the evidence and output contract and terminal states.
-- `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, `references/harnesses/kimi.md`, and `references/harnesses/opencode.md` — per-harness orchestration.
+- `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, `references/harnesses/kimi.md`, `references/harnesses/omp.md`, and `references/harnesses/opencode.md` — per-harness orchestration.

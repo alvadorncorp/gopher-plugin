@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 CASES_PATH = ROOT / "tests/fixtures/forward-tests.json"
 SCHEMA_PATH = ROOT / "tests/fixtures/response-schema.json"
 LAYOUT_PATH = ROOT / "tests/fixtures/expected-layout.json"
-HARNESSES = ("codex", "claude", "grok", "kimi", "opencode")
+HARNESSES = ("codex", "claude", "grok", "kimi", "opencode", "omp")
 
 
 def load_json(path: Path):
@@ -263,9 +263,67 @@ def run_opencode(case, timeout):
             continue
     raise RuntimeError("OpenCode returned no structured object")
 
+def run_omp(case, timeout):
+    schema = json.dumps(load_json(SCHEMA_PATH), separators=(",", ":"))
+    prompt = (
+        wrapped_prompt(case)
+        + "\n\nSkill identifiers must always use the canonical `gopher:` prefix"
+        " (for example `gopher:architecture`, never a bare `architecture`)."
+        " `authorization_gate` must be exactly one of `none`,"
+        " `approval-required`, or `blocked`."
+        "\n\nResponse JSON schema:\n" + schema
+    )
+    with tempfile.TemporaryDirectory(prefix="gopher-omp-") as temp_dir:
+        # omp lists discovered skills in the system prompt only when `read` is
+        # available, and it namespaces no skill, so a same-named skill from
+        # another installed plugin would answer instead. The overlay pins this
+        # repository's tree as the owner of the gopher skill names.
+        overlay = Path(temp_dir) / "config.yml"
+        overlay.write_text(
+            "skills:\n  customDirectories:\n"
+            f"    - {ROOT / 'plugins/gopher/skills'}\n",
+            encoding="utf-8",
+        )
+        command = [
+            "omp",
+            "-p",
+            "--mode",
+            "json",
+            "--cwd",
+            str(ROOT),
+            "--config",
+            str(overlay),
+            "--tools",
+            "read",
+            "--no-session",
+            "--no-title",
+            prompt,
+        ]
+        completed = subprocess.run(command, text=True, capture_output=True, timeout=timeout)
+    if completed.returncode != 0:
+        raise RuntimeError(completed.stderr.strip() or completed.stdout.strip())
+    candidates = []
+    for line in completed.stdout.splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        try:
+            event = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if event.get("type") not in ("message_end", "turn_end"):
+            continue
+        candidates.extend(_assistant_texts(event))
+    for candidate in reversed(candidates):
+        try:
+            return _coerce_structured(candidate)
+        except (RuntimeError, json.JSONDecodeError):
+            continue
+    raise RuntimeError("omp returned no structured object")
+
 
 def parse_args():
-    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex, Claude, Grok, Kimi, and OpenCode")
+    parser = argparse.ArgumentParser(description="Run Gopher forward tests on Codex, Claude, Grok, Kimi, OpenCode, and omp")
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--harness", action="append", choices=HARNESSES)
     parser.add_argument("--case", default="*")
@@ -291,9 +349,9 @@ def main():
         return 1
     harnesses = args.harness or list(HARNESSES)
     if args.validate_only:
-        print(f"Validated {len(payload['cases'])} forward-test cases for codex, claude, grok, kimi, and opencode.")
+        print(f"Validated {len(payload['cases'])} forward-test cases for codex, claude, grok, kimi, opencode, and omp.")
         return 0
-    runners = {"codex": run_codex, "claude": run_claude, "grok": run_grok, "kimi": run_kimi, "opencode": run_opencode}
+    runners = {"codex": run_codex, "claude": run_claude, "grok": run_grok, "kimi": run_kimi, "opencode": run_opencode, "omp": run_omp}
     results = []
     failed = False
     for harness in harnesses:

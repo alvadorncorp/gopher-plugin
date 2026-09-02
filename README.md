@@ -5,10 +5,10 @@
 </p>
 
 Gopher packages evidence-driven Go engineering workflows as one installable
-plugin for Codex, Claude Code, Grok Build, Kimi Code, and OpenCode. Its goal is to help
-an agent diagnose before it prescribes, choose idiomatic Go designs, make small
-reversible changes, review code through explicit risk lenses, and coordinate
-larger refactors with documented evidence.
+plugin for Codex, Claude Code, Grok Build, Kimi Code, OpenCode, and omp. Its
+goal is to help an agent diagnose before it prescribes, choose idiomatic Go
+designs, make small reversible changes, review code through explicit risk
+lenses, and coordinate larger refactors with documented evidence.
 
 The repository keeps one shared plugin implementation at `plugins/gopher/` and
 exposes it through native marketplace manifests for each host. Codex reads the
@@ -19,8 +19,10 @@ manifest. Grok Build reads `.grok-plugin/marketplace.json` and the plugin's
 `.grok-plugin/plugin.json` manifest. Kimi Code reads
 `.kimi-plugin/marketplace.json` and the plugin's `.kimi-plugin/plugin.json`
 manifest. OpenCode installs the npm package `@alvadorncorp/gopher`, whose config
-hook registers the same `skills/` tree and three native role agents. All five
-hosts load the same physical skill tree.
+hook registers the same `skills/` tree and three native role agents. omp reads
+`.omp-plugin/marketplace.json` and installs the same `plugins/gopher` tree; it
+needs no plugin manifest of its own, resolving identity and version from
+`.claude-plugin/plugin.json`. All six hosts load the same physical skill tree.
 
 ## What Gopher provides
 
@@ -50,6 +52,7 @@ startup config hook to register the shared skills and native role agents.
 - Claude Code marketplace: `.claude-plugin/marketplace.json`
 - Grok Build marketplace: `.grok-plugin/marketplace.json`
 - Kimi Code marketplace: `.kimi-plugin/marketplace.json`
+- omp marketplace: `.omp-plugin/marketplace.json`
 - Shared plugin: `plugins/gopher/`
 - Codex manifest: `plugins/gopher/.codex-plugin/plugin.json`
 - Claude Code manifest: `plugins/gopher/.claude-plugin/plugin.json`
@@ -127,6 +130,16 @@ Kimi Code does not load packaged plugin agents, so the Kimi review and refactor
 adapters restate the constraint envelope inline as instruction text with no
 binding behind it at all: the review adapter dispatches through the runtime
 `Agent` and `AgentSwarm` tools, and the refactor adapter through `Agent`.
+
+omp also discovers `plugins/gopher/agents/*.md`, but
+omp binds no packaged agent model, effort, or tool restriction:
+it ignores `disallowedTools`, `skills`, `effort`, and `color`, and it matches
+a `model` value such as `opus` or `sonnet` against no selector, so each role
+falls back to the session model and tools. Gopher's `reviewer` shadows omp's
+bundled agent of the same name, and it arrives without its read-only binding.
+The omp review and refactor adapters therefore restate the envelope inline and
+dispatch bundled read-only `scout` children; `task.disabledAgents` in omp
+settings removes the roster for users who want the bundled agents back.
 
 The definitions shipped in the package are the authoritative binding: the host
 reads them when it loads the agent, so a project file cannot rebind the model,
@@ -270,8 +283,37 @@ opencode debug config
 Then start an OpenCode session and select `gopher-reviewer` when you need an
 explicit read-only multi-lens review.
 
-## Use Gopher
+## Install locally in omp
 
+From this repository root, add the local marketplace and install the plugin:
+
+```bash
+omp plugin marketplace add ./
+omp plugin install gopher@alvadorncorp
+```
+
+Run `/reload-plugins` in a running session or start a new omp session after
+installation so the plugin snapshot is loaded. To confirm omp can see the
+plugin:
+
+```bash
+omp plugin marketplace list
+omp plugin list
+```
+
+omp exposes the skills by their canonical names and applies no `gopher:`
+namespace, and it resolves a skill by that bare name, so a same-named skill
+from another installed plugin can win by provider precedence and shadow a
+Gopher skill. Pin Gopher's tree as the owner of its skill names with
+`skills.customDirectories` in `~/.omp/agent/config.yml` when that happens:
+
+```yaml
+skills:
+  customDirectories:
+    - /path/to/gopher-plugin/plugins/gopher/skills
+```
+
+## Use Gopher
 After installation, ask naturally for Go engineering help or select a bundled
 skill explicitly. Codex can route from the prompt or from an installed plugin
 skill. Claude Code and Grok Build expose plugin skills as namespaced commands
@@ -279,6 +321,9 @@ such as `/gopher:review --mode full`. Kimi Code routes from the prompt or from
 explicit skill invocation such as `/skill:review`. OpenCode exposes the skills
 by their canonical names, such as `review`; it does not apply a `gopher:`
 namespace, so users must avoid duplicate skill names in their OpenCode setup.
+omp also exposes the skills by their canonical names with no namespace, and
+resolves each by that bare name, so a competing plugin can shadow one; see the
+Install locally in omp section for the remedy.
 
 Examples:
 
@@ -359,10 +404,10 @@ python3 tests/run_forward_tests.py --validate-only
 ```
 
 Live forward tests require authenticated local harnesses and installed Codex,
-Claude Code, Grok Build, Kimi Code, and/or OpenCode plugin snapshots:
+Claude Code, Grok Build, Kimi Code, OpenCode, and/or omp plugin snapshots:
 
 ```bash
-python3 tests/run_forward_tests.py --harness codex --harness claude --harness grok --harness kimi --harness opencode
+python3 tests/run_forward_tests.py --harness codex --harness claude --harness grok --harness kimi --harness opencode --harness omp
 ```
 
 Review official, version-sensitive Go references after every stable Go release

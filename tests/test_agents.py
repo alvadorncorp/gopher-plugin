@@ -15,6 +15,10 @@ KIMI_ADAPTERS = {
     "review": ROOT / "plugins/gopher/skills/review/references/harnesses/kimi.md",
     "refactor": ROOT / "plugins/gopher/skills/refactor/references/harnesses/kimi.md",
 }
+OMP_ADAPTERS = {
+    "review": ROOT / "plugins/gopher/skills/review/references/harnesses/omp.md",
+    "refactor": ROOT / "plugins/gopher/skills/refactor/references/harnesses/omp.md",
+}
 OPENCODE_AGENTS = AGENTS / "opencode"
 
 
@@ -82,7 +86,7 @@ class PackagedAgentTest(unittest.TestCase):
             self.assertIn("agents.policy_divergence", text, skill)
             self.assertNotIn("../", text, skill)
             # Kimi has no binding at all, so this prose is the whole control.
-            self.assertIn(SPEC["kimi_policy_contract_marker"], text, skill)
+            self.assertIn(SPEC["adapter_policy_contract_marker"], text, skill)
         # The architect envelope needs both conjuncts here or a Kimi controller
         # edits where the packaged agent must hand back.
         self.assertIn("inherit-session", KIMI_ADAPTERS["refactor"].read_text(encoding="utf-8"))
@@ -91,6 +95,23 @@ class PackagedAgentTest(unittest.TestCase):
         review = KIMI_ADAPTERS["review"].read_text(encoding="utf-8")
         refactor = KIMI_ADAPTERS["refactor"].read_text(encoding="utf-8")
         self.assertIn("agents.reviewer_max_parallel", review)
+        self.assertIn("agents.authorization", refactor)
+
+    def test_omp_adapters_reproduce_the_agent_envelope_inline(self):
+        """omp loads the packaged markdown agents but binds none of their model,
+        effort, or tool keys, so the adapters carry the whole envelope."""
+        for skill, path in OMP_ADAPTERS.items():
+            text = path.read_text(encoding="utf-8")
+            self.assertIn("binds no packaged agent model, effort, or tool restriction", text, skill)
+            self.assertIn("policy_status", text, skill)
+            self.assertIn("agents.enabled", text, skill)
+            self.assertIn("agents.policy_divergence", text, skill)
+            self.assertNotIn("../", text, skill)
+            self.assertIn(SPEC["adapter_policy_contract_marker"], text, skill)
+        self.assertIn("agents.reviewer_max_parallel", OMP_ADAPTERS["review"].read_text(encoding="utf-8"))
+        refactor = OMP_ADAPTERS["refactor"].read_text(encoding="utf-8")
+        self.assertIn("agents.authorization", refactor)
+        self.assertIn("inherit-session", refactor)
         self.assertIn("agents.authorization", refactor)
 
     def test_opencode_agents_are_thin_native_wrappers(self):
@@ -108,6 +129,8 @@ class PackagedAgentTest(unittest.TestCase):
         documents = {"schema.md": SCHEMA_DOC.read_text(encoding="utf-8")}
         for skill, path in KIMI_ADAPTERS.items():
             documents[f"{skill} kimi adapter"] = path.read_text(encoding="utf-8")
+        for skill, path in OMP_ADAPTERS.items():
+            documents[f"{skill} omp adapter"] = path.read_text(encoding="utf-8")
         for label, text in documents.items():
             for status in SPEC["policy_status_values"]:
                 self.assertIn(status, text, f"{label} omits {status}")

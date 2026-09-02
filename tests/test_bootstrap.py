@@ -1,4 +1,5 @@
 import json
+import tomllib
 import unittest
 from pathlib import Path
 
@@ -8,6 +9,7 @@ CODEX_MARKET = ROOT / ".agents/plugins/marketplace.json"
 CLAUDE_MARKET = ROOT / ".claude-plugin/marketplace.json"
 GROK_MARKET = ROOT / ".grok-plugin/marketplace.json"
 KIMI_MARKET = ROOT / ".kimi-plugin/marketplace.json"
+OMP_MARKET = ROOT / ".omp-plugin/marketplace.json"
 PLUGIN = ROOT / "plugins/gopher"
 CODEX_PLUGIN = PLUGIN / ".codex-plugin/plugin.json"
 CLAUDE_PLUGIN = PLUGIN / ".claude-plugin/plugin.json"
@@ -22,7 +24,7 @@ def load(path: Path):
 
 
 class BootstrapPackageTest(unittest.TestCase):
-    def test_quad_harness_identity_and_sources_match(self):
+    def test_harness_identity_and_sources_match(self):
         codex_market = load(CODEX_MARKET)
         claude_market = load(CLAUDE_MARKET)
         grok_market = load(GROK_MARKET)
@@ -36,10 +38,13 @@ class BootstrapPackageTest(unittest.TestCase):
         self.assertEqual("alvadorncorp", claude_market["name"])
         self.assertEqual("alvadorncorp", grok_market["name"])
         self.assertEqual("alvadorncorp", kimi_market["name"])
+        omp_market = load(OMP_MARKET)
+        self.assertEqual("alvadorncorp", omp_market["name"])
         self.assertEqual("./plugins/gopher", codex_market["plugins"][0]["source"]["path"])
         self.assertEqual("./plugins/gopher", claude_market["plugins"][0]["source"])
         self.assertEqual("./plugins/gopher", grok_market["plugins"][0]["source"]["path"])
         self.assertEqual("./plugins/gopher", kimi_market["plugins"][0]["source"])
+        self.assertEqual("./plugins/gopher", omp_market["plugins"][0]["source"])
 
         for key in ("name", "version", "description", "author"):
             self.assertEqual(codex_plugin[key], claude_plugin[key])
@@ -76,6 +81,29 @@ class BootstrapPackageTest(unittest.TestCase):
         this test asserts nothing about it."""
         for manifest in (KIMI_PLUGIN, ROOT_KIMI_PLUGIN):
             self.assertNotIn("agents", load(manifest))
+
+    def test_marketplace_catalogs_that_declare_a_version_match_the_plugin_manifest(self):
+        """The release engine bumps manifests and version-pinned catalogs in
+        lockstep; this catches a catalog pinned by hand to the wrong version.
+        The codex and omp catalogs declare no version and inherit it at
+        install time."""
+        expected = load(CODEX_PLUGIN)["version"]
+        for market in (CODEX_MARKET, CLAUDE_MARKET, GROK_MARKET, KIMI_MARKET, OMP_MARKET):
+            entry = load(market)["plugins"][0]
+            if "version" in entry:
+                self.assertEqual(expected, entry["version"], market.name)
+
+    def test_release_config_bumps_every_version_pinned_catalog(self):
+        """Catalog versions drifted 0.7.0 -> 1.1.0 once because the engine
+        bumped manifests only. Every catalog that pins a plugin version must
+        stay a marketplace bump target so the engine keeps it in lockstep."""
+        config = tomllib.loads((ROOT / ".release.toml").read_text(encoding="utf-8"))
+        targets = {(entry["type"], entry["path"])
+                   for entry in config["groups"]["default"]["targets"]}
+        for market in (CODEX_MARKET, CLAUDE_MARKET, GROK_MARKET, KIMI_MARKET, OMP_MARKET):
+            if "version" in load(market)["plugins"][0]:
+                self.assertIn(
+                    ("marketplace", market.relative_to(ROOT).as_posix()), targets)
 
 
 if __name__ == "__main__":

@@ -1,8 +1,9 @@
 # Release configuration for the Gopher plugin.
 #
-# The release engine updates only top-level manifest version fields. Keep
-# README, marketplace metadata, fixtures, and release validation notes aligned
-# before publishing when those files mention the version explicitly.
+# The release engine updates top-level manifest version fields and the
+# plugins[0].version of every marketplace catalog listed as a target. Keep
+# README, fixtures, and release validation notes aligned before publishing
+# when those files mention the version explicitly.
 
 [groups.default]
 tag = "v{version}"
@@ -12,6 +13,7 @@ notes_paths = [
   ".claude-plugin/marketplace.json",
   ".grok-plugin/marketplace.json",
   ".kimi-plugin/marketplace.json",
+  ".omp-plugin/marketplace.json",
   "package.json",
   "README.md",
   "tests",
@@ -35,6 +37,20 @@ path = "plugins/gopher/.kimi-plugin/plugin.json"
 [[groups.default.targets]]
 type = "plugin"
 path = ".kimi-plugin/plugin.json"
+# The codex (.agents) and omp catalogs declare no plugin version: they inherit
+# it at install time, so they are not bump targets.
+
+[[groups.default.targets]]
+type = "marketplace"
+path = ".claude-plugin/marketplace.json"
+
+[[groups.default.targets]]
+type = "marketplace"
+path = ".grok-plugin/marketplace.json"
+
+[[groups.default.targets]]
+type = "marketplace"
+path = ".kimi-plugin/marketplace.json"
 
 [[groups.default.targets]]
 type = "node"
@@ -48,8 +64,8 @@ notes_paths = [
   ".agents/plugins/marketplace.json",
   ".claude-plugin/marketplace.json",
   ".grok-plugin/marketplace.json",
-  ".kimi-plugin",
   "package.json",
+  ".omp-plugin/marketplace.json",
   "README.md",
   "tests",
 ]

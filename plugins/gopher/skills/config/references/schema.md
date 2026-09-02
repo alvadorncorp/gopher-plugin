@@ -187,8 +187,8 @@ the project declares.
 | `architect_effort` | string | `shipped` \| `inherit` \| `low` \| `medium` \| `high` \| `xhigh` | `shipped` | the packaged `architect` agent |
 | `reviewer_model` | string | `shipped` \| `inherit` \| `haiku` \| `sonnet` \| `opus` | `shipped` | the packaged `reviewer` agent |
 | `reviewer_effort` | string | `shipped` \| `inherit` \| `low` \| `medium` \| `high` \| `xhigh` | `shipped` | the packaged `reviewer` agent |
-| `reviewer_max_parallel` | integer | `1`–`7` | `7` | the `gopher:review` controller, however the review was entered; the Kimi review adapter |
-| `authorization` | string | `handback` \| `request-approval` \| `inherit-session` | `handback` | the packaged `developer` and `architect` agents; the Kimi refactor adapter |
+| `reviewer_max_parallel` | integer | `1`–`7` | `7` | the `gopher:review` controller, however the review was entered; the Kimi and omp review adapters |
+| `authorization` | string | `handback` \| `request-approval` \| `inherit-session` | `handback` | the packaged `developer` and `architect` agents; the Kimi and omp refactor adapters |
 | `policy_divergence` | string | `report` \| `block` | `report` | all three packaged agents |
 
 Each packaged agent ships with a fixed binding for its model, its reasoning
@@ -220,8 +220,8 @@ reported as `degradation: sequential_no_parallel_support`, which states only tha
 the host could not run the lenses together. Lower it when seven concurrent
 reviewers would exhaust a rate limit or a context budget; the default of `7`
 equals the lens count and so never binds. It reaches a review dispatched through
-the packaged `reviewer` agent or the Kimi adapter. A review invoked directly as
-`gopher:review` reads it through `references/controller.md`.
+the packaged `reviewer` agent or the Kimi and omp adapters. A review invoked
+directly as `gopher:review` reads it through `references/controller.md`.
 
 Every packaged agent reports one `policy_status` alongside its skill's own
 output, and so does `gopher:review` when the skill is invoked directly. The five

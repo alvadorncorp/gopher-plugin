@@ -182,5 +182,5 @@ the new review; parent lens reports and parent verdicts remain historical only.
 - `references/controller.md` — bundle capture, dispatch lifecycle, failure handling.
 - `references/consolidation.md` — preservation, deduplication, adjudication, verdict.
 - `references/severity.md` — shared severity and confidence scales.
-- `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, `references/harnesses/kimi.md`, and `references/harnesses/opencode.md` — native adapters.
+- `references/harnesses/codex.md`, `references/harnesses/claude.md`, `references/harnesses/grok.md`, `references/harnesses/kimi.md`, `references/harnesses/omp.md`, and `references/harnesses/opencode.md` — native adapters.
 - `references/lenses/*.md` — seven non-overlapping review criteria.

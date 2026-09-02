@@ -76,6 +76,7 @@
       "references/harnesses/codex.md",
       "references/harnesses/grok.md",
       "references/harnesses/kimi.md",
+      "references/harnesses/omp.md",
       "references/harnesses/opencode.md",
       "references/lenses/architecture.md",
       "references/lenses/complexity.md",
@@ -126,6 +127,7 @@
       "references/harnesses/codex.md",
       "references/harnesses/grok.md",
       "references/harnesses/kimi.md",
+      "references/harnesses/omp.md",
       "references/harnesses/opencode.md",
       "references/prioritization.md",
       "references/reports.md"
@@ -199,6 +201,7 @@
     "codex",
     "grok",
     "kimi",
+    "omp",
     "opencode"
   ],
   "agents": {
@@ -256,7 +259,7 @@
       "reviewer": "read-only"
     },
     "policy_contract_marker": "It may narrow this agent and it can never widen it beyond that binding.",
-    "kimi_policy_contract_marker": "The declared policy may narrow this run and it can never widen it.",
+    "adapter_policy_contract_marker": "The declared policy may narrow this run and it can never widen it.",
     "policy_status_values": [
       "BLOCKED_BY_POLICY",
       "NOT_CONFIGURED",

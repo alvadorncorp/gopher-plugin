@@ -27,8 +27,8 @@ detected `config_status`, one `effective_values` entry for every resolved
   `gopher:architecture`, the shared project scope, `gopher:developer`, and
   session workflow policy under `[workflow]`.
   Preserve the packaged developer, architect, and reviewer agents, plus the
-  direct `gopher:review` controller and Kimi review adapter wherever the schema
-  names them.
+  direct `gopher:review` controller and the Kimi and omp review adapters
+  wherever the schema names them.
 
 Keep every effective key, including keys at their default and keys whose table
 is absent but whose default still applies. For versions `1`, `2`, and `3`
