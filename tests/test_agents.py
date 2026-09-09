@@ -1,7 +1,10 @@
 import json
+import shutil
+import tempfile
 import tomllib
 import unittest
 from pathlib import Path
+from unittest.mock import patch
 
 import validate_repo
 
@@ -97,22 +100,18 @@ class PackagedAgentTest(unittest.TestCase):
         self.assertIn("agents.reviewer_max_parallel", review)
         self.assertIn("agents.authorization", refactor)
 
-    def test_omp_adapters_reproduce_the_agent_envelope_inline(self):
-        """omp loads the packaged markdown agents but binds none of their model,
-        effort, or tool keys, so the adapters carry the whole envelope."""
-        for skill, path in OMP_ADAPTERS.items():
-            text = path.read_text(encoding="utf-8")
-            self.assertIn("binds no packaged agent model, effort, or tool restriction", text, skill)
-            self.assertIn("policy_status", text, skill)
-            self.assertIn("agents.enabled", text, skill)
-            self.assertIn("agents.policy_divergence", text, skill)
-            self.assertNotIn("../", text, skill)
-            self.assertIn(SPEC["adapter_policy_contract_marker"], text, skill)
-        self.assertIn("agents.reviewer_max_parallel", OMP_ADAPTERS["review"].read_text(encoding="utf-8"))
+    def test_omp_adapters_dispatch_native_roles(self):
+        review = OMP_ADAPTERS["review"].read_text(encoding="utf-8")
+        self.assertIn("gopher-reviewer", review)
+        self.assertIn("scout", review)
+        self.assertNotIn("binds no packaged agent model, effort, or tool restriction", review)
+        self.assertNotIn("../", review)
         refactor = OMP_ADAPTERS["refactor"].read_text(encoding="utf-8")
-        self.assertIn("agents.authorization", refactor)
-        self.assertIn("inherit-session", refactor)
-        self.assertIn("agents.authorization", refactor)
+        self.assertIn("gopher-developer", refactor)
+        self.assertIn("gopher-architect", refactor)
+        self.assertIn("gopher-reviewer", refactor)
+        self.assertNotIn("binds no packaged agent model, effort, or tool restriction", refactor)
+        self.assertNotIn("../", refactor)
 
     def test_opencode_agents_are_thin_native_wrappers(self):
         for role, agent_id in SPEC["opencode_agent_ids"].items():
@@ -129,11 +128,61 @@ class PackagedAgentTest(unittest.TestCase):
         documents = {"schema.md": SCHEMA_DOC.read_text(encoding="utf-8")}
         for skill, path in KIMI_ADAPTERS.items():
             documents[f"{skill} kimi adapter"] = path.read_text(encoding="utf-8")
-        for skill, path in OMP_ADAPTERS.items():
-            documents[f"{skill} omp adapter"] = path.read_text(encoding="utf-8")
         for label, text in documents.items():
             for status in SPEC["policy_status_values"]:
                 self.assertIn(status, text, f"{label} omits {status}")
+
+
+class OmpAgentTest(unittest.TestCase):
+    def test_omp_agent_contract_reports_no_errors(self):
+        self.assertEqual([], validate_repo.validate_omp_agents(LAYOUT))
+
+    def test_omp_agents_are_thin_native_wrappers(self):
+        for role, agent_id in SPEC["omp_agent_ids"].items():
+            path = validate_repo.OMP_AGENTS / f"{role}.md"
+            metadata = validate_repo.parse_frontmatter(path)
+            body = validate_repo.agent_body(path)
+            self.assertEqual(agent_id, metadata["name"])
+            self.assertTrue(agent_id.startswith("gopher-"), role)
+            self.assertIn("It may narrow this agent and it can never widen it beyond that binding.", body)
+            self.assertLessEqual(validate_repo.normalized_size(body), validate_repo.AGENT_BODY_MAX_CHARS)
+
+    def test_missing_omp_wrapper_is_an_error(self):
+        with tempfile.TemporaryDirectory(prefix="gopher-omp-agents-") as temp_dir:
+            with patch.object(validate_repo, "OMP_AGENTS", Path(temp_dir)):
+                errors = validate_repo.validate_omp_agents(LAYOUT)
+        self.assertTrue(any("omp agent mismatch" in error for error in errors))
+        self.assertTrue(any("missing packaged omp agent" in error for error in errors))
+
+    def test_legacy_omp_frontmatter_is_rejected(self):
+        with tempfile.TemporaryDirectory(prefix="gopher-omp-legacy-") as temp_dir:
+            dest = Path(temp_dir)
+            for path in validate_repo.OMP_AGENTS.glob("*.md"):
+                shutil.copy(path, dest / path.name)
+            reviewer = dest / "reviewer.md"
+            text = reviewer.read_text(encoding="utf-8")
+            text = text.replace("spawns: scout\n", "spawns: scout\nskills: [\"gopher:review\"]\n")
+            reviewer.write_text(text, encoding="utf-8")
+            with patch.object(validate_repo, "OMP_AGENTS", dest):
+                errors = validate_repo.validate_omp_agents(LAYOUT)
+        self.assertTrue(any("frontmatter key set must match the fixture exactly" in error for error in errors))
+
+    def test_reviewer_write_or_unrestricted_spawn_is_rejected(self):
+        with tempfile.TemporaryDirectory(prefix="gopher-omp-reviewer-") as temp_dir:
+            dest = Path(temp_dir)
+            for path in validate_repo.OMP_AGENTS.glob("*.md"):
+                shutil.copy(path, dest / path.name)
+            reviewer = dest / "reviewer.md"
+            text = reviewer.read_text(encoding="utf-8")
+            text = text.replace(
+                "tools: read, grep, glob, bash, web_search, task, hub\n",
+                "tools: read, grep, glob, bash, web_search, task, hub, write\n",
+            ).replace("spawns: scout\n", "spawns: \"*\"\n")
+            reviewer.write_text(text, encoding="utf-8")
+            with patch.object(validate_repo, "OMP_AGENTS", dest):
+                errors = validate_repo.validate_omp_agents(LAYOUT)
+        self.assertTrue(any("tools expected" in error for error in errors))
+        self.assertTrue(any("spawns expected" in error for error in errors))
 
 
 if __name__ == "__main__":

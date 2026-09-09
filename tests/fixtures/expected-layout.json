@@ -225,6 +225,34 @@
       "developer": "gopher-developer",
       "reviewer": "gopher-reviewer"
     },
+    "omp": [
+      "architect.md",
+      "developer.md",
+      "reviewer.md"
+    ],
+    "omp_agent_ids": {
+      "architect": "gopher-architect",
+      "developer": "gopher-developer",
+      "reviewer": "gopher-reviewer"
+    },
+    "omp_frontmatter": {
+      "architect": {
+        "tools": "read, grep, glob, bash, edit",
+        "thinkingLevel": "high",
+        "autoloadSkills": "architecture"
+      },
+      "developer": {
+        "tools": "read, grep, glob, bash, edit, write",
+        "thinkingLevel": "medium",
+        "autoloadSkills": "developer"
+      },
+      "reviewer": {
+        "tools": "read, grep, glob, bash, web_search, task, hub",
+        "thinkingLevel": "high",
+        "autoloadSkills": "review",
+        "spawns": "scout"
+      }
+    },
     "skill_ids": {
       "architect": "gopher:architecture",
       "developer": "gopher:developer",

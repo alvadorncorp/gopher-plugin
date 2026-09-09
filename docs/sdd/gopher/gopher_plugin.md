@@ -94,11 +94,11 @@ packaged agents, so its review and refactor adapters reproduce the same
 constraint envelope inline.
 OpenCode loads three native role agents from its package config hook; its skills
 retain unprefixed canonical names, so users must avoid name collisions.
-omp discovers the packaged markdown agents but applies none of their binding
-keys, so the omp review and refactor adapters reproduce the constraint envelope
-inline and dispatch bundled read-only `scout` children; its skills also carry
-unprefixed canonical names, and a same-named skill from another installed plugin
-can shadow one.
+omp loads three native role agents from `plugins/gopher/omp/agents/` when that
+root is registered through `extensions`; the names are `gopher-architect`,
+`gopher-developer`, and `gopher-reviewer`. Its skills also carry unprefixed
+canonical names, and a same-named skill from another installed plugin can
+shadow one.
 
 Explicitly requested local and reversible changes may proceed. Cross-package,
 public-contract, boundary, persistence, security-boundary, or ADR-affecting
@@ -173,9 +173,10 @@ the change while keeping modernization specialist-owned.
   both Kimi adapters, with its presence enforced by test.
 - OpenCode does not namespace configured skills → document collisions and retain
   canonical names rather than introducing wrapper copies.
-- omp binds no packaged agent key and resolves skills by bare name → the
-  constraint envelope duplicated inline in both omp adapters, enforced by test,
-  and collisions documented with a `skills.customDirectories` remedy.
+- omp user-scope marketplace installs do not expose packaged agents until a
+  directed `extensions` root is registered, and skills resolve by bare name →
+  document the `extensions` plus `skills.customDirectories` activation and keep
+  `gopher-` prefixed role names.
 
 ## Evolution Plan
 
@@ -206,8 +207,10 @@ the change while keeping modernization specialist-owned.
 - Phase 10: OpenCode npm package, config hook, three native role agents,
   `review`/`refactor` task adapters, and shared forward-test runner
   (`adr:gopher:010`).
-- Phase 11: omp catalog-only packaging, `task`/`scout` review and refactor
-  adapters, and the omp forward-test runner (`adr:gopher:012`).
+- Phase 11: omp catalog packaging, native role agents at
+  `plugins/gopher/omp/agents`, directed `extensions` activation, `task`/`scout`
+  review fan-out with `gopher-reviewer` as controller, and the omp forward-test
+  runner (`adr:gopher:012`).
 - After a real non-Go consumer exists: evaluate extracting `design-patterns`
   and `application-architecture` without changing handoff identifiers.
 - After every stable Go release and at least quarterly: review

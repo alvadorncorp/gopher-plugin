@@ -33,7 +33,6 @@ class DocumentationTest(unittest.TestCase):
             "## Install locally in Kimi Code", "gopher@alvadorncorp", "--mode full",
             "## Install in OpenCode", "@alvadorncorp/gopher", "gopher-reviewer",
             "## Install locally in omp",
-            "omp binds no packaged agent model, effort, or tool restriction",
             "does not apply a `gopher:`\nnamespace",
             "All repository documentation is written in English.",
             "## Agents", "plugins/gopher/agents/",

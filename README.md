@@ -64,6 +64,7 @@ startup config hook to register the shared skills and native role agents.
 - Packaged agents (Claude Code, Grok Build): `plugins/gopher/agents/`
 - Packaged agents (Codex): `plugins/gopher/agents/codex/`
 - Packaged agents (OpenCode): `plugins/gopher/agents/opencode/`
+- Packaged agents (omp): `plugins/gopher/omp/agents/`
 - Structural and forward tests: `tests/`
 - Architecture notes: `docs/`
 
@@ -104,11 +105,11 @@ the skill keeps the workflow, the evidence discipline, and the output. The agent
 add no ownership row and no orchestrator, so each one's primary owner stays the
 skill it wraps.
 
-| Agent | Skill | Markdown binding | Codex binding | OpenCode binding | Declared edit envelope |
-|---|---|---|---|---|---|
-| `developer` | `gopher:developer` | `sonnet`, effort `medium` | sandbox `workspace-write` | `gopher-developer` subagent | local and reversible, inside one package |
-| `architect` | `gopher:architecture` | `opus`, effort `high` | sandbox `read-only` | `gopher-architect` subagent, `edit: deny` | existing files only, under an explicit approval; never creates a file |
-| `reviewer` | `gopher:review` | `opus`, effort `high` | sandbox `read-only` | `gopher-reviewer` primary agent, `edit: deny` | none |
+| Agent | Skill | Markdown binding | Codex binding | OpenCode binding | omp binding | Declared edit envelope |
+|---|---|---|---|---|---|---|
+| `developer` | `gopher:developer` | `sonnet`, effort `medium` | sandbox `workspace-write` | `gopher-developer` subagent | `gopher-developer` | local and reversible, inside one package |
+| `architect` | `gopher:architecture` | `opus`, effort `high` | sandbox `read-only` | `gopher-architect` subagent, `edit: deny` | `gopher-architect` | existing files only, under an explicit approval; never creates a file |
+| `reviewer` | `gopher:review` | `opus`, effort `high` | sandbox `read-only` | `gopher-reviewer` primary agent, `edit: deny` | `gopher-reviewer` | none |
 
 The markdown dialect binds the model, the reasoning effort, and the tool set. The
 Codex agent dialect accepts `name`, `description`, `sandbox_mode`, and
@@ -131,15 +132,14 @@ adapters restate the constraint envelope inline as instruction text with no
 binding behind it at all: the review adapter dispatches through the runtime
 `Agent` and `AgentSwarm` tools, and the refactor adapter through `Agent`.
 
-omp also discovers `plugins/gopher/agents/*.md`, but
-omp binds no packaged agent model, effort, or tool restriction:
-it ignores `disallowedTools`, `skills`, `effort`, and `color`, and it matches
-a `model` value such as `opus` or `sonnet` against no selector, so each role
-falls back to the session model and tools. Gopher's `reviewer` shadows omp's
-bundled agent of the same name, and it arrives without its read-only binding.
-The omp review and refactor adapters therefore restate the envelope inline and
-dispatch bundled read-only `scout` children; `task.disabledAgents` in omp
-settings removes the roster for users who want the bundled agents back.
+omp loads native role agents from `plugins/gopher/omp/agents/` when that
+directory is registered as an `extensions` root. The three names are
+`gopher-architect`, `gopher-developer`, and `gopher-reviewer`, so they do not
+shadow omp's bundled `reviewer`. Each wrapper binds tools, thinking level, and
+an autoloaded skill; the session model stays whatever the host selected. The
+omp review adapter still fans lenses out through bundled `scout` children, and
+the refactor adapter dispatches the three Gopher roles. A marketplace install
+alone does not register those agents at user scope; see Install locally in omp.
 
 The definitions shipped in the package are the authoritative binding: the host
 reads them when it loads the agent, so a project file cannot rebind the model,
@@ -304,14 +304,32 @@ omp plugin list
 omp exposes the skills by their canonical names and applies no `gopher:`
 namespace, and it resolves a skill by that bare name, so a same-named skill
 from another installed plugin can win by provider precedence and shadow a
-Gopher skill. Pin Gopher's tree as the owner of its skill names with
-`skills.customDirectories` in `~/.omp/agent/config.yml` when that happens:
+Gopher skill. A user-scoped marketplace install also does not expose the
+packaged agents until a directed root is registered. Pin both the agent root
+and the skill tree in `~/.omp/agent/config.yml`:
 
 ```yaml
+extensions:
+  - ~/.omp/plugins/node_modules/gopher/omp
 skills:
   customDirectories:
-    - /path/to/gopher-plugin/plugins/gopher/skills
+    - ~/.omp/plugins/node_modules/gopher/skills
 ```
+
+`extensions` points at the directory above `agents/`, not at `agents/` itself
+and not at the shared plugin root. Restart the session after changing this
+file; a previously memoized agent list does not prove the new state. A
+project-scoped install uses the matching paths under
+`<project>/.omp/plugins/node_modules/gopher`.
+
+Uninstalling or disabling the marketplace plugin does not remove an
+`extensions` entry. To stop the Gopher roles, delete that directed entry or
+list `gopher-architect`, `gopher-developer`, and `gopher-reviewer` in
+`task.disabledAgents`.
+
+If `~/.omp/plugins/node_modules/gopher` is absent, use the `installPath` from
+`~/.omp/plugins/installed_plugins.json` and update it when the installed
+version changes.
 
 ## Use Gopher
 After installation, ask naturally for Go engineering help or select a bundled

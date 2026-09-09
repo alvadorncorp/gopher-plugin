@@ -12,6 +12,7 @@ PLUGIN = ROOT / "plugins/gopher"
 SKILLS = PLUGIN / "skills"
 AGENTS = PLUGIN / "agents"
 OPENCODE_AGENTS = AGENTS / "opencode"
+OMP_AGENTS = PLUGIN / "omp/agents"
 FIXTURE = ROOT / "tests/fixtures/expected-layout.json"
 
 CODEX_AGENT_KEYS = {"name", "description", "sandbox_mode", "developer_instructions"}
@@ -290,6 +291,77 @@ def validate_opencode_package(expected) -> list[str]:
     return errors
 
 
+def validate_omp_agents(expected) -> list[str]:
+    errors: list[str] = []
+    spec = expected.get("agents")
+    if not isinstance(spec, dict):
+        return ["layout fixture declares no agents"]
+    expected_agents = spec.get("omp")
+    ids = spec.get("omp_agent_ids")
+    pinned = spec.get("omp_frontmatter")
+    if not isinstance(expected_agents, list):
+        return ["layout fixture declares no omp agents"]
+    if not isinstance(ids, dict):
+        return errors + ["layout fixture declares no omp agent ids"]
+    if not isinstance(pinned, dict):
+        return errors + ["layout fixture declares no omp frontmatter"]
+
+    actual_agents = sorted(path.name for path in OMP_AGENTS.glob("*.md")) if OMP_AGENTS.is_dir() else []
+    if actual_agents != expected_agents:
+        errors.append(f"omp agent mismatch: expected={expected_agents} actual={actual_agents}")
+
+    seen_names: list[str] = []
+    for role, agent_id in sorted(ids.items()):
+        path = OMP_AGENTS / f"{role}.md"
+        rel = f"omp/agents/{role}.md"
+        if not path.is_file():
+            errors.append(f"{rel}: missing packaged omp agent")
+            continue
+        try:
+            metadata = parse_frontmatter(path)
+        except ValueError as exc:
+            errors.append(f"{rel}: {exc}")
+            continue
+
+        name = metadata.get("name")
+        if name != agent_id:
+            errors.append(f"{rel}: frontmatter name must be {agent_id}")
+        if not isinstance(name, str) or not name.startswith("gopher-"):
+            errors.append(f"{rel}: frontmatter name must use the gopher- prefix")
+        if isinstance(name, str):
+            if name in seen_names:
+                errors.append(f"{rel}: duplicate omp agent name {name}")
+            seen_names.append(name)
+
+        description = metadata.get("description", "")
+        problem = plain_scalar_problem(description)
+        if problem:
+            errors.append(f"{rel}: description {problem}")
+
+        role_pins = pinned.get(role)
+        if not isinstance(role_pins, dict):
+            errors.append(f"{rel}: fixture declares no frontmatter for this role")
+            role_pins = {}
+        if set(metadata) - {"name", "description"} != set(role_pins):
+            errors.append(f"{rel}: frontmatter key set must match the fixture exactly")
+        for key, value in role_pins.items():
+            if metadata.get(key) != value:
+                errors.append(f"{rel}: {key} expected {value!r}, found {metadata.get(key)!r}")
+
+        skill = role_pins.get("autoloadSkills")
+        if isinstance(skill, str) and skill and not (SKILLS / skill / "SKILL.md").is_file():
+            errors.append(f"{rel}: autoloadSkills {skill!r} has no skill directory")
+
+        body = agent_body(path)
+        size = normalized_size(body)
+        if size > AGENT_BODY_MAX_CHARS:
+            errors.append(
+                f"{rel}: body must stay a thin wrapper "
+                f"({size} normalized characters, cap {AGENT_BODY_MAX_CHARS})"
+            )
+    return errors
+
+
 def validate_doctor_catalog() -> list[str]:
     """The rule count and the three profile counts are written out in prose in
     two files. Derive them from the tables so a moved row fails here first."""
@@ -517,6 +589,7 @@ def validate_repository() -> list[str]:
 
     errors.extend(validate_agents(expected))
     errors.extend(validate_opencode_package(expected))
+    errors.extend(validate_omp_agents(expected))
     errors.extend(validate_doctor_catalog())
 
     return errors
