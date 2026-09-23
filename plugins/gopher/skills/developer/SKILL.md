@@ -42,10 +42,9 @@ Load only the references required by the current change:
 
 | Situation | Load |
 |---|---|
-| Any change | `project-detection.md`, then `testing.md` + `tooling.md` as the workflow needs them |
+| Any change | `project-detection.md` and `idioms.md`, then `testing.md` + `tooling.md` as the workflow needs them. From `plugins/gopher/skills/modernize/references/language-apis.md`, read the analyzer table only. Do not invoke `go fix`. |
 | Construction / options | `construction-options.md` |
 | Errors / values / public local API | `api-errors-values.md` |
-| Idiom policy disputes, or selecting a shape under `latest-compatible` | `idioms.md` |
 | Local reversible refactor | `refactoring.md` |
 | `pattern.*` supplied or returned from `gopher:design-patterns` | `pattern-mappings.md` |
 | Clone, snapshot, intern, or AST-eval construction | `pattern-mappings.md` (or hand off if no `pattern.*`) |
@@ -82,12 +81,13 @@ Keep unloaded references out of context until a row above requires them.
    named local shape (for example Functional Options plus tests), when a
    `pattern.*` mapping is already supplied or returned from design-patterns, or
    when the change is mechanical inside one package.
-6. **SELECT FAST PATH** after CLASSIFY CHANGE (still run steps 1–2 and package
-   envelope detection before any production edit):
+6. **SELECT FAST PATH** after CLASSIFY CHANGE (still run steps 1–2, package
+   envelope detection, and **SELECT DECLARED-VERSION FORM** before any
+   production edit):
 
 | change_class | Path |
 |---|---|
-| `mechanical` with `adaptive-tdd` or `test-after` | FOCUSED BASELINE → record first_signal `exception` → IMPLEMENT → `gofmt` + focused package test → FINAL VALIDATION (package only). Omit red-green ceremony. |
+| `mechanical` with `adaptive-tdd` or `test-after` | FOCUSED BASELINE → record first_signal `exception` → SELECT DECLARED-VERSION FORM → IMPLEMENT → `gofmt` + focused package test → FINAL VALIDATION (package only). Omit red-green ceremony. |
 | `mechanical` with `strict-tdd` | Production edits blocked unless the session supplies an explicit override: a user or session instruction that permits this mechanical production edit under `strict-tdd`. Record the override text in `first_signal.reason` (and `limitations` if residual). Without that override, leave production code unchanged and set `status: BLOCKED`. |
 | `test-only` | Production files stay unchanged; add or strengthen tests; CONFIRM GREEN on focused command |
 | `behavior` / `bug-fix` | full workflow (first signal → implement → green → refactor → final validation) |
@@ -112,15 +112,26 @@ Keep unloaded references out of context until a row above requires them.
     is cross-package or public-contract structural work, and
     `handoff: gopher:architecture` (or `gopher:refactor` when multidimensional).
     Record the package list in `limitations`.
-13. **IMPLEMENT** the smallest cohesive change that satisfies the requested
+13. **SELECT DECLARED-VERSION FORM** before IMPLEMENT. Follow the Write-time
+    forms section of `references/idioms.md`. Read only the analyzer table and
+    its floor column in
+    `plugins/gopher/skills/modernize/references/language-apis.md`. Do not
+    invoke `go fix`. The cap is the declared `go` directive in `go.mod` (and
+    in `go.work` when present); a newer local toolchain does not raise it, and
+    `modernize.target_go` is not an input. Apply the `idiom_policy` already
+    resolved in step 2. When the declared `go` version is unknown, pause form
+    selection, name the missing file, and set `BLOCKED` when the edit depends
+    on a newer form. This step chooses forms for new or directly changed code
+    and does not edit code outside the request.
+14. **IMPLEMENT** the smallest cohesive change that satisfies the requested
     behavior, with tests for changed observable behavior.
-14. **CONFIRM GREEN** with the same focused command and record its evidence,
+15. **CONFIRM GREEN** with the same focused command and record its evidence,
     then **REFACTOR WHILE GREEN**.
-15. Run **FINAL VALIDATION** with the affected-risk ladder in
+16. Run **FINAL VALIDATION** with the affected-risk ladder in
     `references/tooling.md` and existing project commands. On the mechanical
     adaptive/test-after fast path, use the package-only ladder in
     `references/tooling.md` (focused package test + `gofmt`).
-16. Complete **Micro-review** (below), then report files, behavior, validation,
+17. Complete **Micro-review** (below), then report files, behavior, validation,
     limitations, `micro_review`, and any handoff. Apply **Terminal status**.
 
 For each workflow gate, classify supporting claims as `observed`, `inferred`, or
@@ -143,7 +154,8 @@ item aimed at `gopher:developer`, treat it as `from_slice` before IMPLEMENT:
    one package for this slice. Otherwise hand off to `gopher:architecture` (or
    `gopher:refactor` when multidimensional) without editing.
 4. Classify change (usually `behavior`, `refactor`, or `mechanical`) and follow
-   the matching path, including package-envelope detection.
+   the matching path, including package-envelope detection and
+   **SELECT DECLARED-VERSION FORM**.
 5. After green, run the slice `verification` command in addition to the focused
    package tests; record both in `test_evidence`.
 6. Report `slice_id` and whether the structure card slice is complete.
@@ -254,6 +266,8 @@ with that evidence in place of editing.
 ## Quality checklist
 
 - Respect the declared Go/toolchain version and repository conventions.
+- Run **SELECT DECLARED-VERSION FORM** before IMPLEMENT. Read the modernizer
+  analyzer table; do not invoke `go fix`.
 - Keep concrete types until real behavior variability or a consumer seam exists.
 - Preserve error identity and context; keep expected absence distinct from failure.
 - Define Functional Options ordering, duplicate, nil, and validation semantics.
@@ -274,7 +288,7 @@ with that evidence in place of editing.
 ## References
 
 - `references/project-detection.md` — version, module, CI, and convention detection.
-- `references/idioms.md` — concrete types, interfaces, context, and ownership.
+- `references/idioms.md` — idiom policy, write-time forms, concrete types, interfaces, context, and ownership.
 - `references/construction-options.md` — constructor/config/builder/options decisions.
 - `references/api-errors-values.md` — APIs, values, errors, and compatibility.
 - `references/testing.md` — Go-specific behavioral test guidance.

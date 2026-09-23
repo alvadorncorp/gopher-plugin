@@ -114,6 +114,21 @@ class DeveloperContractTest(unittest.TestCase):
         self.assertIn("nearby adopted conventions", document)
         self.assertIn("only on explicit request", document)
 
+    def test_declared_version_form_is_selected_before_implement(self):
+        document = text(DEVELOPER_SKILL)
+        self.assertIn(
+            "Any change | `project-detection.md` and `idioms.md`",
+            document,
+        )
+        self.assertIn("Do not invoke `go fix`", document)
+        self.assertNotIn("Idiom policy disputes", document)
+        assert_order(
+            document,
+            "12. **DETECT PACKAGE ENVELOPE.**",
+            "13. **SELECT DECLARED-VERSION FORM**",
+            "14. **IMPLEMENT**",
+        )
+
     def test_write_time_forms_follow_the_declared_go_directive(self):
         document = text(REFERENCES["idioms"])
         for marker in (
