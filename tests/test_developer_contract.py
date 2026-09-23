@@ -204,6 +204,7 @@ class DeveloperContractTest(unittest.TestCase):
             "green:",
             "refactor:",
             "authorization_gate: none | approval-required | blocked",
+            "declared_version_form: pass | fail | n/a",
         ):
             with self.subTest(marker=marker):
                 self.assertIn(marker, document)

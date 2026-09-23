@@ -162,7 +162,7 @@ item aimed at `gopher:developer`, treat it as `from_slice` before IMPLEMENT:
 
 ## Micro-review (local, not gopher:review)
 
-After CONFIRM GREEN and before claiming COMPLETE, answer these five checks in
+After CONFIRM GREEN and before claiming COMPLETE, answer these six checks in
 `micro_review` using `pass | fail | n/a` plus a one-line note on any `fail`.
 This local checklist is not multi-lens review and leaves full multi-lens work to
 `gopher:review`.
@@ -173,6 +173,15 @@ This local checklist is not multi-lens review and leaves full multi-lens work to
 4. Shared-state/goroutine changes covered by race-aware tests or handed to
    `gopher:concurrency`?
 5. Expected absence vs failure distinguished in tests?
+6. New or directly changed code matches the form **SELECT DECLARED-VERSION FORM**
+   chose?
+
+`declared_version_form` is `pass` when that code matches the chosen form. A
+`project-aligned` choice that kept the local form is `pass` when `limitations`
+names the newer available form; that note is not a handoff. It is `fail` when
+the code is still in a pre-rewrite form the resolved policy and declared `go`
+directive would have replaced; fix that inside the one-package envelope before
+`COMPLETE`. It is `n/a` when the change introduces none of those expressions.
 
 If any check is `fail`, fix locally when inside the one-package envelope;
 otherwise hand off with evidence. When the session or
@@ -222,6 +231,7 @@ micro_review:
   interface_seam: pass | fail | n/a
   concurrency: pass | fail | n/a
   absence_vs_failure: pass | fail | n/a
+  declared_version_form: pass | fail | n/a
 ```
 
 Evidence entries record the exact command, exit status, and concise observation.
