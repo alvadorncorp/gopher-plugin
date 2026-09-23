@@ -19,6 +19,47 @@ unrelated rewrites to that skill. When a required input remains unknown after
 project detection, report the missing evidence and pause idiom selection until
 compatibility or adoption is evidenced.
 
+## Write-time forms
+
+The in-toolchain modernizer roster is the catalog of forms to emit while
+writing. Read the analyzer table and its declared-version floor column in
+`plugins/gopher/skills/modernize/references/language-apis.md`. That table is a
+catalog. Applying it belongs to `gopher:modernize`. Do not invoke `go fix`.
+
+The floor is the project's declared `go` directive in `go.mod`, and in
+`go.work` when one is present. A newer local toolchain does not raise it.
+When the declared `go` version is unknown, pause form selection and name the
+missing file.
+
+For new or directly changed code in the current change, the resolved
+`idiom_policy` selects the form:
+
+| Policy | Form to emit |
+|---|---|
+| `latest-compatible` | The post-rewrite form of every analyzer whose floor is at or below the declared `go` directive, when the substitution preserves the requested behavior. |
+| `project-aligned` | That form only when the touched package already uses it. Otherwise repeat the local form and record the newer available form as a non-blocking limitation. Leave the newer form unapplied. |
+| `explicit-only` | A newer form only when the current request names that idiom. |
+
+Existing occurrences in the same file stay as they are. Converting them is
+`gopher:modernize` work.
+
+Three analyzers are not blind substitutions even when their floor is met:
+
+- `omitzero` changes the zero-value contract. Keep `omitempty` when the zero
+  value must be omitted differently from `omitzero`.
+- `atomictypes` and `unsafefuncs` change how shared state and pointer
+  arithmetic are written. Use the newer form only when this change already
+  edits that state or that arithmetic.
+
+`buildtag`, `hostport`, and `inline` are not write-time forms. Apply
+`plusbuild` only when this change already edits the build-tag line.
+
+When `go tool fix help` on the active toolchain disagrees with the table,
+record the difference in `limitations` and follow the table. Do not invent an
+analyzer, and do not block implementation on roster drift.
+
+The declared-version-gated shapes below are language surface, not this roster.
+
 ## Baseline idioms
 
 - Prefer useful zero values, literals, and explicit constructors.

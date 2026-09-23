@@ -114,6 +114,21 @@ class DeveloperContractTest(unittest.TestCase):
         self.assertIn("nearby adopted conventions", document)
         self.assertIn("only on explicit request", document)
 
+    def test_write_time_forms_follow_the_declared_go_directive(self):
+        document = text(REFERENCES["idioms"])
+        for marker in (
+            "## Write-time forms",
+            "modernize/references/language-apis.md",
+            "declared `go` directive",
+            "Do not invoke `go fix`",
+            "`omitzero`",
+            "not blind substitutions",
+            "new or directly changed code",
+            "roster drift",
+        ):
+            with self.subTest(marker=marker):
+                self.assertIn(marker, document)
+
     def test_test_workflow_matrix_covers_every_change_class(self):
         document = text(REFERENCES["testing"])
         for workflow in ("adaptive-tdd", "strict-tdd", "test-after"):
