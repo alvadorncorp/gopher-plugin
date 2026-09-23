@@ -55,7 +55,7 @@ and edits the ones the release moves.
 | `plugins/gopher/skills/resilience/references/{overload,runtime-controls,sources}.md` | Server-side limits supplied by the toolchain, and error shapes the taxonomy matches on. |
 | `plugins/gopher/skills/architecture/references/modules-workspaces.md` | Module and workspace command behavior. |
 | `plugins/gopher/skills/codegen/references/{inventory,provenance,reproduction}.md` | Tool directives, `//line` resolution, reproduction determinism. |
-| `plugins/gopher/skills/developer/references/{idioms,pattern-mappings,project-detection}.md` | Newly available language shapes and standard-library APIs. |
+| `plugins/gopher/skills/developer/references/{idioms,pattern-mappings,project-detection}.md` | Newly available language shapes and standard-library APIs. The write-time procedure in `idioms.md` consumes the `language-apis.md` roster, so an analyzer or floor change is a developer behavior change even when the Go 1.27 shape list in `idioms.md` does not move. |
 | `plugins/gopher/skills/fuzz/references/sources.md` | The native fuzzing floor. |
 
 ## Verification commands
