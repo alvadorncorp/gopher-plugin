@@ -116,13 +116,16 @@ Keep unloaded references out of context until a row above requires them.
     forms section of `references/idioms.md`. Read only the analyzer table and
     its floor column in
     `plugins/gopher/skills/modernize/references/language-apis.md`. Do not
-    invoke `go fix`. The cap is the declared `go` directive in `go.mod` (and
-    in `go.work` when present); a newer local toolchain does not raise it, and
-    `modernize.target_go` is not an input. Apply the `idiom_policy` already
-    resolved in step 2. When the declared `go` version is unknown, pause form
-    selection, name the missing file, and set `BLOCKED` when the edit depends
-    on a newer form. This step chooses forms for new or directly changed code
-    and does not edit code outside the request.
+    invoke `go fix`. The cap is the declared `go` directive in the `go.mod`
+    of the module that owns the edited file. Read `go.work` when present; its
+    `go` directive does not raise that cap. A newer local toolchain does not
+    raise it, and `modernize.target_go` is not an input. Apply the
+    `idiom_policy` already resolved in step 2. When the declared `go` version
+    is unknown, name the missing file. If accepting or rejecting a write-time
+    form depends on that floor, set `BLOCKED` and leave that code unchanged.
+    Otherwise record the missing file in `limitations` and continue. This
+    step chooses forms for new or directly changed code and does not edit
+    code outside the request.
 14. **IMPLEMENT** the smallest cohesive change that satisfies the requested
     behavior, with tests for changed observable behavior.
 15. **CONFIRM GREEN** with the same focused command and record its evidence,
@@ -178,7 +181,8 @@ This local checklist is not multi-lens review and leaves full multi-lens work to
 
 `declared_version_form` is `pass` when that code matches the chosen form. A
 `project-aligned` choice that kept the local form is `pass` when `limitations`
-names the newer available form; that note is not a handoff. It is `fail` when
+names the newer available form, or names the missing declared `go` file when
+that version is unknown; that note is not a handoff. It is `fail` when
 the code is still in a pre-rewrite form the resolved policy and declared `go`
 directive would have replaced; fix that inside the one-package envelope before
 `COMPLETE`. It is `n/a` when the change introduces none of those expressions.

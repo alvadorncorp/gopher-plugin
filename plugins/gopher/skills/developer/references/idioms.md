@@ -24,10 +24,12 @@ compatibility or adoption is evidenced.
 The in-toolchain modernizer roster is the catalog of forms to emit while
 writing. Read the analyzer table and its declared-version floor column in
 `plugins/gopher/skills/modernize/references/language-apis.md`. That table is a
-catalog. Applying it belongs to `gopher:modernize`. Do not invoke `go fix`.
+catalog. `gopher:modernize` owns running the analyzer and owns rewrites
+outside this change. Do not invoke `go fix`.
 
-The floor is the project's declared `go` directive in `go.mod`, and in
-`go.work` when one is present. A newer local toolchain does not raise it.
+The floor is the declared `go` directive in the `go.mod` of the module that
+owns the code being written. When `go.work` is present, read its `go`
+directive and do not let it, or a newer local toolchain, raise that floor.
 When the declared `go` version is unknown, pause form selection and name the
 missing file.
 
@@ -73,7 +75,8 @@ The declared-version-gated shapes below are language surface, not this roster.
 - Make resource ownership and `Close` responsibility explicit.
 - Keep package APIs cohesive and names meaningful at the call site.
 - Use `defer` when lifetime is clear and its cost is appropriate for the path.
-- Prefer `wg.Go` over `wg.Add(1)` / `go` / `defer wg.Done()` from Go 1.25.
+- Prefer `wg.Go` over `wg.Add(1)` / `go` / `defer wg.Done()` from Go 1.25
+  when the Write-time forms table selects that form.
 
 ## Declared-version-gated shapes
 
