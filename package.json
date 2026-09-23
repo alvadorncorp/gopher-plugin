@@ -1,6 +1,6 @@
 {
   "name": "@alvadorncorp/gopher",
-  "version": "1.2.1",
+  "version": "1.2.2",
   "description": "Evidence-driven Go engineering workflows for design, implementation, diagnosis, security, and multi-lens review.",
   "license": "MIT",
   "author": {
